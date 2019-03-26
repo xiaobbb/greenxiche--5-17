@@ -1,0 +1,89 @@
+.p30 {
+  padding: 30rpx;
+}
+
+.plr30 {
+  padding-left: 30rpx;
+  padding-right: 30rpx;
+}
+
+.b1 {
+  border-bottom: 1px #ececec solid;
+}
+
+.shop {
+  padding: 40rpx 0;
+  display: flex;
+  align-items: center;
+
+  img {
+    width: 168rpx;
+    height: 168rpx;
+    margin: 0 25rpx;
+  }
+
+  .info {
+    display: flex;
+    height: 168rpx;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+
+    .name {
+      font-size: 28rpx;
+      color: #333;
+      height: 50rpx;
+      line-height: 50rpx;
+    }
+
+    .price {
+      color: #ff6666;
+      font-size: 36rpx;
+      font-weight: 600;
+      height: 56rpx;
+      line-height: 56rpx;
+    }
+  }
+}
+
+.prompt{
+    line-height:37rpx;
+    padding:15rpx 25rpx; 
+    font-size:24rpx;
+    color:#999;
+    border-bottom:20rpx #f4f7fc solid;
+}
+.pricePrompt{
+    background:#f4f7fc;
+    height:66rpx;
+    line-height:66rpx;
+    padding:0 30rpx;
+}
+.upimg{
+    font-size:30rpx;
+    font-weight:600;
+    border-bottom:20rpx #f4f7fc solid;
+    .title{
+        height:75rpx;
+        line-height:75rpx;
+    }
+    img{
+        width:134rpx;
+        height:134rpx;
+        margin-bottom:30rpx;
+    }
+}
+.editButton{
+  display:flex;
+  justify-content:flex-end;
+  font-size:28rpx;
+  text-align:center;
+  padding:25rpx 30rpx;
+  .buy{
+    color:#fff;
+    background: linear-gradient(to bottom right, #fc8556 , #ff6666);
+    border-radius:30rpx;
+    width:148rpx;
+    height:60rpx;
+    line-height:60rpx;
+  }
+}

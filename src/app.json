@@ -1,5 +1,12 @@
 {
-  "pages": ["pages/index/main","pages/shopcenter/main","pages/orderDetail/main","pages/certical/main","pages/confirmorder/main","pages/coupondetail/main","pages/coupons/main","pages/city/main","pages/shoprank/main","pages/shopdetail/main","pages/mycar/main","pages/shoplist/main","pages/serdetail/main","pages/choosenum/main","pages/mycenter/main","pages/servince/main","pages/writeorder/main","pages/signinfo/main","pages/sceneplace/main","pages/location/main","pages/locationorder/main","pages/orderpay/main","pages/locationcomplete/main","pages/writeordertest/main"],
+  "pages": ["pages/index/main","pages/shopcenter/main","pages/refund/main","pages/orderDetail/main","pages/certical/main","pages/confirmorder/main","pages/coupondetail/main","pages/coupons/main","pages/city/main","pages/shoprank/main","pages/shopdetail/main","pages/mycar/main","pages/shoplist/main","pages/serdetail/main","pages/choosenum/main","pages/mycenter/main","pages/servince/main","pages/writeorder/main","pages/signinfo/main","pages/sceneplace/main","pages/location/main","pages/locationorder/main","pages/orderpay/main","pages/locationcomplete/main","pages/writeordertest/main"],
+  "usingComponents": {
+    "van-button" : "/static/vant/button/index",
+    "van-icon" : "/static/vant/icon/index",
+    "van-field" : "/static/vant/field/index",
+    "van-cell-group" : "/static/vant/cell-group/index",
+    "van-action-sheet" : "/static/vant/action-sheet/index"
+  },
   "window": {
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "绿妞洗车",

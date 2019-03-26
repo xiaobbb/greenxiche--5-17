@@ -1,84 +1,111 @@
 <template>
   <div>
-    <!--列表页面-->
-    <div v-if="isshow" class="congray">
-        <!--车辆列表-->
-        <div class="carlist">
-            <radio-group class="radio-group"  @change="radioChange">
-               <label class="radio"  v-for="item in carinfolist" :key="item.id">
-                    <div class="caritem">
-                    <div class="flex-container infostyle">
-                      <div class="carlogo">
-                          <img src="/static/images/bg6.png" class="cloth">
-                          <img src="/static/images/car3.png" class="car">
-                      </div>
-                      <div class="flex-container coml">
-                        <p class="brand">品牌: {{item.name}}</p>
-                        <p class="carnum">车牌: {{item.carnum}}</p>
-                      </div>
-                    </div>
-                    <div class="flex-container choosemenu">
-                      <div class="flex-container choose">
-                          <radio :value="item.id" :checked="item.checked"/>
-                          <span class="chosetitle" v-if="!item.checked">设为默认</span>
-                          <span class="chosetitle2" v-else>已设为默认</span>
-                      </div>
-                      <div class="flex-container edit">
-                          <p>
-                              <img src="/static/images/edit.png" class="menu">
-                              <text>编辑</text>
-                          </p>
-                          <p>
-                              <img src="/static/images/del.png" class="menu">
-                              <text>删除</text>
-                          </p>
-                      </div>
-                    </div>
-                </div>
-              </label>
-            </radio-group>
-
+    <div class="order-status">已完成</div>
+    <!-- 到店服务 -->
+    <div class="shop-service" v-if="!isshow">
+      <div class="title">
+        <div class="icon">
+          <van-icon name="location-o" color="#a1a1a1" size="40rpx"></van-icon>
+        </div>到店服务
+      </div>
+      <div class="infoBox">
+        <img src="/static/images/car.png" alt>
+        <div class="info">
+          <div class="head">车御品汽车服务</div>
+          <div class="text">深圳市龙华区梅龙大道912号</div>
         </div>
-        <!--底部按钮-->
-        <div class="btn" @click="addCar">
-            <div>
-                <img src="/static/images/add.png" class="add">
-                <span>新增车辆</span>
-            </div>
-        </div>
+      </div>
     </div>
-    <!--添加车辆信息页面-->
-    <div v-else>
-        <div class="sel">
-            <div><span class="zhi">*&nbsp;</span>车牌号码</div>
-            <div class="flex-container line-input">
-                <div class="flex-container title">
-                    <p class="flex-container" data-id="1" @click="chooseCity($event)">粤<img src="/static/images/bot1.png" class="arrow"></p>
-                    <p class="flex-container" data-id="2"  @click="chooseCity($event)">A<img src="/static/images/bot1.png" class="arrow"></p>
-                </div>
-                <input type="text" placeholder="请填写车牌号" class="inn">
-            </div>
+    <!-- 邮寄 -->
+    <div class="post" v-else>
+      <div class="addressBox b1">
+        <div class="name">
+          <div>张三</div>
+          <div class="phoneNum">13125252626</div>
         </div>
-        <div class="sel">
-            <div><span class="zhi">*&nbsp;</span>品牌车系</div>
-            <div  class="line-input">
-                <input type="text" placeholder="请填写您的汽车品牌">
-            </div>
+        <div class="address">
+        <div class="icon">
+          <van-icon name="location-o" color="#a1a1a1" size="45rpx"></van-icon>
+          </div>
+          广东省 深圳市 龙岗区 坂田街道 雅兰新洲社区学府花园 5期12栋
+          </div>
+      </div>
+      <div class="time b1">
+        <div class="icon">
+          <van-icon name="clock-o" color="#a1a1a1" size="40rpx"></van-icon>
+          </div>
+          2019-03-20 14:00-16:00
+          </div>
+    </div>
+
+    <div class="carinfo">
+      <img src="/static/images/carioc.png" alt>
+      <div class="car">
+        <div class="name">东风本田-思域</div>
+        <div class="carNum">粤AJ6688</div>
+      </div>
+    </div>
+    <!-- 服务项目 -->
+    <div class="service plr30 b1">
+      <div class="title">服务项目</div>
+      <div class="infoBox">
+        <img src="/static/images/car.png" alt>
+        <div class="info">
+          <div class="head">车御品汽车服务</div>
+          <div class="text">
+            <div>￥100.00</div>
+            <div class="num">×2</div>
+          </div>
         </div>
-        <div class="sel">
-            <div>&nbsp;车&nbsp;&nbsp; 型</div>
-            <div  class="line-input">
-                <input type="text" placeholder="请填写您的汽车车型">
-            </div>
+      </div>
+    </div>
+    <div class="price">
+      <div class="top b1">
+        <div class="item">
+          <div>运费（快递）</div>
+          <div>￥100.00</div>
         </div>
-        <div class="sel">
-            <div>&nbsp;颜&nbsp;&nbsp; 色</div>
-            <div  class="line-input">
-                <input type="text" placeholder="请填写您的汽车颜色">
-            </div>
+        <div class="item">
+          <div>订单总价</div>
+          <div>￥100.00</div>
         </div>
-        <!--按钮-->
-        <div class="paybtn btn-save" @click="saveCar">保存</div>
+        <div class="item">
+          <div>优惠</div>
+          <div>￥100.00</div>
+        </div>
+      </div>
+      <div class="bottom p30">
+        <div>需付款</div>
+        <div class="main">￥500.00</div>
+      </div>
+    </div>
+    <div class="orderINfo plr30">
+      <div class="title">订单信息</div>
+      <div class="item">
+        订单编号：20000054115841
+        <div class="copy">
+          <van-button plain type="warning" size="mini">复制</van-button>
+        </div>
+      </div>
+      <div class="item">创建时间：2018-04-20 10:20:59</div>
+      <div class="item">支付时间：2018-04-20 10:20:59</div>
+      <div class="item">到店时间：2018-04-20 10:20:59</div>
+      <div class="item">成交时间：2018-04-20 10:20:59</div>
+    </div>
+    <div class="phone">
+      <div class="item br1">
+        <img src="/static/images/phone1.png" alt>
+        拨打电话
+      </div>
+      <div class="item">
+        <img src="/static/images/service.png" alt>
+        在线客服
+      </div>
+    </div>
+    <div class="editButton">
+      <div class="remove">删除订单</div>
+      <!-- <div class="buy">重新购买</div> -->
+      <div class="buy" @click="refund">申请退款</div>
     </div>
   </div>
 </template>
@@ -87,65 +114,35 @@
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onLoad() {
     this.setBarTitle();
   },
-  data () {
+  data() {
     return {
-        isshow:true,
-        data:0,
-        carinfolist:[
-          {id:1,name:"东风本田-思域",carnum:"粤AJ6666",checked:true},
-          {id:2,name:"日产-轩逸",carnum:"粤AJ6996",checked:false}
-          
-        ]
-    }
+      isshow: true
+    };
   },
- 
-  components: {
-    
-  },
+
+  components: {},
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
-        title: "车辆信息"
+        title: "申请退款"
       });
     },
-    
-    radioChange(e){
-      //console.log(e.target.value)
-      var arrs = this.carinfolist;
-      var that = this;
-      for (const x in arrs) {
-        if (arrs[x].id == e.target.value) {
-          arrs[x].checked = true;
-        } else {
-          arrs[x].checked = false;
-        }
-      }
-      
-    },
-    saveCar(){
-        this.isshow=true
-    },
-    addCar(){
-        this.isshow=false
-    },
-    chooseCity(e){
-      //console.log(e)
-      var id=e.target.dataset.id
-      //console.log(id)
-      wx.navigateTo({ url: "/pages/choosenum/main?id="+id });
-    },
+
+    refund() {
+      wx.navigateTo({ url: "/pages/refund/main"});
+    }
   },
 
-  created () {
+  created() {
     // let app = getApp()
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-  @import "./style";
-  @import "../../css/common.css";
+@import "./style";
+@import "../../css/common.css";
 </style>
