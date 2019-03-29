@@ -14,7 +14,7 @@
             <div class="ships">以下为门店服务内容</div>
             <div class="serlist">
                 <div class="seritem flex-container">
-                    <div class="flex-container ">
+                    <div class="flex-container"  @click="choseItem(1)">
                         <img src="/static/images/smallcar.png" class="smallcar">
                         <div class="flex-container col">
                             <p class="infotitle">漆面抛光研磨打蜡</p>
@@ -25,7 +25,7 @@
                             </p>
                         </div>
                     </div>
-                    <div class="pay">支付</div>
+                    <div class="pay" @click="choseItem(2)">支付</div>
                 </div>
                 <div class="seritem flex-container">
                     <div class="flex-container ">
@@ -77,7 +77,7 @@
                           <text>特惠价:￥</text>
                           <text>1998</text>
                       </p>
-                      <p class="mealpay">立即购买</p>
+                      <p class="mealpay" @click="choseItem(2)">立即购买</p>
                     </div>
                 </div>
             </div>
@@ -150,7 +150,6 @@ export default {
         sershow:true,
         dishshow:false,
         pointshow:false
-        
     }
   },
  
@@ -168,17 +167,14 @@ export default {
     change(e){
       this.active=e
       if(e=="服务"){
-          this.showHead=true,
           this.sershow=true,
           this.dishshow=false,
           this.pointshow=false
       }else if(e=="套餐"){
-          this.showHead=true,
           this.dishshow=true,
           this.sershow=false,
           this.pointshow=false
       }else{
-          this.showHead=false,
           this.pointshow=true,
           this.sershow=false,
           this.dishshow=false
@@ -187,6 +183,15 @@ export default {
     showInfo(e){
       //console.log(e)
       this.first=e
+    },
+    choseItem(e){
+      var id=e
+      if(id==1){
+         wx.navigateTo({ url: "/pages/serdetail/main" });
+      }
+      if(id==2){
+         wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
+      }
     }
     
       

@@ -3,9 +3,8 @@
     <!--备注-->
     <div class="signtitle">不填写备注也可以提交订单</div>
     <!--图片列表-->
-    <div class="infobg">
-        可以把停车位置写的更详细，可以把想跟洗车员传达的信息都写在这里
-    </div>
+    <textarea name="" id="" cols="20" rows="10" class="infobg" placeholder="可以把停车位置写的更详细，可以把想跟洗车员传达的信息都写在这里">
+    </textarea>
     <div class="paybtn" @click="orderpay">确定</div>
   </div>
 </template>

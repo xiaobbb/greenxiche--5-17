@@ -17,15 +17,15 @@
                   <img src="/static/images/bottom.png" class="bottom" v-else>
               </div>
         </div>
-        <!--排行帮-->
-        <div><img src="/static/images/gold.png" class="gold"></div>
+        <!--排行榜-->
+        <div @click="showItem(1)"><img src="/static/images/gold.png" class="gold"></div>
     </div>
     <!--商户列表-->
     <div class="shoplist">
-      <div class="shopitem flex-container white">
+      <div class="shopitem flex-container white" @click="showItem(2)">
           <img src="/static/images/car.png" class="mycar">
           <div class="shopinfo flex-container">
-              <div class="shopname">车御品汽车服务</div>
+              <div class="shopnamelist">车御品汽车服务</div>
               <div class="shopclass flex-container">
                   <p>
                     <img src="/static/images/xing.png" class="xing-point">
@@ -45,7 +45,7 @@
       <div class="shopitem flex-container white">
           <img src="/static/images/car.png" class="mycar">
           <div class="shopinfo flex-container">
-              <div class="shopname">车御品汽车服务</div>
+              <div class="shopnamelist">车御品汽车服务</div>
               <div class="shopclass flex-container">
                   <p>
                     <img src="/static/images/xing.png" class="xing-point">
@@ -79,7 +79,7 @@
         
     </div>
     <div v-if="showplace" class="load">
-        <div v-for="item in placelist" :key="item.name" @click="change(item.name)">
+        <div v-for="item in placelist" :key="item.name" @click="changeColor(item.name)">
             <span :class="{active2:active==item.name}">{{item.name}}</span>
             <span class="dui" :class="{active1:active==item.name}">✔</span>
         </div>
@@ -124,7 +124,7 @@ export default {
         title: "商户列表"
       });
     },
-    change(i){
+    changeColor(i){
       this.active=i
     },
     changeItem(e){
@@ -160,7 +160,15 @@ export default {
       }
       
     },
-    
+    showItem(e){
+        var id=e
+        if(id==1){
+            wx.navigateTo({ url: "/pages/shoprank/main" });
+        }
+        if(id==2){
+            wx.navigateTo({ url: "/pages/shopdetail/main" });
+        }
+    }
     
   },
 

@@ -6,46 +6,41 @@
         <img src="/static/images/location.png" class="location-logo">
         <img src="/static/images/cart.png" class="cart-img pic-center">
     </div>
-   <!--预约时间-->
-    <div class="appoint">预约时间</div>
-   <!--时间-->
-    <div class="timeflex">
-      <div v-for="item in datelist" :key="item" :class="{active:active==item}" @click="changebg(item)">{{item}}</div>
-    </div>
-    <!--开始时间 结束时间-->
-    <div class="tagflex">
-      <div>开始时间</div>
-      <div>结束时间</div>
-    </div>
-    <!--滑动选择时间-->
-    <div class="choosetime">
-      <div class="chooseitem">
-        <div>7点</div>
-        <div>8点</div>
-        <div class="itemshow">9点</div>
-        <div>10点</div>
-        <div>11点</div>
-      </div>
-      <div class="chooseitem">
-        <div class="itemshow">00分</div>
-        <div>01分</div>
-        <div>02分</div>
-      </div>
-      <div class="chooseitem">
-          <div>7点</div>
-          <div>8点</div>
-          <div class="itemshow">9点</div>
-          <div>10点</div>
-          <div>11点</div>
-      </div>
-      <div class="chooseitem">
-          <div class="itemshow">00分</div>
-          <div>01分</div>
-          <div>02分</div>
-      </div>
+    <div class="pad">
+        <!--预约时间-->
+          <div class="appoint">预约时间</div>
+        <!--时间-->
+          <div class="timeflex">
+            <div v-for="(item,index) in datelist" :key="index" :class="{active:active==index}" @click="changebg(index)">{{item}}</div>
+          </div>
+          <!--开始时间 结束时间-->
+          <div class="tagflex">
+            <div>开始时间</div>
+            <div>结束时间</div>
+          </div>
+          <!--滑动选择时间-->
+          <div class="freeRoom">
+            <div>
+                <!--<div class="timeText">{{year}}年{{month}}月{{day}}日</div>-->
+                <picker-view class="pickerView" :value="value" @change="bindDateChangeStart">
+                    <picker-view-column class="pickerColumn">
+                        <div class="pickerItem" v-for="(item,key) in hourses" :key='key'>{{item}}点</div>
+                    </picker-view-column>
+                    <picker-view-column class="pickerColumn">
+                        <div class="pickerItem" v-for="(item,key) in minutes" :key='key'>{{item}}分</div>
+                    </picker-view-column>
+                    <picker-view-column class="pickerColumn">
+                        <div class="pickerItem" v-for="(item,key) in hourses" :key='key'>{{item}}点</div>
+                    </picker-view-column>
+                    <picker-view-column class="pickerColumn">
+                        <div class="pickerItem" v-for="(item,key) in minutes" :key='key'>{{item}}分</div>
+                    </picker-view-column>
+                </picker-view>
+            </div>
+        </div>
     </div>
     <!--底部按钮组-->
-    <div class="tagflex">
+    <div class="tagflex bottomstyle">
         <div class="btn-cancle">取消</div>
         <div class="btn-order">立即下单</div>
     </div>
@@ -58,12 +53,16 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.choosedate()
+    this.choosedate();
+    this.gethous();
+    this.getMinutes()
   },
   data () {
     return {
       datelist:[],
-      active:'3月19日'
+      active:'0',
+      hourses:[],
+      minutes:[]
     }
   },
  
@@ -94,6 +93,31 @@ export default {
       }
       //console.log(this.datelist)
     },
+    gethous(){
+      for (let i =0; i <= 24; i++) {
+          if(i.toString().length<2){
+            i="0"+i
+          }
+          this.hourses.push(i)
+      }
+    },
+    getMinutes(){
+      for (let i =0; i <= 60; i++) {
+          if(i.toString().length<2){
+            i="0"+i
+          }
+          this.minutes.push(i)
+      }
+    },
+    bindDateChangeStart (e) {
+        //console.log(e)
+          // valIndex 是获取到的年月日在各自集合中的下标
+          const valIndex = e.mp.detail.value
+          // console.log(JSON.stringify(e.mp.detail.value))
+          let hourses = this.hourses[valIndex[0]]
+          let minutes = this.minutes[valIndex[1]]
+          // 滚动时再动态 通过年和月获取 这个月下对应有多少天
+    }
     
   },
 
@@ -106,4 +130,21 @@ export default {
 <style lang="scss" scoped>
   @import "./style";
   @import "../../css/common.css";
+  .freeRoom{
+        .timeText{
+            text-align: center;
+        }
+        .pickerView{
+            width:100%;
+            height: 300rpx;
+            .pickerColumn{
+                .pickerItem{
+                    line-height:68rpx;
+                    height:34rpx;
+                    overflow:hidden;
+                    text-align: center;
+                }
+            }
+        }
+    }
 </style>

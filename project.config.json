@@ -6,11 +6,12 @@
 		"postcss": true,
 		"minified": true,
 		"newFeature": true,
-		"autoAudits": false
+		"autoAudits": false,
+		"checkInvalidKey": true
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx9fceb77bb4432c26",
+	"appid": "wx3fef1ccc9946eb7b",
 	"projectname": "my-project",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
@@ -32,7 +33,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 21,
+			"current": 46,
 			"list": [
 				{
 					"id": 0,
@@ -185,6 +186,181 @@
 					"id": -1,
 					"name": "副本",
 					"pathName": "pages/writeordertest/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "产品详情",
+					"pathName": "pages/detail/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "防保质量查询",
+					"pathName": "pages/qualityQuery/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "购物车",
+					"pathName": "pages/shopcart/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的积分",
+					"pathName": "pages/integral/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "发表评论",
+					"pathName": "pages/addcomment/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "订单详情",
+					"pathName": "pages/orderdetail/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "申请退款",
+					"pathName": "pages/applymoney/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "设置",
+					"pathName": "pages/installinfo/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "设置手机号码",
+					"pathName": "pages/setphone/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "设置支付密码",
+					"pathName": "pages/setpassword/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 32,
+					"name": "设置意见反馈",
+					"pathName": "pages/setoption/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "上门订单申请退款",
+					"pathName": "pages/refound/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "地址管理",
+					"pathName": "pages/sitemanage/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "添加新地址",
+					"pathName": "pages/addnewsite/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的",
+					"pathName": "pages/mine/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的订单",
+					"pathName": "pages/myorder/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的钱包",
+					"pathName": "pages/wallet/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "余额充值",
+					"pathName": "pages/sum/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "资金明细",
+					"pathName": "pages/moneydetail/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的消息",
+					"pathName": "pages/message/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的消息详情",
+					"pathName": "pages/messagedetail/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 43,
+					"name": "预约订单详情",
+					"pathName": "pages/appointorderdet/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "到店确认订单",
+					"pathName": "pages/visitconfirmorder/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "登录",
+					"pathName": "pages/login/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "注册",
+					"pathName": "pages/register/main",
 					"query": "",
 					"scene": null
 				}

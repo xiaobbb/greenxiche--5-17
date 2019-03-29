@@ -6,12 +6,12 @@
       </div>
       <div class="slide"></div>
       <!--没有优惠券-->
-      <div class="nodata">
+      <div class="nodata"  v-if="isdata">
           <img src="/static/images/nodata.png" class="couppics">
           <p>暂无优惠券</p>
       </div>
       <!--排行list-->
-      <div class="certlist" v-if="isdata">
+      <div class="certlist">
           <div>
               <div class="coupitem" v-for="item in couptlist" :key="item.id">
                 <img src="/static/images/huiyellow.png" class="bgcolor" v-if="isactive">

@@ -1,155 +1,193 @@
-
-.congray{
-    background:#f4f7fc;
-    height:1180rpx;
+.remind{
+    height:130rpx;
+    background: #ff6666;
+    text-align: center;
+    color:#fff;
+    line-height: 130rpx;
+    box-sizing: border-box;
 }
-.carlist{
-    width:100%;
-    background:#f4f7fc;
-    border-top:1rpx solid #eee;
+.place{
+    width:28rpx;
+    height:41rpx;
+    margin-bottom: 10rpx;
 }
-.cloth{
-    width:88rpx;
-    height:88rpx;
-}
-.car{
-    width:44rpx;
-    height:35rpx;
-    position: absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%)
-}
-.menu{
-    width:32rpx;
-    height:32rpx;
-    margin-right:15rpx;
-}
-.caritem{
-    background: #fff;
-    margin:22rpx 0;
-    padding:30rpx
-}
-.coml{
-    flex-direction: column;
+.orderhead{
+    padding:20rpx;
     align-items: flex-start;
+    align-items: flex-end;
 }
-.infostyle{
-    justify-content: flex-start;
-    border-bottom:1rpx solid #eee;
-    padding-bottom:40rpx;
+.personinfo{
+    width:95%;
 }
-.carlogo{
-    width:88rpx;
-    height:88rpx;
-    position: relative;
-    margin-right: 32rpx;
-    
-}
-.brand{
-    font-size: 30rpx;
-}
-.carnum{
-    font-size:26rpx;
-    color:#999;
-    margin-top:10rpx;
-}
-.choosemenu{
-    padding-top:30rpx;
-}
-.small-checkbox{
-    width:30rpx;
-    height:30rpx;
-    margin-right:30rpx;
-    margin-top:-10rpx;
-}
-.small-checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
-    width:30rpx;
-    height:30rpx;
-  }
-.choose{
-    height:60rpx;
-}
-.edit{
-    width:33%;
-}
-.edit p{
+.orderuser{
     display: flex;
-    align-items: center;
+    width:100%;
+    justify-content: flex-start;
+    font-size: 30rpx;
+    margin-bottom:10rpx;
 }
-.edit text,.chosetitle{
+.orderuser p+p{
+    color:#999;
+    margin-left:20rpx;
+}
+.orderpics{
+    width:160rpx;
+    height:160rpx;
+}
+.prodetail{
+    padding:20rpx 30rpx;
+    border-bottom:1rpx solid #f4f4f4;
+}
+.proright{
+    width:73%;
+    align-items: flex-start;
+    height:160rpx;
+}
+.ordercolor{
     color:#999;
     font-size:24rpx;
 }
-.chosetitle2{
-    color:#ff6325
+.protitle{
+    align-items: flex-start;
+    width:70%;
 }
-
-.btn{
-    background:#ff6325;
-    width:100%;
-    height:89rpx;
-    color:#fff;
-    position:fixed;
-    bottom:0;
-    left:0;
-    z-index: 10;
-}
-.btn div{
-    display: flex;
-    justify-content:center;
-    align-items: center;
-    line-height: 89rpx;
-    box-sizing: border-box;
-}
-.add{
-    width:40rpx;
-    height:40rpx;
-    margin-right:25rpx;
-}
-.btn-save{
-    margin-top:80rpx;
-}
-.sel{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom:1rpx solid #eee;
-    padding:20rpx;
-}
-.sel:first-child{
-    border-top:1rpx solid #eee;
-}
-.line-input{
-    width:65%;
-}
-.zhi{
-    color:#ff6325;
-    font-size:32rpx;
-    vertical-align: middle;
-}
-.sel div:first-child{
-    width:25%;
-}
-.arrow{
-    width:24rpx;
-    height:14rpx;
-    margin-left:15rpx;
-}
-.title{
-    
-    display: flex;
-}
-.title p{
+.orderlist{
     padding:0 30rpx;
 }
-.title p:first-child{
-    padding-left:0;
+.orderitem{
+    border-bottom:1rpx solid #f4f4f4;
 }
-.title p+p{
-    border-left:1rpx solid #eee;
-    border-right:1rpx solid #eee;
+.orderitem>div{
+    padding:5rpx 0;
 }
-.inn{
-    width:45%;
+.padtop{
+    padding:20rpx 0;
+}
+.pricecolor{
+    color:#ff6325;
+}
+.orderinfo{
+    padding:30rpx;
+    border-bottom:1rpx solid #f4f4f4;
+}
+.pitem{
+    font-size:24rpx;
+    color:#999;
+    margin-top:10rpx;
+}
+.copy{
+    border:1rpx solid #ff6325;
+    padding:2rpx 15rpx;
+    margin-left:20rpx;
+    color:#ff6325;
+    font-size: 20rpx;
+}
+.infotitle{
+    border-left:3rpx solid #ff6325;
+    padding-left:20rpx;
+}
+.tippics1{
+    width:32rpx;
+    height:32rpx;
+    margin-right:20rpx;
+}
+.tippics2{
+    width:30rpx;
+    height:31rpx;
+    margin-right:20rpx;
+}
+.tipmenu{
+    justify-content: space-around;
+    padding:30rpx;
+}
+.orderbottom{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding:15rpx 30rpx;
+    height:93rpx;
+}
+.orderbottom p{
+    display: inline-block;
+    width:152rpx;
+    height:60rpx;
+    line-height: 60rpx;
+    text-align: center;
+    border-radius: 25rpx;
+    box-sizing: border-box;
+}
+.orderbottom p:first-child{
+    border:1rpx solid #ff6325;
+    color:#ff6325;
+}
+.orderbottom p+p{
+    background:linear-gradient(45deg,#ff6325,#ff6865);
+    color:#fff;
+    margin-left:30rpx;
+}
+.orderapybottom{
+    padding:15rpx 30rpx;
+    height:93rpx;
+}
+.orderapybottom p{
+    background:linear-gradient(45deg,#ff6325,#ff6865);
+    color:#fff;
+    float:right;
+    width:152rpx;
+    height:60rpx;
+    line-height: 60rpx;
+    text-align: center;
+    border-radius: 25rpx;
+    box-sizing: border-box;
+}
+.maskdelete{
+    position: fixed;
+    top:360rpx;
+    left:100rpx;
+    width:550rpx;
+    height:310rpx;
+    box-sizing: border-box;
+    z-index:60;
+    background: #fff;
+    border-radius: 25rpx;
+    justify-content: space-around;
+}
+.maskcall{
+    position: fixed;
+    top:520rpx;
+    left:100rpx;
+    width:550rpx;
+    height:280rpx;
+    box-sizing: border-box;
+    z-index:60;
+    background: #fff;
+    border-radius: 25rpx;
+    justify-content: space-around;
+}
+.bottombtn{
+    border-top:1rpx solid #f4f4f4;
+    justify-content: space-around;
+    width:100%;
+    height:110rpx;
+}
+.bottombtn div{
+    width:50%;
+    text-align:center;
+    height:110rpx;
+    line-height: 110rpx;
+}
+.bottombtn div+div{
+    color:#ff6325;
+    border-left:1rpx solid #f4f4f4;
+}
+.title{
+    height:200rpx;
+    padding:50rpx 100rpx;
+    font-size:30rpx;
+    font-weight: bold;
+    text-align: center;
+}
+.call{
+    height: 160rpx;
+    font-size: 36rpx;
 }

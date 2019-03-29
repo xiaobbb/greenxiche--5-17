@@ -19,9 +19,9 @@
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(options){
+  onLoad(){
     this.setBarTitle();
-    this.id=options.id
+    this.id=this.$root.$mp.query.id
     //console.log(this.id)
   },
   data () {

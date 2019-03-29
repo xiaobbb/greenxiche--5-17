@@ -11,9 +11,9 @@
         <div class="flex-container intitem" v-for="item in servicelist" :key="item.id">
             <div class="flex-container cartdetal">
                 <div>
-                    <img src="/static/images/caritem.png" class="carpic" v-if="ispop">
-                    <img src="/static/images/comblo.png" class="carpic" v-else-if="comb">
-                    <img src="/static/images/cardshop.png" class="carpic" v-else>
+                    <img src="/static/images/caritem.png" class="carpic" v-if="ispop" @click="goDetail(1)">
+                    <img src="/static/images/comblo.png" class="carpic" v-else-if="comb"  @click="goDetail(2)">
+                    <img src="/static/images/cardshop.png" class="carpic" v-else  @click="goDetail(2)">
                 </div>
               <div class="flex-container citeminfo">
                   <p class="itemtitle">{{item.title}}</p>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="shopprice">￥428</div>
             </div>
-            <div class="btn-confirm">确定</div>
+            <div class="btn-confirm" @click="toPAy">确定</div>
         </div>
     </div>
   </div>
@@ -110,7 +110,7 @@ export default {
       });
     },
     change(e){
-      //console.log(e)
+      console.log(e)
       this.active=e
       if(e=="服务卡券"){
         this.servicelist=this.cardlist
@@ -119,12 +119,24 @@ export default {
       }else if(e=="营销套餐"){
         this.servicelist=this.combolist
         this.comb=true
+        this.ispop=false
       }else{
         this.servicelist=this.productlist
         this.ispop=true
       }
     },
-    
+    goDetail(e){
+      var a=e
+      if(a==1){
+        wx.navigateTo({ url: "/pages/detail/main" });
+      }
+      if(a==2){
+        wx.navigateTo({ url: "/pages/coupondetail/main" });
+      }
+    },
+    toPAy(){
+      wx.navigateTo({ url: "/pages/confirmorder/main" });
+    }
     
     
   },

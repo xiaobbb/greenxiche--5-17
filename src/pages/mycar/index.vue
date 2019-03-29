@@ -53,8 +53,8 @@
             <div><span class="zhi">*&nbsp;</span>车牌号码</div>
             <div class="flex-container line-input">
                 <div class="flex-container title">
-                    <p class="flex-container" data-id="1" @click="chooseCity($event)">粤<img src="/static/images/bot1.png" class="arrow"></p>
-                    <p class="flex-container" data-id="2"  @click="chooseCity($event)">A<img src="/static/images/bot1.png" class="arrow"></p>
+                    <p class="flex-container"  @click="chooseCity(1)">粤<img src="/static/images/bot1.png" class="arrow"></p>
+                    <p class="flex-container"  @click="chooseCity(2)">A<img src="/static/images/bot1.png" class="arrow"></p>
                 </div>
                 <input type="text" placeholder="请填写车牌号" class="inn">
             </div>
@@ -92,7 +92,7 @@ export default {
   },
   data () {
     return {
-        isshow:true,
+        isshow:false,
         data:0,
         carinfolist:[
           {id:1,name:"东风本田-思域",carnum:"粤AJ6666",checked:true},
@@ -132,10 +132,10 @@ export default {
         this.isshow=false
     },
     chooseCity(e){
-      //console.log(e)
-      var id=e.target.dataset.id
+      console.log(e)
+      //var id=e.target.dataset.id
       //console.log(id)
-      wx.navigateTo({ url: "/pages/choosenum/main?id="+id });
+      wx.navigateTo({ url: "/pages/choosenum/main?id="+e });
     },
   },
 

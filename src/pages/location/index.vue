@@ -11,29 +11,26 @@
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
             <span class="location-self">展涛科技大厦c座</span>
-            <img src="/static/images/back.png" class="back">
+            <img src="/static/images/back.png" class="back" @click="chosePlace">
         </div>
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
             <span class="location-self">请选择服务项目</span>
-            <img src="/static/images/back.png" class="back">
+            <img src="/static/images/back.png" class="back" @click="choseItem">
         </div>
-        <p class="hr"></p>
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
             <span class="location-self">03-13 13:08-15:08</span>
-            <img src="/static/images/back.png" class="back">
+            <img src="/static/images/back.png" class="back" @click="choseTime">
         </div>
-        <p class="hr"></p>
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
             <span class="location-self">请添加车辆</span>
-            <img src="/static/images/back.png" class="back">
+            <img src="/static/images/back.png" class="back" @click="choseCar">
         </div>
-        <p class="hr"></p>
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
@@ -46,23 +43,20 @@
             <img src="/static/images/back.png" class="back">
         </div>
         <p class="hr"></p>
-        <p class="hr"></p>
         <div class="item">
              <img src="/static/images/yellow.png" class="diandian">
              <p class="location-self">姓名 <input placeholder="请输入您的姓名"/></p>
         </div>
-        <p class="hr"></p>
         <p class="hr"></p>
         <div class="item">
              <img src="/static/images/yellow.png" class="diandian">
              <p class="location-self">手机 <input  placeholder="请输入您的手机号码"/></p>
         </div>
         <p class="hr"></p>
-        <p class="hr"></p>
         <div class="item sign">
             <span @click="addpics">添加现场照片</span><span @click="addinfo">备注</span>
         </div>
-        <div class="chase">立即下单</div>
+        <div class="chase" @click="toPay">立即下单</div>
     </div>
 
   </div>
@@ -91,13 +85,27 @@ export default {
         title: "填写订单"
       });
     },
+    chosePlace(){
+        wx.navigateTo({ url: "/pages/locationorder/main" });
+    },
+    choseItem(){
+        wx.navigateTo({ url: "/pages/servince/main" });
+    },
+    choseTime(){
+        wx.navigateTo({ url: "/pages/writeorder/main" });
+    },
+    choseCar(){
+        wx.navigateTo({ url: "/pages/mycar/main" });
+    },
     addpics() {
       wx.navigateTo({ url: "/pages/sceneplace/main" });
     },
     addinfo() {
       wx.navigateTo({ url: "/pages/signinfo/main" });
     },
-
+    toPay(){
+      wx.navigateTo({ url: "/pages/orderpay/main" });
+    }
   },
 
   created () {

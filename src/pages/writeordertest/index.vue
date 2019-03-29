@@ -19,34 +19,6 @@
           <div>结束时间</div>
         </div>
         <!--滑动选择时间-->
-        <!--
-        <div class="choosetime">
-          <div class="chooseitem">
-            <div>7点</div>
-            <div>8点</div>
-            <div class="itemshow">9点</div>
-            <div>10点</div>
-            <div>11点</div> 
-          </div>
-          <div class="chooseitem">
-            <div class="itemshow">00分</div>
-            <div>01分</div>
-            <div>02分</div>
-          </div>
-          <div class="chooseitem">
-              <div>7点</div>
-              <div>8点</div>
-              <div class="itemshow">9点</div>
-              <div>10点</div>
-              <div>11点</div>
-          </div>
-          <div class="chooseitem">
-              <div class="itemshow">00分</div>
-              <div>01分</div>
-              <div>02分</div>
-          </div>
-        </div>
-        -->
         <div class="freeRoom">
             <div>
                 <!--<div class="timeText">{{year}}年{{month}}月{{day}}日</div>-->

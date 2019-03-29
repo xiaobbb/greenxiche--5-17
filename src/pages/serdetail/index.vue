@@ -101,7 +101,7 @@
       <!--支付-->
       <div class="btn"> 
           <div class="btnmoney">￥30.00</div>
-          <div class="btncharge">去结算</div>
+          <div class="btncharge" @click="toPay">去结算</div>
       </div>
 
   </div>
@@ -129,7 +129,9 @@ export default {
         title: "服务详情"
       });
     },
-    
+    toPay(){
+      wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
+    }
     
     
   },

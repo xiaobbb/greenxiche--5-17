@@ -1,5 +1,5 @@
 .contain{
-    padding:0 35rpx;
+    padding:0 30rpx;
     font-size: 28rpx;
 }
 .signtitle{
@@ -8,10 +8,11 @@
 }
 .infobg{
     height:268rpx;
-    margin:0 auto;
+    width:690rpx;
     background:#f4f7fc;
-    padding:30rpx 20rpx;
     color:#999999;
     border-radius:10rpx;
     margin-bottom:80rpx;
+    padding:20rpx;
+    box-sizing: border-box
 }
