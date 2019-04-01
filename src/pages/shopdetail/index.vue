@@ -1,6 +1,6 @@
 <template>
   <div>
-    <shopChild :isShow="showHead"></shopChild>
+    <shopChild :isShow="showHead" :detailinfo="detailinfo"></shopChild>
     <!--操作菜单-->
     <div class="shopmian">
         <div class="flex-container title">
@@ -126,6 +126,7 @@
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
 import shopChild from "@/components/shopChild"; //公用组件
 import pointChild from "@/components/pointChild"; //公用评论组件
 import pointChildpic from "@/components/pointChildpic"; //公用评论带图片组件
@@ -135,9 +136,18 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.shopid=this.$root.$mp.query.shopid
+    this.lat=this.$root.$mp.query.lat
+    this.lng=this.$root.$mp.query.lng
+    this.getShopDetail()
+    //console.log(this.shopid,this.lat,this.lng)
   },
   data () {
     return {
+        shopid:"",
+        lat:"",
+        lng:"",
+        detailinfo:[],
         showHead:true,
         active:"服务",
         first:1,
@@ -159,6 +169,18 @@ export default {
     pointChildpic
   },
   methods: {
+    async getShopDetail(){
+        var res=await post("Shop/GetMerchantDetail",{
+          ShopId:this.shopid,
+          Lat:this.lat,
+          Lng:this.lng
+        })
+        
+        if(res.code==0){
+            this.detailinfo=res.data
+        }
+        console.log(this.detailinfo)
+    },
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "商户详情"

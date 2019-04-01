@@ -3,9 +3,9 @@
      <!--顶部输入框-->
      <div class="white">
         <div class="topinput">
-            <input type="text" placeholder="搜索商户">
+            <input type="text" placeholder="搜索商户" v-model="seartext"  @input="searchShop">
             <img src="/static/images/search.png" class="searchpic absolu">
-            <img src="/static/images/cancle.png" class="canclepic absolu">
+            <img src="/static/images/cancle.png" class="canclepic absolu" @click="trimData">
         </div>
     </div>
     <!--导航栏-->
@@ -18,14 +18,14 @@
               </div>
         </div>
         <!--排行榜-->
-        <div @click="showItem(1)"><img src="/static/images/gold.png" class="gold"></div>
+        <div @click="showBrand()"><img src="/static/images/gold.png" class="gold"></div>
     </div>
     <!--商户列表-->
     <div class="shoplist">
-      <div class="shopitem flex-container white" @click="showItem(2)">
-          <img src="/static/images/car.png" class="mycar">
+      <div class="shopitem flex-container white" @click="showItem(index)" v-for="(item,index) in shoplist" :key="index">
+          <img :src="item.Logo" class="mycar">
           <div class="shopinfo flex-container">
-              <div class="shopnamelist">车御品汽车服务</div>
+              <div class="shopnamelist">{{item.ShopNick}}</div>
               <div class="shopclass flex-container">
                   <p>
                     <img src="/static/images/xing.png" class="xing-point">
@@ -34,54 +34,33 @@
                     <img src="/static/images/xing.png" class="xing-point">
                     <img src="/static/images/gray1.png" class="xing-point">
                   </p>
-                  <text class="grad">5.0分</text>
-                  <text class="numb">(428条订单)</text>
+                  <text class="grad">{{item.ServiceScore}}.0分</text>
+                  <text class="numb">({{item.TransactionNumber}}条订单)</text>
               </div>
               <div class="shoplocat">
-                  <text>龙岗区坂田街道河背中心路...</text><text>0.32km</text>
+                  <text>{{item.Address}}</text><text>{{item.Distance}}km</text>
               </div>
           </div>
       </div>
-      <div class="shopitem flex-container white">
-          <img src="/static/images/car.png" class="mycar">
-          <div class="shopinfo flex-container">
-              <div class="shopnamelist">车御品汽车服务</div>
-              <div class="shopclass flex-container">
-                  <p>
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/gray1.png" class="xing-point">
-                  </p>
-                  <text class="grad">5.0分</text>
-                  <text class="numb">(428条订单)</text>
-              </div>
-              <div class="shoplocat">
-                  <text>龙岗区坂田街道河背中心路...</text><text>0.32km</text>
-              </div>
-          </div>
-      </div>
+      
     </div>
 
     <!--点击导航栏弹框-->
     <div class="bigmask" v-if="isServe"></div>
     <div v-if="showserve" class="flex-container itemposit">
-        <div class="yellow">全部服务</div>
-        <div>洗车</div>
-        <div>内饰</div>
-        <div>除甲醛</div>
-        <div>镀金</div>
-    </div>
-    <div v-if="showload" class="load">
-        <div class="yellow">距离排序</div>
-        <div>订单排序</div>
+        <div @click="choseItem(99)" :class="{yellow:defaultactive}">全部服务</div>
+        <div class="flex-container">
+            <div v-for="item in serlist" :key="item.name" :class="{yellow:seractive==item.TypeName}" @click="choseItem(item.TypeName)" style="width:120rpx">{{item.TypeName}}</div>
+        </div>
         
     </div>
+    <div v-if="showload" class="load">
+        <div  v-for="item in distancelist" :key="item.name" :class="{yellow:disactive==item.name}" @click="choseItem(item.name)">{{item.name}}</div>
+    </div>
     <div v-if="showplace" class="load">
-        <div v-for="item in placelist" :key="item.name" @click="changeColor(item.name)">
-            <span :class="{active2:active==item.name}">{{item.name}}</span>
-            <span class="dui" :class="{active1:active==item.name}">✔</span>
+        <div v-for="item in placelist" :key="item.name" @click="choseItem(item.name)">
+            <span :class="{active2:active==item.name}" class="ttborder">{{item.name}}</span>
+            <span class="dui ttborder" :class="{active1:active==item.name}">✔</span>
         </div>
     </div>
 
@@ -91,27 +70,44 @@
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.latitude=wx.getStorageSync('latitude');
+    this.longitude=wx.getStorageSync('longitude');
+    this.getServe()
+    this.getShopList()
   },
   data () {
     return {
+        latitude:"",
+        longitude:"",
+        shoplist:[],
+        seartext:"",
         list:[
-          {id:1,name:"全部服务"},{id:1,name:"距离排序"},{id:1,name:"全部区域"}
+          {id:1,name:"全部服务"},{id:1,name:"距离排序"},{id:1,name:"全部区域"} //导航栏
+        ],
+        serlist:[ ],
+       
+        distancelist:[
+            {id:1,name:"距离排序"},{id:2,name:"订单排序"}
         ],
         placelist:[
           {id:1,name:"全部区域"},{id:2,name:"罗湖区"},{id:3,name:"福田区"},{id:4,name:"南山区"},{id:5,name:"宝安区"},{id:6,name:"龙岗区"}
         ],
         active:'全部区域',
-       isServe:false,
-       showserve:false,
-       showload:false,
-       showplace:false,
-       showdeaf:true,
-       aa:""
+        defaultactive:"全部服务",
+        seractive:"",
+        disactive:"距离排序",
+        isServe:false,
+        showserve:false,
+        showload:false,
+        showplace:false,
+        showdeaf:true,
+        aa:""
     }
   },
  
@@ -119,13 +115,30 @@ export default {
     
   },
   methods: {
+    async getShopList(){
+        var result=await post("/Shop/SearchShopList",{
+          Page:1,
+          Lat:this.latitude,
+          Lng:this.longitude,
+          //Sort:0
+        })
+        //console.log(result)
+        if(result.code==0){
+            this.shoplist=result.data
+            //console.log(result.data)
+        }
+    },
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "商户列表"
       });
     },
-    changeColor(i){
-      this.active=i
+    async getServe(){
+        var result=await post("/Server/GetServerType")
+        if(result.code==0){
+            this.serlist=result.data.slice(0,-1)
+            console.log(this.serlist)
+        }
     },
     changeItem(e){
       this.aa=e
@@ -133,6 +146,8 @@ export default {
       if(e=="全部服务"){
         if(!this.showserve){
           this.showserve=true
+          this.defaultactive=true
+          this.seractive=false
           this.showload=false
           this.showplace=false
           }else{
@@ -142,6 +157,7 @@ export default {
       }else if(e=="距离排序"){
         if(!this.showload){
           this.showload=true
+          this.disactive="距离排序"
           this.showserve=false
           this.showplace=false
           }else{
@@ -151,6 +167,7 @@ export default {
       }else{
         if(!this.showplace){
           this.showplace=true
+          this.active="全部区域"
           this.showserve=false
           this.showload=false
           }else{
@@ -160,15 +177,79 @@ export default {
       }
       
     },
+    showBrand(){  
+        wx.navigateTo({ url: "/pages/shoprank/main" });
+    },
+    async choseItem(e){  //选择服务类型展示列表
+      this.seractive=e
+      this.disactive=e
+      this.active=e
+      //console.log(e)
+      if(e==99){
+          console.log(666)
+          this.defaultactive=true
+          this.getShopList()
+          this.isServe=false
+      }else{
+            this.defaultactive=false
+            var result=await post("/Shop/SearchShopList",{
+              Page:1,
+              Lat:this.latitude,
+              Lng:this.longitude,
+              ServiceType:e
+          })
+          //console.log(result)
+          if(result.code==0){
+              this.shoplist=result.data
+              this.isServe=false
+              //console.log(result.data)
+          }
+      }
+      
+    },
     showItem(e){
-        var id=e
-        if(id==1){
-            wx.navigateTo({ url: "/pages/shoprank/main" });
-        }
-        if(id==2){
-            wx.navigateTo({ url: "/pages/shopdetail/main" });
-        }
+        //console.log(e)
+        var shopid=this.shoplist[e].ShopId
+        var lat=this.shoplist[e].Lat
+        var lng=this.shoplist[e].Lng
+        // var lat="1.000"
+        // var lng="2.000"
+        //console.log(typeof(lat))
+        //console.log(shopid,lat,lng)
+        wx.navigateTo({ url: "/pages/shopdetail/main?shopid="+shopid+"&lat="+lat+"&lng="+lng})
+    },
+    trimData(){
+      //console.log(123)
+      this.seartext=this.seartext.slice(0,-1)
+      if(this.seartext=""){
+          this.getShopList()
+      }
+    },
+    async searchShop(){
+      var reg= /^[\u4e00-\u9fa5]+$/
+      reg.test(this.seartext)
+      //console.log(reg.test(this.seartext))
+      if(reg.test(this.seartext)){
+          var result=await post("/Shop/SearchShopList",{
+              Page:1,
+              Lat:this.latitude,
+              Lng:this.longitude,
+              SearchKey:this.seartext
+          })
+          if(result.code==0){
+                this.shoplist=result.data
+                console.log(result.data)
+                this.clearText()
+               
+          }
+      }
+      
     }
+       
+           
+        
+        
+    
     
   },
 

@@ -11,11 +11,11 @@
       <!--定位当前城市-->
       <div class="item">定位当前城市</div>
       <div class="itemlocat">
-          <div class="name">深圳</div>
-          <div class="chose">
+          <div class="name">{{cityname}}</div>
+          <!-- <div class="chose" @click="choseCIty">
             <img src="/static/images/can.png" class="can">
             <text>重新定位</text>
-          </div>
+          </div> -->
       </div>
       <div class="item">热门城市</div>
       <div class="flex-container cityhot">
@@ -53,7 +53,7 @@ export default {
   },
   data () {
     return {
-        
+        cityname:"深圳"
     }
   },
  
@@ -66,7 +66,18 @@ export default {
         title: "选择城市"
       });
     },
-    
+    choseCIty(){
+        wx.getLocation({
+        type: 'wgs84',
+        success:(res) =>{
+          console.log(res)
+          const latitude = res.latitude
+          const longitude = res.longitude
+          const speed = res.speed
+          const accuracy = res.accuracy
+        }
+      })
+    }
    
    
   },

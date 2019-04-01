@@ -4,7 +4,7 @@
       <div class="radius">
         <div class="flex-container item">
             <div class="flex-container  row">
-                <p class="sertitle">车御品汽车服务</p>
+                <p class="sertitle">{{detailinfo[0].ShopNick}}</p>
                 <div class="shopclass flex-container">
                     <p>
                       <img src="/static/images/xing.png" class="xing-point">
@@ -13,8 +13,8 @@
                       <img src="/static/images/xing.png" class="xing-point">
                       <img src="/static/images/gray1.png" class="xing-point">
                     </p>
-                    <text class="grad">5.0分</text>
-                    <text class="numb">(428条订单)</text>
+                    <text class="grad">{{detailinfo[0].ServiceScore}}.0分</text>
+                <text class="numb">({{detailinfo[0].TransactionNumber}}条订单)</text>
                 </div>
             </div>
             <div class="flex-container range alig">
@@ -30,7 +30,7 @@
                 <img src="/static/images/locat2.png" class="locationwid">
                 <div>
                   <p class="sertitle">地址</p>
-                  <p class="sercomplain">深圳市龙华区梅龙大道912号</p>
+                  <p class="sercomplain">{{detailinfo[0].Address}}</p>
                 </div>
             </div>
             <div class="flex-container range lineleft ">
@@ -38,7 +38,7 @@
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/to.png" class="small">
               </p>
-              <p>0.32km</p>
+              <p>{{detailinfo[0].Distance}}km</p>
             </div>
         </div>
         <div class="halfhr"></div>
@@ -47,7 +47,7 @@
                 <img src="/static/images/time2.png" class="locationwid timesize">
                 <div>
                   <p class="sertitle">营业时间</p>
-                  <p class="sercomplain">09:00-18:00</p>
+                  <p class="sercomplain">{{detailinfo[0].BusinessHours}}</p>
                 </div>
             </div>
         </div>
@@ -58,9 +58,9 @@
 <script>
 
 export default {
-  props:["isShow"],
+  props:["isShow","detailinfo"],
    onLoad(){
-  
+
   },
   data () {
     return {
@@ -186,6 +186,6 @@ export default {
   margin:0 auto;
 }
 .alig{
-  margin-right:20rpx;
+  margin-right:10rpx;
 }
 </style>

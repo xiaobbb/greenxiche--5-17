@@ -4,7 +4,7 @@
         <!--顶部导航栏-->
         <div class="head white">
           <div>
-            <span class="province">深圳市</span>
+            <span class="province">{{cityName}}</span>
             <img src="/static/images/bottom.png" class="img-bottom" @click="goTo(1)">
           </div>
           <div v-for="item in titlelist" :key="item.name" :class="{active:active==item.name}" @click="change(item.name)">{{item.name}}</div>
@@ -14,8 +14,29 @@
           </div>
         </div>
         <!--中部定位图片-->
-        <div class="location glo-relative">
+        <!-- <div class="location glo-relative">
           <img src="/static/images/tupian.png" class="dingwei">
+          <img src="/static/images/location.png" class="location-logo">
+          <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
+          <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
+          <img src="/static/images/cart.png" class="car-small" v-if="!isshow">
+        </div> -->
+        <div class="location glo-relative">
+          <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
+          <map
+            id="map"
+            longitude="113.324520"
+            latitude="23.099994"
+            scale="14"
+            :controls="controls"
+            bindcontroltap="controltap"
+            :markers="markers"
+            bindmarkertap="markertap"
+            :polyline="polyline"
+            bindregionchange="regionchange"
+            show-location
+            style="width: 100%; height: 1000rpx;"
+          ></map>
           <img src="/static/images/location.png" class="location-logo">
           <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
           <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
@@ -102,12 +123,52 @@
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
+import amapFile from "../../utils/amap-wx"; //高德地图API调用JS SDK
+import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 import shoplist from "@/components/shoplist";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
+  onLoad() {
+    this.getCityName()
+    this.getMapShow()
+  },
   data () {
     return {
+      latitude:"",
+      longitude:"",
+       markers: [{
+        iconPath: '/resources/others.png',
+        id: 0,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        width: 50,
+        height: 50
+      }],
+      polyline: [{
+        points: [{
+          longitude:this.longitude,
+          latitude:this.latitude
+        }, {
+          longitude:this.longitude,
+          latitude:this.latitude
+        }],
+        color: '#FF0000DD',
+        width: 2,
+        dottedLine: true
+      }],
+      controls: [{
+        id: 1,
+        iconPath: '../../static/images/shop5.png',
+        position: {
+          left: 0,
+          top: 300 - 50,
+          width: 50,
+          height: 50
+        },
+        clickable: true
+      }],
       titlelist:[
         {name:"全部"}, {name:"上门"}, {name:"到店"},
       ],
@@ -120,12 +181,58 @@ export default {
       isnew:true
     }
   },
-
+  computed:{
+    ...mapState(["cityName"])
+  },
   components: {
     shoplist
   },
 
   methods: {
+    ...mapMutations(["update"]),
+    getCityName(){
+        var myAmapFun = new amapFile.AMapWX({
+        key: "3fab6f1c5564f0c55818b26348612d3d" //高德地图注册的API KEY
+      });
+      myAmapFun.getRegeo({
+        success:(data)=> {
+          console.log(data)
+          this.update({
+              cityName:data[0].regeocodeData.addressComponent.city
+              .toString()
+              .split(" ")[0]
+          })
+          //console.log(this.cityName)
+        },
+        fail:(info)=>{
+          //失败回调
+          console.log(info);
+          //如果用户拒绝授权
+          // 默认为北京
+          this.cityName = "北京市";
+          this.update({ cityName: "北京市" });
+        }
+      });
+      
+    },
+    getMapShow(){
+        wx.getLocation({   //获取当前位置的经纬度
+        type: 'wgs84', // 返回可以用于wx.openLocation的经纬度
+        success:(res)=>{
+          //console.log(res,"这是getLocation")
+          this.latitude = res.latitude
+          this.longitude = res.longitude
+          wx.setStorageSync("latitude", this.latitude)
+          wx.setStorageSync("longitude", this.longitude)
+          console.log(this.latitude,this.longitude)
+          
+
+
+
+          
+        }
+      })
+    },
     close:function(){
       this.isnew=true
       this.showmember=false,
