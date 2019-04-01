@@ -3,20 +3,20 @@
       <div v-if="showEvaluate">
           <!--头部-->
           <div>
-              <img src="/static/images/shopdetail.png" class="shippic" v-if="showtitle">
+              <img :src="product.img" class="shippic">
               <div class="shophead">
-                  <p class="headtitle">￥<span>1288</span></p>
+                  <p class="headtitle">￥<span>{{product.price}}</span></p>
                   <div class="flex-container">
-                      <p class="headinfo">绿妞长效镀晶9H汽车度镀晶纳米水晶镀膜包施工新全车辆车漆面德国</p>
+                      <p class="headinfo">{{product.title}}</p>
                       <p class="flex-container headright" @click="share">
                           <img src="/static/images/shareicon.png" class="share">
                           <text>分享</text>
                       </p>
                   </div>
                   <div class="flex-container headtips">
-                    <P>快递:免运费</P>
-                    <P>已售485</P>
-                    <P>广东深圳</P>
+                    <P>快递:{{freight||'免运费'}}</P>
+                    <P>已售{{salesNum}}</P>
+                    <P>{{province}}{{city}}</P>
                   </div>
               </div>
           </div>
@@ -37,7 +37,7 @@
                           <div class="flex-container couptsild">
                               <text class="itemname">积分</text>
                               <p>
-                                购买可得200积分
+                                购买可得{{score}}积分
                               </p>
                           </div>
                       </div>
@@ -94,16 +94,16 @@
                       <img src="/static/images/back.png" class="right">
                   </p>
               </div>
-              <detailChild></detailChild>
+              <detailChild v-for="(item,index) in product.comment" :key="index" :data="item" v-show="index===0">{{item}}</detailChild>
           </div>
           <div class="slide"></div>
           <!--商品详情-->
           <div class="particular">
               <div class="parttitle">商品详情</div>
-              <div>
-                  <img src="/static/images/vedio.png" class="vedio">
+              <div v-html="product.detail">
+                  <!-- <img src="/static/images/vedio.png" class="vedio"> -->
               </div>
-              <img src="/static/images/detailinfo.png" class="partinfo">
+              <!-- <img src="/static/images/detailinfo.png" class="partinfo"> -->
           </div>
           <!--底部按钮-->
           <div class="bottom">
@@ -252,22 +252,21 @@
 <script>
 import detailChild from "@/components/detailChild"; //公用组件
 import detailChildpic from "@/components/detailChildpic"; //公用组件
+import { post } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
-    this.setBarTitle();
-  },
   data () {
     return {
-      showtitle:true,
+        id:'',
       isshow:false,
       showDiscount:false,
       showShare:false,
       showPram:false,
       addcart:false,
       showNums:false,
-      showEvaluate:true
+      showEvaluate:true,
+      product:{}
     }
   },
  
@@ -275,11 +274,61 @@ export default {
     detailChild,
     detailChildpic
   },
+  mounted(){
+     this.id = this.$root.$mp.query.id;
+    this.setBarTitle();
+    this.getData();
+      
+  },
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "普通清洗漆面上光打蜡"
       });
+    },
+    getData(){
+        const that = this;
+        const id = this.$root.$mp.query.id
+        console.log(this.$root.$mp.query)
+        post('Goods/ProductInfo',{proId:304*1}).then(res=>{
+            console.log(res,'产品详情')
+            const datas = res.data;
+            that.product = {
+                img:datas.ProductImgList[0],
+                imgs:[],
+                comment:[],
+                title: datas.ProductName,
+                price: datas.ProductPrice,
+                // 积分
+                score: datas.Score,
+                detail: datas.ContentDetail,
+                salesNum: datas.SalesVolume,
+                freight: datas.freight,
+                province: datas.ProvinceNam,
+                city:datas.CityName,
+                productParams:{
+                    name: datas.BrandName,
+                    typeNum: datas.ModelName,
+                    // serviceType: datas.
+                }   
+            }
+            for(let i=0;i<datas.ProductImgList.length;i+=1){
+                that.product.imgs.push(datas.ProductImgList[i].PicUrl)
+            }
+            for(let i=0;i<datas.EvaluateList.length;i+=1){
+                const comments = datas.EvaluateList[i]
+                that.product.comment.push({
+                    id:comments.id,
+                    userId:comments.MemberId,
+                    userName: comments.MemberName,
+                    userImg: comments.MemberHeadImg,
+                    content: comments.ContentText,
+                    time:comments.AddTime,
+                    rank: comments.Rank,
+                    img: comments.EvaluateImgList
+                })
+            }
+        })
     },
     addCart(){
       this.addcart=true

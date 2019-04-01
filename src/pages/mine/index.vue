@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -84,6 +85,18 @@ export default {
  
   components: {
     
+  },
+  mounted(){
+      const data ={
+          Mobile:'15014010199',
+          PassWord:'123456'
+      }
+    //   登录，设置缓存
+      post('Login/LoginByMobile',data).then(res=> {
+          wx.setStorageSync('userid',res.data.UserId)
+          wx.setStorageSync('token',res.data.Token)
+      })
+      console.log(wx.getStorageSync('userid'),wx.getStorageSync('token'))
   },
   methods: {
     setBarTitle() {

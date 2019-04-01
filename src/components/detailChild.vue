@@ -3,16 +3,15 @@
         <div class="flex-container userinfo">
             <div class="flex-container">
                 <div>
-                    <img src="/static/images/avatar.png" class="avatar">
+                    <img :src="data.userImg" class="avatar">
                 </div>
                 <div>
                     <p>
-                        <text>筱风月忆</text>
+                        <text>{{data.userName}}</text>
                         <text  class="carname">奥迪A3</text>
                     </p>
                     <p>
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
+                        <img v-for="(img,indexImg) in data.img" :key="indexImg" :src="img" class="xing-point">
                         <img src="/static/images/xing.png" class="xing-point">
                         <img src="/static/images/xing.png" class="xing-point">
                         <img src="/static/images/gray1.png" class="xing-point">
@@ -28,7 +27,20 @@
 
 <script>
 export default {
-  
+    props:{
+        data:function (){
+            return []
+        }
+    },
+    data(){
+        return {
+
+        }
+    },
+    mounted(){
+        console.log(this.data)
+    }
+
 }
 </script>
 
