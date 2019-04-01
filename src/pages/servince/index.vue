@@ -44,6 +44,7 @@ import "../../css/global.css";
 export default {
    onLoad(){
     this.setBarTitle();
+    this.getMenulist()
   },
   data () {
     return {
@@ -75,6 +76,12 @@ export default {
       wx.setNavigationBarTitle({
         title: "服务项目"
       });
+    },
+    async getMenulist(){
+        console.log(123)
+        var res=await post("/Server/GetCarWash")
+        console.log(res)
+        
     },
     change(e){
       this.active=e

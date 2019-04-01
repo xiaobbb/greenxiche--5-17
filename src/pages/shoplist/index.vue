@@ -210,13 +210,11 @@ export default {
     showItem(e){
         //console.log(e)
         var shopid=this.shoplist[e].ShopId
-        var lat=this.shoplist[e].Lat
-        var lng=this.shoplist[e].Lng
         // var lat="1.000"
         // var lng="2.000"
         //console.log(typeof(lat))
         //console.log(shopid,lat,lng)
-        wx.navigateTo({ url: "/pages/shopdetail/main?shopid="+shopid+"&lat="+lat+"&lng="+lng})
+        wx.navigateTo({ url: "/pages/shopdetail/main?shopid="+shopid})
     },
     trimData(){
       //console.log(123)

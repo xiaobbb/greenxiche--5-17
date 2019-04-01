@@ -86,7 +86,7 @@ export default {
         //console.log(res.data)
         if(res.data.code==0){
          this.datalist=res.data.data
-         console.log(this.datalist)
+         //console.log(this.datalist)
         }
        },
       
@@ -95,8 +95,9 @@ export default {
     
     },
     showShopDetail(e){
-      console.log(e)
-      //wx.navigateTo({ url: "/pages/shopdetail/main" });
+      //console.log(this.datalist[e].ShopId,"排行榜发送")
+      var shopid=this.datalist[e].ShopId
+      wx.navigateTo({ url: "/pages/shopdetail/main?shopid="+shopid });
     }
     
   },

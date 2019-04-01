@@ -137,10 +137,10 @@ export default {
   onLoad(){
     this.setBarTitle();
     this.shopid=this.$root.$mp.query.shopid
-    this.lat=this.$root.$mp.query.lat
-    this.lng=this.$root.$mp.query.lng
+    //console.log(this.shopid,"详情页接收")
+    this.lat=wx.getStorageSync('latitude');
+    this.lng=wx.getStorageSync('longitude');
     this.getShopDetail()
-    //console.log(this.shopid,this.lat,this.lng)
   },
   data () {
     return {
@@ -179,7 +179,7 @@ export default {
         if(res.code==0){
             this.detailinfo=res.data
         }
-        console.log(this.detailinfo)
+        //console.log(this.detailinfo)
     },
     setBarTitle() {
       wx.setNavigationBarTitle({
