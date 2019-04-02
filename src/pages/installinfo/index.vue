@@ -2,12 +2,12 @@
   <div class="backgray setlist">
     <div class="setitem flex-container white">
           <p>绑定手机号码</p>
-          <p class="flex-container" v-if="showPhone" @click="bandItem(1)">
+          <p class="flex-container" v-if="showPhone" @click="bindPhone()">
               <text class="radius">立即绑定</text>
               <img src="/static/images/back.png" class="right">
           </p>
-          <p class="flex-container" v-else>
-              <text class="phonecolor">135****3920</text>
+          <p class="flex-container" v-else @click="bindPhone()">
+              <text class="phonecolor">{{phone}}</text>
               <text class="radius circle">重新绑定</text>
               <img src="/static/images/back.png" class="right">
           </p>
@@ -42,15 +42,14 @@
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
-    this.setBarTitle();
-  },
   data () {
     return {
       showPhone:true,
+      phone:'',
       showPass:true
     }
   },
@@ -58,17 +57,33 @@ export default {
   components: {
     
   },
+  mounted(){
+    this.setBarTitle();
+    this.getData()
+  },
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "设置"
       });
     },
-    bandItem(e){
-      var a=e
-      if(a==1){
-         wx.navigateTo({ url: "/pages/setphone/main" });
+    async getData(){
+      const params ={
+        UserId: wx.getStorageSync('userid'),
+        Token: wx.getStorageSync('token')
       }
+      const res =await post('User/SettingPageData',params)
+      this.showPhone = !res.data.IsMobile;
+      this.showPass = !res.data.IsPayPwd;
+      this.phone = res.data.Mobile
+    },
+    bindPhone(){
+         wx.navigateTo({ url: "/pages/setphone/main" });
+    },
+    bandItem(a){
+      // if(a==1){
+      //    wx.navigateTo({ url: "/pages/setphone/main" });
+      // }
       if(a==2){
          wx.navigateTo({ url: "/pages/setpassword/main" });
       }
