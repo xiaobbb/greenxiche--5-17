@@ -184,3 +184,14 @@ img{
 .commonpad{
   padding:20rpx 30rpx
 }
+
+.van-textarea-min-height{
+  /* min-height:0!important; */
+}
+
+.backgray .van-cell{
+  padding:15px!important;
+}
+.color333{
+  color:#333!important;
+}

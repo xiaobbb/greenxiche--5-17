@@ -24,7 +24,7 @@
     </view>
   </view>
   <view wx:if="{{ loading }}" class="van-picker__loading">
-    <loading color="#1989fa"/>
+    <loading color="#ff6325"/>
   </view>
   <view
     class="van-picker__columns"
