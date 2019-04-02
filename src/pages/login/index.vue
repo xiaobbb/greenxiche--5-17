@@ -42,85 +42,14 @@ export default {
       wx.showLoading({
         title: "登陆中..."
       });
-      // wx.login({
-      //   success: function(res) {
-      //     var code = res.code; //腾讯服务器返回res,拿到code进行下一步操作
-      //     //console.log(res)
-      //     wx.getUserInfo({
-      //       success: function(res) {
-      //         //console.log(res)
-      //         var userInfo = res.userInfo;
-      //         ivata = res.iv;
-      //         encriptData = res.encryptedData;
-      //         //name=userInfo.nickname
-      //         console.log(name)
-      //         wx.setStorageSync("userInfo", userInfo); //保存用户信息，userInfo对象里面含有用户昵称，用户头像,性别等信息：
-      //                                                  //userInfo.nickName 用户昵称; 
-      //                                                  //userInfo.avatarUrl 用户头像图片的URL;
-      //                                                  //userInfo.gender 用户性别
-      //         // if (code) {
-      //         //   wx.request({
-      //         //     method: "POST",
-      //         //     url: "http://carapi.wtvxin.com/api/Login/LoginByMobile", //提交数据到服务器，如果没有绑定手机号码，则提示用户需要绑定手机号码
-      //         //     data: {
-      //         //       Mobile:"18202172651",
-      //         //       PassWord:"123456"
-      //         //     },
-      //         //     header: {
-      //         //       "content-type": "application/x-www-form-urlencoded"
-      //         //     },
-      //         //     success: function(res) {
-      //         //       console.log(res)
-      //         //       wx.setStorageSync("token", res.data.data.accessToken); //保存的令牌 accessToken
-      //         //       wx.setStorageSync("userId", res.data.data.uid); //保存用户Id到本地缓存
-      //         //       wx.setStorageSync("unionid", res.data.data.unionid); 
-      //         //       wx.setStorageSync("openId", res.data.data.openId); 
-      //         //     //   if (res.data.meta.code !== 2) {
-      //         //     //   console.log("登陆成功");
-      //         //     //   wx.showToast({
-      //         //     //   title: '登陆成功',
-      //         //     //   icon: 'success',
-			// 		    //     //   duration: 2000,
-			// 	  	  //     //   complete: function (){//登陆成功之后,延时2秒跳转到会员中心
-      //         //     //   setTimeout(function(){
-      //         //     //   wx.switchTab({
-      //         //     //     url:"/pages/my/main",
-      //         //     //   })
-      //         //     //  }, 2000);
-      //         //     //  }
-      //         //     //   });
-      //         //     //   } else {
-      //         //     //     //没有绑定手机，则跳转到绑定手机的页面
-      //         //     //     _this.bindPhone(); //绑定手机
-      //         //     //   }
-      //         //     },
-      //         //     fail: function(error) {},
-      //         //     complete: function() {
-      //         //       wx.hideLoading();
-      //         //     }
-      //         //   });
-      //         // } else {
-      //         //   wx.hideLoading();
-      //         //   console.log("获取用户登录态失败：" + res.errMsg);
-      //         //   wx.showToast({
-      //         //     title: "获取授权信息失败",
-      //         //     icon: "none",
-      //         //     duration: 2000
-      //         //   });
-      //         //   return;
-      //         // }
-      //       }
-      //     });
-      //   }
-      // });
      // 用户授权登陆，code发送给服务器
       if(_this.Mobile==""){
            _this.bindPhone(); 
         }else{
           wx.login({
           success: function(ress) {
-            //console.log(_this,'this的指向')
             var code = ress.code; //腾讯服务器返回res,拿到code进行下一步操作
+            //console.log(code)
             var mobile=_this.Mobile,
                 password=_this.PassWord
             // wx.getUserInfo({
@@ -135,7 +64,7 @@ export default {
             //                                             //userInfo.gender 用户性别
             //   }
             // });
-            console.log(mobile,password)
+            //console.log(mobile,password)
             if (code) {
                   wx.request({
                     method: "POST",
@@ -148,7 +77,7 @@ export default {
                       "content-type": "application/x-www-form-urlencoded"
                     },
                     success: function(res) {
-                      //console.log(res)
+                      console.log(res)
                       //console.log(res.data.data.Token)
                         wx.setStorageSync("token", res.data.data.Token); //保存的令牌 accessToken
                         wx.setStorageSync("userId", res.data.data.UserId); //保存用户Id到本地缓存
@@ -161,11 +90,11 @@ export default {
                               icon: 'success',
                               duration: 2000,
                               complete: function (){//登陆成功之后,延时2秒跳转到会员中心
-                                setTimeout(function(){
-                                  wx.switchTab({
-                                  url:"/pages/mine/main",
-                                  })
-                                }, 2000);
+                                // setTimeout(function(){
+                                //   wx.switchTab({
+                                //   url:"/pages/mine/main",
+                                //   })
+                                // }, 2000);
                              }
                           });
                         } else {
@@ -189,6 +118,8 @@ export default {
                       return;
                     }
               }
+        
+        
         });
       }
       

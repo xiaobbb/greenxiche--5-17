@@ -203,6 +203,7 @@ export default {
               .split(" ")[0]
           })
           //console.log(this.cityName)
+          wx.setStorageSync("cityName",this.cityName)
         },
         fail:(info)=>{
           //失败回调
@@ -225,10 +226,6 @@ export default {
           wx.setStorageSync("latitude", this.latitude)
           wx.setStorageSync("longitude", this.longitude)
           console.log(this.latitude,this.longitude)
-          
-
-
-
           
         }
       })

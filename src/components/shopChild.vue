@@ -1,6 +1,6 @@
 <template>
-  <div class="childbg" v-if="isShow">
-      <img src="/static/images/download2.png" class="shopbg1">
+  <div class="childbg">
+      <img :src="detailinfo[0].Logo" class="shopbg1">
       <div class="radius">
         <div class="flex-container item">
             <div class="flex-container  row">
@@ -60,7 +60,7 @@
 export default {
   props:["isShow","detailinfo"],
    onLoad(){
-
+      console.log(this.detailinfo)
   },
   data () {
     return {

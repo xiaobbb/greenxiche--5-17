@@ -58,9 +58,14 @@
         <div  v-for="item in distancelist" :key="item.name" :class="{yellow:disactive==item.name}" @click="choseItem(item.name)">{{item.name}}</div>
     </div>
     <div v-if="showplace" class="load">
-        <div v-for="item in placelist" :key="item.name" @click="choseItem(item.name)">
-            <span :class="{active2:active==item.name}" class="ttborder">{{item.name}}</span>
-            <span class="dui ttborder" :class="{active1:active==item.name}">✔</span>
+        <!-- <div >全部区域</div> -->
+        <div @click="choseItem(199)" :class="{yellow:defaultactive}" class="ttborder">
+            <span @click="choseItem(199)" :class="{yellow:defaultactive}" class="ttborder">全部区域</span>
+            <span class="dui ttborder" :class="{active1:defaultactive}">✔</span>
+        </div>
+        <div v-for="item in placelist" :key="item.Name" @click="choseItem(item.Name)">
+            <span :class="{active2:active==item.Name}" class="ttborder">{{item.Name}}</span>
+            <span class="dui ttborder" :class="{active1:active==item.Name}">✔</span>
         </div>
     </div>
 
@@ -78,13 +83,16 @@ export default {
     this.setBarTitle();
     this.latitude=wx.getStorageSync('latitude');
     this.longitude=wx.getStorageSync('longitude');
+    this.cityName=wx.getStorageSync("cityName")
     this.getServe()
     this.getShopList()
+    this.getPlace()
   },
   data () {
     return {
         latitude:"",
         longitude:"",
+        cityName:"",
         shoplist:[],
         seartext:"",
         list:[
@@ -95,22 +103,22 @@ export default {
         distancelist:[
             {id:1,name:"距离排序"},{id:2,name:"订单排序"}
         ],
-        placelist:[
-          {id:1,name:"全部区域"},{id:2,name:"罗湖区"},{id:3,name:"福田区"},{id:4,name:"南山区"},{id:5,name:"宝安区"},{id:6,name:"龙岗区"}
-        ],
+        placelist:[ ],
         active:'全部区域',
         defaultactive:"全部服务",
+        defaultplace:"全部区域",
         seractive:"",
         disactive:"距离排序",
         isServe:false,
         showserve:false,
         showload:false,
         showplace:false,
-        showdeaf:true,
         aa:""
     }
   },
- 
+  computed:{
+    
+  },
   components: {
     
   },
@@ -128,6 +136,14 @@ export default {
             //console.log(result.data)
         }
     },
+    async getPlace(){
+      var result=await post("/Server/GetArea",{
+        CityName:this.cityName
+      })
+      if(result.code==0){
+        this.placelist=result.data
+      }
+    },
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "商户列表"
@@ -137,10 +153,10 @@ export default {
         var result=await post("/Server/GetServerType")
         if(result.code==0){
             this.serlist=result.data.slice(0,-1)
-            console.log(this.serlist)
+            //console.log(this.serlist)
         }
     },
-    changeItem(e){
+    changeItem(e){   //弹框展示
       this.aa=e
       this.isServe=true
       if(e=="全部服务"){
@@ -186,11 +202,16 @@ export default {
       this.active=e
       //console.log(e)
       if(e==99){
-          console.log(666)
+          //console.log(666)
           this.defaultactive=true
           this.getShopList()
           this.isServe=false
-      }else{
+      }else if(e==199){
+           this.defaultplace=true
+           this.getShopList()
+           this.isServe=false
+      }   
+      else{
             this.defaultactive=false
             var result=await post("/Shop/SearchShopList",{
               Page:1,
@@ -201,12 +222,14 @@ export default {
           //console.log(result)
           if(result.code==0){
               this.shoplist=result.data
-              this.isServe=false
-              //console.log(result.data)
+              //setTimeout(this.closeMask(),6000)
+              this.closeMask()
           }
+          
       }
       
     },
+   
     showItem(e){
         //console.log(e)
         var shopid=this.shoplist[e].ShopId
@@ -223,6 +246,17 @@ export default {
           this.getShopList()
       }
     },
+    closeMask(){
+       setTimeout(
+         ()=>{
+          this.isServe=false,
+          this.showserve=false,
+          this.showload=false,
+          this.showplace=false
+          
+         },2000)
+         
+    },
     async searchShop(){
       var reg= /^[\u4e00-\u9fa5]+$/
       reg.test(this.seartext)
@@ -236,7 +270,7 @@ export default {
           })
           if(result.code==0){
                 this.shoplist=result.data
-                console.log(result.data)
+                //console.log(result.data)
                 this.clearText()
                
           }

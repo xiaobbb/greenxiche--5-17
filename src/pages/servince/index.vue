@@ -2,8 +2,8 @@
   <div class="flex-container bigcontainer">
     <!--左菜单-->
     <div class="ser-menu">
-        <div v-for="(item,index) in menulist" :key="index" :class="{active:active==item.name}" @click="change(item.name)" class="nemeitem">
-          <text class="title">{{item.name}}</text>
+        <div v-for="(item,index) in menulist" :key="index" :class="{active:active==item.TypeName}" @click="change(item.TypeName)" class="nemeitem">
+          <text class="title">{{item.TypeName}}</text>
         </div>
     </div>
     <!--右列表-->
@@ -39,21 +39,19 @@
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
    onLoad(){
     this.setBarTitle();
-    this.getMenulist()
+    this.id=this.$root.$mp.query.id
+    this.getMenulist();
   },
   data () {
     return {
-      menulist:[
-        {name:"洗车"},
-        {name:"内饰"},
-        {name:"除甲醛"},
-        {name:"镀金"},
-      ],
+      id:"",
+      menulist:[],
       servicelist:[
         {id:1,title:"外观简单清洗",sale:"198",price:"30.00",isSelect:true},
         {id:2,title:"精细清洗漆面上光打蜡",sale:"98",price:"198.00",isSelect:false},
@@ -69,7 +67,7 @@ export default {
     
   },
   computed:{
-     
+    
   },
   methods: {
     setBarTitle() {
@@ -78,9 +76,16 @@ export default {
       });
     },
     async getMenulist(){
-        console.log(123)
-        var res=await post("/Server/GetCarWash")
-        console.log(res)
+       var result=await post("/Server/GetCarWash")
+       if(result.code==0){
+         if(this.id==1){
+            this.menulist=result.data.slice(0,-2)
+         }else{
+           this.menulist=result.data
+         }
+          console.log(result.data)
+         
+       }
         
     },
     change(e){

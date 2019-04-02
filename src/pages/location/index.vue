@@ -89,7 +89,7 @@ export default {
         wx.navigateTo({ url: "/pages/locationorder/main" });
     },
     choseItem(){
-        wx.navigateTo({ url: "/pages/servince/main" });
+        wx.navigateTo({ url: "/pages/servince/main?id=1" });
     },
     choseTime(){
         wx.navigateTo({ url: "/pages/writeorder/main" });

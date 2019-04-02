@@ -1,12 +1,12 @@
 <template>
-    <div class="point"> 
+    <div class="point" :iteminfo="iteminfo"> 
         <div class="flex-container userinfo">
             <div class="flex-container">
                 <div>
                     <img src="/static/images/avatar.png" class="avatar">
                 </div>
                 <div>
-                    <p>筱风月忆</p>
+                    <p>{{iteminfo.MemberName}}</p>
                     <p>
                         <img src="/static/images/xing.png" class="xing-point">
                         <img src="/static/images/xing.png" class="xing-point">
@@ -16,26 +16,40 @@
                     </p>
                 </div>
             </div>
-            <div class="carname">奥迪A6</div>
+            <div class="carname">{{iteminfo.ProductSpecText}}</div>
         </div>
-        <div>工作人员很认真，服务态度很好</div>
+        <div>{{iteminfo.ContentText}}</div>
         <div class="flex-container picslist">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
         </div>
-        <div class="usertime">01-20 10:50</div>
+        <div class="usertime">{{iteminfo.AddTime}}</div>
+        <div class="callback" v-if="iteminfo.Reply.length>0">
+            {{iteminfo.Reply}}
+        </div>
     </div>
 </template>
 
 <script>
 export default {
+  props:["iteminfo"],
+  onLoad(){
+    //console.log(this.iteminfo,"这是子页面的")
+  }
   
 }
 </script>
 
 <style scoped>
+.callback{
+    background: #fef4f0;
+    color:#7c726e;
+    padding:20rpx;
+    margin:0 20rpx 20rpx 20rpx;
+    border-radius:10rpx;
+}
 .point{
 padding:20rpx;
 box-sizing: border-box;

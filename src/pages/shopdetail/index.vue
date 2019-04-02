@@ -1,6 +1,6 @@
 <template>
   <div>
-    <shopChild :isShow="showHead" :detailinfo="detailinfo"></shopChild>
+    <shopChild :detailinfo="detailinfo" v-if="detailinfo.length>0"></shopChild>
     <!--操作菜单-->
     <div class="shopmian">
         <div class="flex-container title">
@@ -8,74 +8,41 @@
         </div>
         <!--服务显示-->
         <div class="sershow" v-if="sershow">
-            <div class="caritem">
-                <text class="activecolor">洗车</text><text>内饰</text><text>除甲醛</text><text>镀晶</text>
+            <div class="caritem"> <!--洗车分类-->
+                <text v-for="item in barlist" :key="item.Id" :class="{activecolor:activecolor==item.Id}" @click="showItemServe(item.Id)">{{item.TypeName}}</text>
             </div>
             <div class="ships">以下为门店服务内容</div>
             <div class="serlist">
-                <div class="seritem flex-container">
-                    <div class="flex-container"  @click="choseItem(1)">
+                <div class="seritem flex-container" v-for="item in servincelist" :key="item.Id">
+                    <div class="flex-container"  style="width:80%" @click="goServiceProductsDetail(item.Id)">
                         <img src="/static/images/smallcar.png" class="smallcar">
                         <div class="flex-container col">
-                            <p class="infotitle">漆面抛光研磨打蜡</p>
-                            <p class="infoitem">去除车身污渍 干净透亮</p>
+                            <p class="infotitle">{{item.Name}}</p>
+                            <p class="infoitem">{{item.Synopsis}}</p>
                             <p class="serprice">
-                              <text>￥198.00</text>
-                              <text>vip价:￥188</text>
+                              <text>￥{{item.MarketPrice}}</text>
+                              <text>vip价:￥{{item.Price}}</text>
                             </p>
                         </div>
                     </div>
                     <div class="pay" @click="choseItem(2)">支付</div>
                 </div>
-                <div class="seritem flex-container">
-                    <div class="flex-container ">
-                        <img src="/static/images/smallcar.png" class="smallcar">
-                        <div class="flex-container col">
-                            <p class="infotitle">漆面抛光研磨打蜡</p>
-                            <p class="infoitem">去除车身污渍 干净透亮</p>
-                            <p class="serprice">
-                              <text>￥198.00</text>
-                              <text>vip价:￥188</text>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="pay">支付</div>
-                </div>
             </div>
         </div>
         <!--套餐显示-->
         <div class="meallist" v-if="dishshow">
-            <div class="mealitem">
+            <div class="mealitem" v-for="item in meallist" :key="item.Id">
                 <img src="/static/images/meal.png" class="mealbg">
                 <div class="mealbg mealinfo">
                     <div class="flex-col">
                         <div class="weight sizebig">极护 SN 5W-30 4L</div>
-                        <div class="weight smallsize">小保养套餐6次</div>
                         <div class="explain">有效期720天，仅限本店使用本店拥有最终解释权</div>
                     </div>
                     <div class="linehr"></div>
                     <div class="flex-container">
                       <p class="mealprice">
                           <text>特惠价:￥</text>
-                          <text>1998</text>
-                      </p>
-                      <p class="mealpay">立即购买</p>
-                    </div>
-                </div>
-            </div>
-            <div class="mealitem">
-                <img src="/static/images/meal.png" class="mealbg">
-                <div class="mealbg mealinfo">
-                    <div class="flex-col">
-                        <div class="weight sizebig">极护 SN 5W-30 4L</div>
-                        <div class="weight smallsize">小保养套餐6次</div>
-                        <div class="explain">有效期720天，仅限本店使用本店拥有最终解释权</div>
-                    </div>
-                    <div class="linehr"></div>
-                    <div class="flex-container">
-                      <p class="mealprice">
-                          <text>特惠价:￥</text>
-                          <text>1998</text>
+                          <text>{{item.Price}}</text>
                       </p>
                       <p class="mealpay" @click="choseItem(2)">立即购买</p>
                     </div>
@@ -103,22 +70,12 @@
                 </div>
             </div>
             <div class="flex-container pointmenu">
-                <p v-for="(item,index) in pointlist" :key="index" :class="{active3:first==item.id}" @click="showInfo(item.id)">{{item.name}}</p>
+                <p v-for="(item,index) in pointlist" :key="index" :class="{active3:first==index}" @click="showInfo(index)">{{item.name}}</p>
             </div>
             <div class="pointsheet">
-                <div>
-                    <pointChild></pointChild>
+                <div v-for="(item,index) in commonlist" :key="index">
+                    <pointChildpic :iteminfo="item"></pointChildpic>
                 </div>
-                <div>
-                    <pointChildpic></pointChildpic>
-                </div>
-                <div>
-                    <pointChild></pointChild>
-                    <div class="callback">
-                        [商家回复]：感谢您的评价，我们的价格可以说是龙华最 低、性价比最高、服务最好的洗车店了
-                    </div>
-                </div>
-                
             </div>
         </div>
     </div>
@@ -137,10 +94,14 @@ export default {
   onLoad(){
     this.setBarTitle();
     this.shopid=this.$root.$mp.query.shopid
-    //console.log(this.shopid,"详情页接收")
+    console.log(this.shopid,"详情页接收")
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
+    this.Token=wx.getStorageSync('token');
+    this.UserId=wx.getStorageSync('userId');
     this.getShopDetail()
+    this.getBarlist()
+    this.showItem()
   },
   data () {
     return {
@@ -148,15 +109,22 @@ export default {
         lat:"",
         lng:"",
         detailinfo:[],
-        showHead:true,
+        typeid:"33",
         active:"服务",
-        first:1,
+        activecolor:"33",
+        servincelist:"",
+        meallist:"",
+        first:0,
+        Token:"",
+        UserId:"",
+        barlist:[], //洗车分类
         menulist:[
           {id:1,name:'服务'},{id:2,name:'套餐'},{id:3,name:'评价'}
         ],
         pointlist:[
           {id:1,name:'全部(428)'},{id:2,name:'晒图(88)'},{id:3,name:'低分(60)'},{id:4,name:'最新'}
         ],
+        commonlist:[],
         sershow:true,
         dishshow:false,
         pointshow:false
@@ -169,6 +137,30 @@ export default {
     pointChildpic
   },
   methods: {
+    showItem(){
+      wx.request({
+        url:"http://carapi.wtvxin.com/api/Server/ServiceProducts" ,//服务列表
+        method: "POST",
+        data: {
+           Page:1,
+          //  ShopId:this.shopid,
+          //  TypeId:this.typeid
+           TypeId:this.typeid,
+           ShopId:'7A3E932977BF3C5A',
+        },
+        header: {
+          'content-type': 'application/json' // 默认值
+        },
+       
+        success:(res)=> {
+          if(res.data.code==0){
+              this.servincelist=res.data.data
+              //console.log(res.data.data)
+          }
+        }
+      })
+       
+    },
     async getShopDetail(){
         var res=await post("Shop/GetMerchantDetail",{
           ShopId:this.shopid,
@@ -181,36 +173,82 @@ export default {
         }
         //console.log(this.detailinfo)
     },
+    async getBarlist(){
+        var res=await post("Server/GetCarWash",{
+        })
+        if(res.code==0){
+          this.barlist=res.data.slice(0,-2)
+        }
+    },
+    async showItemServe(e){
+      console.log(e)
+        this.activecolor=e
+        this.typeid=e
+        this.showItem()
+    },
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "商户详情"
       });
     },
-    change(e){
+    async change(e){
+      console.log(e)
       this.active=e
       if(e=="服务"){
           this.sershow=true,
           this.dishshow=false,
-          this.pointshow=false
+          this.pointshow=false,
+          this.getBarlist()
+          this.showItem()
       }else if(e=="套餐"){
           this.dishshow=true,
           this.sershow=false,
           this.pointshow=false
+          var res=await post("/Server/ServiceMealProducts",{
+            Page:1,
+              ShopId:this.shopid
+          })
+          if(res.code==0){
+            this.meallist=res.data
+          }
+
       }else{
           this.pointshow=true,
           this.sershow=false,
           this.dishshow=false
+          var res=await post("/Server/ServiceCommentList",{
+            Page:1,
+            PageSize: 12,
+            //ShopId:this.shopid
+            ShopId:'7A3E932977BF3C5A',
+          })
+          console.log(res)
+          if(res.code==0){
+            this.commonlist=res.data
+          }
+
       }
     },
-    showInfo(e){
-      //console.log(e)
+    async showInfo(e){
+      console.log(e)
       this.first=e
+      var res=await post("/Server/ServiceCommentList",{
+            Page:1,
+            //ShopId:this.shopid
+            ShopId:'7A3E932977BF3C5A',
+            CommentType:this.first
+      })
+      //console.log(res)
+      if(res.code==0){
+        this.commonlist=res.data
+      }
+    },
+    async goServiceProductsDetail(e){
+        wx.navigateTo({ url: "/pages/serdetail/main?proid="+e});  //获取商户服务产品详情
     },
     choseItem(e){
       var id=e
-      if(id==1){
-         wx.navigateTo({ url: "/pages/serdetail/main" });
-      }
+     
       if(id==2){
          wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
       }

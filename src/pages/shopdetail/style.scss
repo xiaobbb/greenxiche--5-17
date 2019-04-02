@@ -39,14 +39,19 @@
     flex-direction: column;
     align-items: flex-start;
     margin-left:20rpx;
+    width:70%;
 }
 .seritem{
     padding:20rpx 10rpx;
+    width:100%;
+    height:100%;
 }
 .infoitem{
     color:#999;
     margin:5rpx 0 10rpx 0;
     font-size:22rpx;
+    height:80rpx;
+    overflow: hidden;
 }
 .infotitle{
     font-weight: bold;

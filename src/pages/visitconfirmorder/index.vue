@@ -5,10 +5,10 @@
       <div class="flex-container clomn  ordershophead white">
           <div class="orderserve">服务商家</div>
           <div class="flex-container ordermain">
-              <img src="/static/images/shop5.png" class="ordershopimg">
+              <img :src="orderinfo[0].ShopData[0].Logo" class="ordershopimg">
               <div class="flex-container clomn orderplace">
-                  <p class="placename">车御品汽车服务</p>
-                  <p>深圳市龙华区梅龙大道912号</p>
+                  <p class="placename">{{orderinfo[0].ShopData[0].ShopNick}}</p>
+                  <p>{{orderinfo[0].ShopData[0].Address}}</p>
               </div>
           </div>
           <div class="ordertips">(温馨提示：请核对收货地址是否正确)</div>
@@ -18,10 +18,10 @@
       <div class="white proinfo">
           <div class="orderserve">服务项目</div>
           <div class="flex-container ordermain">
-              <img src="/static/images/shop5.png" class="ordershopimg">
+              <img :src="orderinfo[0].PicNo" class="ordershopimg">
               <div class="flex-container clomn orderplace">
-                  <p class="placename detailright">普惠(洗车)</p>
-                  <p>￥30.00</p>
+                  <p class="placename detailright">{{orderinfo[0].Name}}</p>
+                  <p>￥{{orderinfo[0].Price}}</p>
               </div>
           </div>
           <div class="flex-container infoslide white pad">
@@ -80,15 +80,26 @@
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.proid=this.$root.$mp.query.proid;
+    this.lat=wx.getStorageSync('latitude');
+    this.lng=wx.getStorageSync('longitude');
+    this.Token=wx.getStorageSync('token');
+    this.UserId=wx.getStorageSync('userId');
+    this.getOrderInfo()
   },
   data () {
     return {
       isshow:true,
+      proid:"",
+      Token:"",
+      UserId:"",
+      orderinfo:[],
       a:4,
     }
   },
@@ -101,6 +112,17 @@ export default {
       wx.setNavigationBarTitle({
         title: "确认订单"
       });
+    },
+    async getOrderInfo(){
+      var result=await post("/Order/ServiceProductsFirmOrder",{
+        UserId:this.UserId,
+        Token:this.Token,
+        ProductId:this.proid
+      })
+      if(result.code==0){
+        this.orderinfo=result.data
+        console.log(result.data)
+      }
     },
     change(e){
       //console.log(e.target)
