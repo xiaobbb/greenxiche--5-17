@@ -88,7 +88,7 @@ export default {
   },
   mounted(){
       const data ={
-          Mobile:'15014010199',
+          Mobile:'18123769378',
           PassWord:'123456'
       }
     //   登录，设置缓存

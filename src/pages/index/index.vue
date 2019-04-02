@@ -25,19 +25,20 @@
           <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
           <map
             id="map"
-            longitude="113.324520"
-            latitude="23.099994"
+            :longitude="longitude"
+            :latitude="latitude"
             scale="14"
             :controls="controls"
             bindcontroltap="controltap"
             :markers="markers"
             bindmarkertap="markertap"
+            :include-points="points"
             :polyline="polyline"
             bindregionchange="regionchange"
             show-location
             style="width: 100%; height: 1000rpx;"
           ></map>
-          <img src="/static/images/location.png" class="location-logo">
+          <!-- <img src="/static/images/location.png" class="location-logo"> -->
           <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
           <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
           <img src="/static/images/cart.png" class="car-small" v-if="!isshow">
@@ -138,15 +139,28 @@ export default {
     return {
       latitude:"",
       longitude:"",
-       markers: [{
-        iconPath: '/resources/others.png',
-        id: 0,
-        latitude: this.latitude,
-        longitude: this.longitude,
-        width: 50,
-        height: 50
-      }],
-      polyline: [{
+      points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
+      img1:'../../static/images/1.png',
+      img2:'../../static/images/2.png',
+       markers: [
+         { //标记点
+          iconPath:this.img1,
+          id: 0,
+          latitude: "20.00",
+          longitude: "115.00",
+          width: 50,
+          height: 50
+      },
+      { //标记点
+          iconPath:this.mg2 ,
+          id: 0,
+          latitude: "21.00",
+          longitude: "109.00",
+          width: 50,
+          height: 50
+      },
+      ],
+      polyline: [{  //路线
         points: [{
           longitude:this.longitude,
           latitude:this.latitude
@@ -158,12 +172,12 @@ export default {
         width: 2,
         dottedLine: true
       }],
-      controls: [{
+      controls: [{  //控件不随着地图移动
         id: 1,
-        iconPath: '../../static/images/shop5.png',
+        iconPath: '../../static/images/location.png',
         position: {
           left: 0,
-          top: 300 - 50,
+          top: 300,
           width: 50,
           height: 50
         },
@@ -196,7 +210,7 @@ export default {
       });
       myAmapFun.getRegeo({
         success:(data)=> {
-          console.log(data)
+          console.log(data,"高德地图")
           this.update({
               cityName:data[0].regeocodeData.addressComponent.city
               .toString()
@@ -216,20 +230,28 @@ export default {
       });
       
     },
-    getMapShow(){
-        wx.getLocation({   //获取当前位置的经纬度
-        type: 'wgs84', // 返回可以用于wx.openLocation的经纬度
-        success:(res)=>{
-          //console.log(res,"这是getLocation")
-          this.latitude = res.latitude
-          this.longitude = res.longitude
-          wx.setStorageSync("latitude", this.latitude)
-          wx.setStorageSync("longitude", this.longitude)
-          console.log(this.latitude,this.longitude)
+    // getMapShow(){
+    //       wx.getLocation({   //获取当前位置的经纬度
+    //         type: 'wgs84', // map 组件使用的经纬度是火星坐标系，调用 wx.getLocation 接口需要指定 type 为 gcj02
+    //         success:(res)=>{
+    //           //console.log(res,"这是getLocation")
+    //           this.latitude = res.latitude
+    //           this.longitude = res.longitude
+    //           wx.setStorageSync("latitude", this.latitude)
+    //           wx.setStorageSync("longitude", this.longitude)
+    //           //console.log(this.latitude,this.longitude)
+              
+    //         }
+    //       })
+    //       this.mapCtx=wx.createMapContext("map")
+    //       this.mapCtx.getCenterLocation({
+    //         success:(res)=>{
+    //             //console.log(res)
+    //         }
+    //       })
           
-        }
-      })
-    },
+        
+    // },
     close:function(){
       this.isnew=true
       this.showmember=false,

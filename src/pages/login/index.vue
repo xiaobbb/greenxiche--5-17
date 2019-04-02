@@ -79,8 +79,8 @@ export default {
                     success: function(res) {
                       console.log(res)
                       //console.log(res.data.data.Token)
-                        wx.setStorageSync("token", res.data.data.Token); //保存的令牌 accessToken
-                        wx.setStorageSync("userId", res.data.data.UserId); //保存用户Id到本地缓存
+                        // wx.setStorageSync("token", res.data.data.Token); //保存的令牌 accessToken
+                        // wx.setStorageSync("userid", res.data.data.UserId); //保存用户Id到本地缓存
                       //wx.setStorageSync("unionid", res.data.data.unionid); 
                       //wx.setStorageSync("openId", res.data.data.openId); 
                       if (res.data.code==0) {

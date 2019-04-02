@@ -98,7 +98,7 @@ export default {
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
-    this.UserId=wx.getStorageSync('userId');
+    this.UserId=wx.getStorageSync('userid');
     this.getShopDetail()
     this.getBarlist()
     this.showItem()

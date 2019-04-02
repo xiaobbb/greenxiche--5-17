@@ -2,13 +2,13 @@
   <div>
     <!--城市-->
     <div class="citylist flex-container" v-if="id==1">
-      <div class="cityitem" v-for="item in citylist" :key="item.id">
+      <div class="cityitem" v-for="(item,index) in citylist" :key="item.id" @click="choseItem(index)">
         <text>{{item.name}}</text>
         </div>
     </div>
     <!--字母-->
     <div class="citylist flex-container" v-else>
-      <div class="numitem" v-for="item in numlist" :key="item.id">
+      <div class="numitem" v-for="(item,cindex) in numlist" :key="item.id" @click="choseItem(cindex)">
         <text>{{item.name}}</text>
         </div>
     </div>
@@ -28,6 +28,7 @@ export default {
     return {
         isCity:false,
         id:"",
+        city:"",
         citylist:[
           {id:1,name:"京（北京）"},{id:2,name:"沪（上海）"},{id:3,name:"粤（广东）"},{id:4,name:"渝 (重庆）"},{id:5,name:"津 (天津）"},{id:6,name:"浙 (浙江）"},
           {id:7,name:"川 (四川）"},{id:8,name:"鄂 (湖北）"},{id:9,name:"苏 (江苏）"},{id:10,name:"皖 (安徽)"},{id:11,name:"闽 (福建）"},{id:12,name:"湘 (湖南）"},
@@ -57,6 +58,27 @@ export default {
       });
     },
     
+    choseItem(e){
+      if(this.id==1){
+          this.city=this.citylist[e].name.slice(0,1)
+      }else{
+          this.city=this.numlist[e].name.slice(0,1)
+      }
+     
+      
+      wx.showLoading({
+        title: "选择成功..."
+      });
+      this.goBack()
+    },
+    goBack(){
+      setTimeout(
+        ()=>{
+          console.log(this.id)
+          console.log(this.city)
+            wx.navigateTo({ url: "/pages/mycar/main?city="+this.city+"&id="+this.id});
+        },2000)
+    }
     
   },
 

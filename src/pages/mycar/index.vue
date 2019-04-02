@@ -53,10 +53,10 @@
             <div><span class="zhi">*&nbsp;</span>车牌号码</div>
             <div class="flex-container line-input">
                 <div class="flex-container title">
-                    <p class="flex-container"  @click="chooseCity(1)">粤<img src="/static/images/bot1.png" class="arrow"></p>
-                    <p class="flex-container"  @click="chooseCity(2)">A<img src="/static/images/bot1.png" class="arrow"></p>
+                    <p class="flex-container"  @click="chooseCity(1)">{{city}}<img src="/static/images/bot1.png" class="arrow"></p>
+                    <p class="flex-container"  @click="chooseCity(2)">{{num}}<img src="/static/images/bot1.png" class="arrow"></p>
                 </div>
-                <input type="text" placeholder="请填写车牌号" class="inn">
+                <input type="num" placeholder="请填写车牌号" class="inn" maxlength="5" v-model="carNum">
             </div>
         </div>
         <div class="sel">
@@ -84,16 +84,35 @@
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.params=this.$root.$mp.query.url
+    //console.log(this.params)
+    //console.log(this.city,"城市信息")
+    let cityname=this.$root.$mp.query.city
+    let lid=this.$root.$mp.query.id
+    console.log(cityname,lid)
+    if(lid==1){
+      this.city=cityname
+    }else if(lid==2){
+      this.num=cityname
+    }
   },
+  // onShow(){
+  //   this.city=this.$root.$mp.query.city
+  //   console.log(this.city,"城市信息")
+  // },
   data () {
     return {
         isshow:false,
         data:0,
+        city:"粤",
+        num:"A",
+        carNum:"",
         carinfolist:[
           {id:1,name:"东风本田-思域",carnum:"粤AJ6666",checked:true},
           {id:2,name:"日产-轩逸",carnum:"粤AJ6996",checked:false}
@@ -101,7 +120,27 @@ export default {
         ]
     }
   },
- 
+  watch:{
+    carNum(){
+      var reg=new RegExp("[0-9A-Z]")
+      //console.log(reg.test(this.carNum))
+      if(reg.test(this.carNum)==false){
+          wx.showToast({
+            title: '格式不对',
+            icon: 'none',
+            image: '',
+            duration: 1500,
+            mask: false,
+            success: (result)=>{
+              this.carNum=""
+            },
+            fail: ()=>{},
+            complete: ()=>{}
+          });
+         
+      }
+    }
+  },
   components: {
     
   },

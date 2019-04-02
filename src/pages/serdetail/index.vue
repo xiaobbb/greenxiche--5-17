@@ -85,7 +85,7 @@
       </div>
       <!--支付-->
       <div class="btn"> 
-          <div class="btnmoney">￥30.00</div>
+          <div class="btnmoney">￥{{detailinfo.Price}}</div>
           <div class="btncharge" @click="toPay(detailinfo.Id)">去结算</div>
       </div>
 
@@ -104,7 +104,7 @@ export default {
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
-    this.UserId=wx.getStorageSync('userId');
+    this.UserId=wx.getStorageSync('userid');
     this.getSerdetail()
   },
   data () {
@@ -135,9 +135,10 @@ export default {
             Lat:this.lat,
             Lng:this.lng
         })
+        //console.log(result)
         if(result.code==0){
             this.detailinfo=result.data[0]
-            console.log(this.detailinfo)
+            //console.log(this.detailinfo)
         }
     },
     toPay(e){
