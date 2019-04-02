@@ -289,8 +289,8 @@ export default {
     getData(){
         const that = this;
         const id = this.$root.$mp.query.id
-        console.log(this.$root.$mp.query)
-        post('Goods/ProductInfo',{proId:304*1}).then(res=>{
+        console.log(this.$root.$mp.query,'id?')
+        post('Goods/ProductInfo',{proId:312*1}).then(res=>{
             console.log(res,'产品详情')
             const datas = res.data;
             that.product = {

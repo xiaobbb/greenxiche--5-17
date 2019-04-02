@@ -50,14 +50,15 @@
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
-    this.setBarTitle();
-  },
   data () {
     return {
+      
+        userid: wx.getStorageSync('userid'),
+        token: wx.getStorageSync('token'),
         isshow:false,
         data:0,
         carinfolist:[
@@ -71,11 +72,31 @@ export default {
   components: {
     
   },
-  methods: {
-    setBarTitle() {
+  mounted(){
       wx.setNavigationBarTitle({
         title: '地址管理'
       });
+      this.getData();
+  },
+  methods: {
+    async getData(){
+      const params ={
+        UserId: this.userid,
+        Token: this.token,
+        Page:1,
+        PageSize:20
+      }
+      const res =await post('Address/AddressList',params)
+      for(let i=0;i<res.data.length;i+=1){
+        const list = res.data[i]
+        this.carinfolist.push({
+          id:list.id,
+          name:list.name,
+          phone:list.tel,
+          site:list.address,
+          checked:list.is_def
+        })
+      }
     },
     deleteSite(){
        this.isshow=true

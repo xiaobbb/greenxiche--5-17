@@ -20,21 +20,21 @@
               <img src="/static/images/back.png" class="right">
           </p>
       </div>
-      <div class="setitem flex-container white">
+      <div class="setitem flex-container white" @click="bandItem(3)">
           <p>地址管理</p>
-          <p @click="bandItem(3)">
+          <p >
               <img src="/static/images/back.png" class="right">
           </p>
       </div>
-      <div class="setitem flex-container white">
+      <div class="setitem flex-container white" @click="bandItem(4)">
           <p>意见反馈</p>
-          <p @click="bandItem(4)">
+          <p >
               <img src="/static/images/back.png" class="right">
           </p>
       </div>
-      <div class="setitem flex-container white">
+      <div class="setitem flex-container white"  @click="bandItem(5)">
           <p>防伪质保查询</p>
-          <p @click="bandItem(5)">
+          <p>
               <img src="/static/images/back.png" class="right">
           </p>
       </div>
@@ -84,6 +84,7 @@ export default {
       // if(a==1){
       //    wx.navigateTo({ url: "/pages/setphone/main" });
       // }
+      console.log(a)
       if(a==2){
          wx.navigateTo({ url: "/pages/setpassword/main" });
       }

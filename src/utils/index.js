@@ -40,18 +40,19 @@ function request(url, method, data, header = {}) {
       },
       success: function (res) {
         wx.hideLoading();
-        resolve(res.data);
         switch(res.data.code){
           case 0:
           resolve(res.data);
           break;
           case 2:
+          reject(false)
           wx.showToast({
             title:'需要重新登录!',
             icon:'none'
           })
           break;
           default:
+          reject(false)
           wx.showToast({
             title:res.data.msg+'，请刷新页面重试!',
             icon:'none'

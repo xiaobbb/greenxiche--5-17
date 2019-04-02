@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { host, post, get } from "../../utils";
+import { post} from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -45,7 +45,7 @@ export default {
     },
 
     async setPhone() {
-      if (this.phoneNumber === ""||!this.verifyCode) {
+      if (!this.verifyCode) {
         wx.showToast({
           title: "验证码不能为空",
           icon: "none",
@@ -63,12 +63,13 @@ export default {
           icon: "success",
           duration: 2000
         });
-        wx.wx.navigateBack()
+      setTimeout(()=> {
+      wx.navigateBack();
+      },1500)
       }
     },
     async getVerifyCode() {
       const TIME_COUNT = 60; // 60s后重新获取验证码
-      const codeNum = this.verificationCode;
       const phoneNum = this.phoneNumber;
       if (!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(phoneNum))) {
         wx.showToast({
