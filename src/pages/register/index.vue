@@ -121,7 +121,7 @@ export default {
           },
           success: function(res) {
             console.log(res);
-            if (res.meta.code === 1) {
+            if (res.data.meta.code === 1) {
               wx.showToast({
                 title: "绑定手机成功",
                 icon: "success",
@@ -138,7 +138,7 @@ export default {
               //绑定手机成功之后，跳转到会员中心
             } else {
               wx.showToast({
-                title: res.meta.message, //提示的内容,
+                title: res.data.meta.message, //提示的内容,
                 icon: "none", //图标,
                 duration: 1500, //延迟时间,
                 mask: false, //显示透明蒙层，防止触摸穿透,
