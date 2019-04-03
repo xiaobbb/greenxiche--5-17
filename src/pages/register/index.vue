@@ -121,7 +121,7 @@ export default {
           },
           success: function(res) {
             console.log(res);
-            if (res.meta === 1) {
+            if (res.meta.code === 1) {
               wx.showToast({
                 title: "绑定手机成功",
                 icon: "success",
