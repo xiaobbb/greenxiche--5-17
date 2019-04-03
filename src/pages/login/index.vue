@@ -11,8 +11,11 @@
 
 <script>
 import { host, myget, mypost } from "../../utils";
-//var qcloud = require("wafer2-client-sdk/index.js");
+var qcloud = require("wafer2-client-sdk/index.js");
 export default {
+  onLoad(){
+     
+  },
   created() {},
   mounted() {},
   data() {
@@ -28,101 +31,127 @@ export default {
       telNumber: "",
       code: "",
       accessToken: "",
-      Mobile:"18123769378",
-      PassWord:"123456",
+      // mobile:wx.getStorageSync("mobile"),
+      // password: wx.getStorageSync("password"),
+      mobile:"18123769378"
+     
     };
   },
   components: {},
   methods: {
     doBind() {
+      console.log(this.mobile,"手机号")
       let _this = this;
       var ivata = "";
       var encriptData = "";
-      var name=""
       wx.showLoading({
         title: "登陆中..."
       });
-     // 用户授权登陆，code发送给服务器
-      if(_this.Mobile==""){
-           _this.bindPhone(); 
-        }else{
-          wx.login({
-          success: function(ress) {
-            var code = ress.code; //腾讯服务器返回res,拿到code进行下一步操作
-            //console.log(code)
-            var mobile=_this.Mobile,
-                password=_this.PassWord
-            // wx.getUserInfo({
-            //   success: function(res) {
-            //     //console.log(res)
-            //     var userInfo = res.userInfo;
-            //     ivata = res.iv;
-            //     encriptData = res.encryptedData;
-            //     wx.setStorageSync("userInfo", userInfo); //保存用户信息，userInfo对象里面含有用户昵称，用户头像,性别等信息：
-            //                                             //userInfo.nickName 用户昵称; 
-            //                                             //userInfo.avatarUrl 用户头像图片的URL;
-            //                                             //userInfo.gender 用户性别
-            //   }
-            // });
-            //console.log(mobile,password)
-            if (code) {
-                  wx.request({
-                    method: "POST",
-                    url: "http://carapi.wtvxin.com/api/Login/LoginByMobile", //提交数据到服务器，如果没有绑定手机号码，则提示用户需要绑定手机号码
-                    data: {
-                      Mobile:mobile,
-                      PassWord:password
-                    },
-                    header: {
-                      "content-type": "application/x-www-form-urlencoded"
-                    },
-                    success: function(res) {
-                      console.log(res)
-                      //console.log(res.data.data.Token)
-                        // wx.setStorageSync("token", res.data.data.Token); //保存的令牌 accessToken
-                        // wx.setStorageSync("userid", res.data.data.UserId); //保存用户Id到本地缓存
-                      //wx.setStorageSync("unionid", res.data.data.unionid); 
-                      //wx.setStorageSync("openId", res.data.data.openId); 
-                      if (res.data.code==0) {
-                          console.log("登陆成功");
-                          wx.showToast({
-                              title: '登陆成功',
-                              icon: 'success',
-                              duration: 2000,
-                              complete: function (){//登陆成功之后,延时2秒跳转到会员中心
-                                // setTimeout(function(){
-                                //   wx.switchTab({
-                                //   url:"/pages/mine/main",
-                                //   })
-                                // }, 2000);
-                             }
-                          });
-                        } else {
-                            //没有绑定手机，则跳转到绑定手机的页面
-                            _this.bindPhone(); //绑定手机
+      //用户授权登陆，code发送给服务器
+      wx.login({
+        success: (res)=>{
+          var code = res.code; //腾讯服务器返回res,拿到code进行下一步操作
+          console.log(code)
+          // if(code){
+          //     wx.request({
+          //           method: "Get",
+          //           url: "http://carapi.wtvxin.com/api/Login/GetLoginOpenId", //提交数据到服务器，如果没有绑定手机号码，则提示用户需要绑定手机号码
+          //           data: {
+          //             code: code,
+          //           },
+          //           header: {
+          //             "content-type": "application/x-www-form-urlencoded"
+          //           },
+          //           success:(res)=>{
+          //             console.log(res)
+          //             const openid=res.data.data.openid
+          //             const session_key=res.data.data.session_key
+          //             const unionid=res.data.data.unionid
+          //             console.log(this.openid)
+          //             wx.setStorageSync("openid", openid)
+          //             wx.setStorageSync("session_key", session_key)
+          //             wx.setStorageSync("unionid", unionid)
+          //           }
+          //       })
+          // }
+
+          wx.getUserInfo({ 
+            success: (res)=> {
+              //console.log(res)
+              var userInfo = res.userInfo;
+              ivata = res.iv;
+              encriptData = res.encryptedData;
+              wx.setStorageSync("userInfo", userInfo); //保存用户信息，userInfo对象里面含有用户昵称，用户头像,性别等信息：
+                                                       //userInfo.nickName 用户昵称; 
+                                                       //userInfo.avatarUrl 用户头像图片的URL;
+                                                       //userInfo.gender 用户性别
+              console.log(this.mobile,"这是参数")                                         
+              if (code) {
+                //code（有效期五分钟），开发者需要将 code 发送到开发者服务器后台，使用code 换取 session_key api，将 code 换成 openid 和 session_key
+                wx.request({
+                  method: "POST",
+                  url: "http://carapi.wtvxin.com/api/Login/SignIn_New", //提交数据到服务器，如果没有绑定手机号码，则提示用户需要绑定手机号码
+                  data: {
+                    iv: ivata,
+                    code: code,
+                    encryptedData: encriptData,
+                    //mobile:this.mobile
+                  },
+                  header: {
+                    "content-type": "application/x-www-form-urlencoded"
+                  },
+                  success: function(res) {
+                    console.log(res)
+                    wx.setStorageSync("token", res.data.data.accessToken); //保存的令牌 accessToken
+                    wx.setStorageSync("userId", res.data.data.uid); //保存用户Id到本地缓存
+                    wx.setStorageSync("unionid", res.data.data.unionid); 
+                    wx.setStorageSync("openId", res.data.data.openId); 
+                    if (res.data.code== 0) {
+                    console.log("登陆成功");
+                      wx.showToast({
+                          title: '登陆成功',
+                          icon: 'success',
+                          duration: 2000,
+                          complete: function (){//登陆成功之后,延时2秒跳转到会员中心
+                            setTimeout(function(){
+                            // wx.switchTab({
+                            //   url:"/pages/mine/main",
+                            // })
+                          }, 2000);
                         }
-                    },
-                    fail: function(error) {},
-                    complete: function() {
-                      wx.hideLoading();
-                    }
                       });
                     } else {
-                      wx.hideLoading();
-                      console.log("获取用户登录态失败：" + res.errMsg);
+                      //没有绑定手机，则跳转到绑定手机的页面
                       wx.showToast({
-                        title: "获取授权信息失败",
-                        icon: "none",
-                        duration: 2000
-                      });
-                      return;
+                          title: '请先绑定手机',
+                          icon: 'none',
+                          duration: 3000,
+                          complete: function (){
+                            // _this.bindPhone()
+                         }
+                       });
+                     //绑定手机
                     }
+                  },
+                  fail: function(error) {},
+                  complete: function() {
+                    wx.hideLoading();
+                  }
+                });
+              } else {
+                wx.hideLoading();
+                console.log("获取用户登录态失败：" + res.errMsg);
+                wx.showToast({
+                  title: "获取授权信息失败",
+                  icon: "none",
+                  duration: 2000
+                });
+                return;
               }
-        
-        
-        });
-      }
-      
+            }
+          });
+        }
+      });
     },
     async getAddressList() {
       var _this = this;
@@ -162,10 +191,11 @@ export default {
       }
     },
     bindPhone() {
-      let that = this;
-      wx.navigateTo({
-        url: "/pages/register/main"
-      });
+      setTimeout(function(){
+          wx.navigateTo({
+            url: "/pages/register/main"
+          });
+      },1000)
     },
     setOpenId(session_id) {
       var sessionid = session_id;
@@ -196,7 +226,7 @@ export default {
             url:
               "https://auth.wtvxin.com/WxOpen/GetUserInfoAndOpenId?sessionId=" +
               sessionid,
-            data: userdetail,
+              data: userdetail,
             header: {
               "content-type": "application/json" //默认值
             },

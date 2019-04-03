@@ -97,7 +97,7 @@ export default {
       //   Password:this.password,
       // });
        wx.request({
-        url:"http://carapi.wtvxin.com/api/Login/MobileRegister" ,//仅为示例，并非真实的接口地址
+        url:"http://carapi.wtvxin.com/api/Login/MobileRegister" ,
         method: "POST",
         data: {
           Mobile:this.phoneNumber,
@@ -107,9 +107,12 @@ export default {
         header: {
           'content-type': 'application/json' // 默认值
         },
-        success: function (res) {
+        success:(res)=>{
           console.log(res)
           if(res.data.code==0){
+              wx.setStorageSync("mobile", this.phoneNumber);
+              wx.setStorageSync("password", this.password);
+              console.log(this.password)
               wx.showToast({
                   title: '绑定手机成功',
                   icon: 'success',
