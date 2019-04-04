@@ -32,7 +32,7 @@ export default {
       phoneNumber: "",
       verifyCode: "",
       token: wx.getStorageSync("token"),
-      userid: wx.getStorageSync('userid')
+      userid: wx.getStorageSync('userId')
     };
   },
 

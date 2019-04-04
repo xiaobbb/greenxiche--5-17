@@ -46,11 +46,17 @@ import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
+  onLoad(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
+  },
   data () {
     return {
       showPhone:true,
       phone:'',
-      showPass:true
+      showPass:true,
+      userId:"",
+      token:""
     }
   },
  
@@ -69,8 +75,8 @@ export default {
     },
     async getData(){
       const params ={
-        UserId: wx.getStorageSync('userid'),
-        Token: wx.getStorageSync('token')
+        UserId: this.userId,
+        Token: this.token
       }
       const res =await post('User/SettingPageData',params)
       this.showPhone = !res.data.IsMobile;
