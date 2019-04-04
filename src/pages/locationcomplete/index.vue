@@ -71,6 +71,7 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    
   },
   data () {
     return {

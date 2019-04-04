@@ -2,15 +2,15 @@
   <div>
     <!--填写订单-->
     <div class="glo-relative bg-cart">
-        <img src="/static/images/cartbg5.png" class="shopbg">
-        <img src="/static/images/location.png" class="location-logo">
+        <!-- <img src="/static/images/cartbg5.png" class="shopbg"> -->
+        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:560rpx;"></map>
         <img src="/static/images/cart.png" class="cart-img">
     </div>
     <!--列表-->
     <div class="list">
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">展涛科技大厦c座</span>
+            <span class="location-self">{{nowPlace}}</span>
             <img src="/static/images/back.png" class="back" @click="chosePlace">
         </div>
         <p class="hr"></p>
@@ -65,21 +65,38 @@
 <script>
 import "../../css/common.css";
 import "../../css/global.css";
+import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
    onLoad(){
     this.setBarTitle();
+    //console.log(this.longitude)
   },
   data () {
     return {
-     
+        latitude: wx.getStorageSync("latitude"),
+        longitude: wx.getStorageSync("longitude"),
+        controls: [{  //控件不随着地图移动
+          id: 1,
+          iconPath: '/static/images/location.png',
+          position: {
+            left: 0,
+            top: 100,
+            width: 30,
+            height: 30
+          },
+          clickable: true
+      }],
     }
   },
-
+  computed:{
+    ...mapState(["cityName","nowPlace"])
+  },
   components: {
     
   },
 
   methods: {
+    ...mapMutations(["update"]),
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "填写订单"
@@ -88,8 +105,8 @@ export default {
     chosePlace(){
         wx.navigateTo({ url: "/pages/locationorder/main" });
     },
-    choseItem(){
-        wx.navigateTo({ url: "/pages/servince/main?id=1" });
+    choseItem(){  //选择服务项目
+        wx.navigateTo({ url: "/pages/servince/main?url=location"});
     },
     choseTime(){
         wx.navigateTo({ url: "/pages/writeorder/main" });
