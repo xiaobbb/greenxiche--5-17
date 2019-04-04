@@ -34,7 +34,7 @@ export default {
       passwords: "",
       confirmPassword: "",
       token: wx.getStorageSync("token"),
-      userid: wx.getStorageSync("userid")
+      userid: wx.getStorageSync("userId")
     };
   },
 
