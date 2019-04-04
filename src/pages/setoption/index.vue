@@ -36,7 +36,7 @@ export default {
     return {
       text:'',
       imgBase:[],
-      userid: wx.getStorageSync("userid"),
+      userid: wx.getStorageSync("userId"),
       token: wx.getStorageSync("token"),
     }
   },
