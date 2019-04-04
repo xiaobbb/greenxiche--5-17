@@ -58,11 +58,13 @@
         <div class="lasttime white">剩余支付时间  <span>{{minute}}</span> : <span>{{second}}</span></div>
         <div class="flex-container white commonpad">
             <p class="strong">应付金额</p>
-            <p class="shouldpay">￥{{orderParmar.Total}}</p>
+            <!-- <p class="shouldpay">￥{{orderParmar.Total}}</p> -->
+            <p class="shouldpay">￥{{orderParmar}}</p>
         </div>
         <div class="slide"></div>
         <div class="white">
-            <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar.Wallet}}</span>元</div>
+            <!-- <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar.Wallet}}</span>元</div> -->
+            <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar}}</span>元</div>
             <!-- <div>
               <div class="flex-container payitem commonpad">
                   <img src="/static/images/wx.png" class="payimg">

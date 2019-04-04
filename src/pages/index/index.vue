@@ -230,28 +230,28 @@ export default {
       });
       
     },
-    // getMapShow(){
-    //       wx.getLocation({   //获取当前位置的经纬度
-    //         type: 'wgs84', // map 组件使用的经纬度是火星坐标系，调用 wx.getLocation 接口需要指定 type 为 gcj02
-    //         success:(res)=>{
-    //           //console.log(res,"这是getLocation")
-    //           this.latitude = res.latitude
-    //           this.longitude = res.longitude
-    //           wx.setStorageSync("latitude", this.latitude)
-    //           wx.setStorageSync("longitude", this.longitude)
-    //           //console.log(this.latitude,this.longitude)
+    getMapShow(){
+          wx.getLocation({   //获取当前位置的经纬度
+            type: 'gcj02', // map 组件使用的经纬度是火星坐标系，调用 wx.getLocation 接口需要指定 type 为 gcj02
+            success:(res)=>{
+              //console.log(res,"这是getLocation")
+              this.latitude = res.latitude
+              this.longitude = res.longitude
+              wx.setStorageSync("latitude", this.latitude)
+              wx.setStorageSync("longitude", this.longitude)
+              //console.log(this.latitude,this.longitude)
               
-    //         }
-    //       })
-    //       this.mapCtx=wx.createMapContext("map")
-    //       this.mapCtx.getCenterLocation({
-    //         success:(res)=>{
-    //             //console.log(res)
-    //         }
-    //       })
+            }
+          })
+          this.mapCtx=wx.createMapContext("map")
+          this.mapCtx.getCenterLocation({
+            success:(res)=>{
+                //console.log(res)
+            }
+          })
           
         
-    // },
+    },
     close:function(){
       this.isnew=true
       this.showmember=false,

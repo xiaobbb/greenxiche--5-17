@@ -2,7 +2,7 @@
 	"description": "项目配置文件。",
 	"setting": {
 		"urlCheck": false,
-		"es6": false,
+		"es6": true,
 		"postcss": true,
 		"minified": true,
 		"newFeature": true,
@@ -11,7 +11,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx3fef1ccc9946eb7b",
+	"appid": "wx73dbae1cbf851757",
 	"projectname": "my-project",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
@@ -176,16 +176,9 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "确认订单",
+					"id": 20,
+					"name": "商城确认订单",
 					"pathName": "pages/confirmorder/main",
-					"query": "",
-					"scene": null
-				},
-				{
-					"id": -1,
-					"name": "副本",
-					"pathName": "pages/writeordertest/main",
 					"query": "",
 					"scene": null
 				},
@@ -361,6 +354,13 @@
 					"id": -1,
 					"name": "注册",
 					"pathName": "pages/register/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "测试代码",
+					"pathName": "pages/testcode/main",
 					"query": "",
 					"scene": null
 				}

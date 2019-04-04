@@ -62,19 +62,19 @@
         <div class="sel">
             <div><span class="zhi">*&nbsp;</span>品牌车系</div>
             <div  class="line-input">
-                <input type="text" placeholder="请填写您的汽车品牌">
+                <input type="text" placeholder="请填写您的汽车品牌" v-model="carBrand">
             </div>
         </div>
         <div class="sel">
             <div>&nbsp;车&nbsp;&nbsp; 型</div>
             <div  class="line-input">
-                <input type="text" placeholder="请填写您的汽车车型">
+                <input type="text" placeholder="请填写您的汽车车型" v-model="carSize">
             </div>
         </div>
         <div class="sel">
             <div>&nbsp;颜&nbsp;&nbsp; 色</div>
             <div  class="line-input">
-                <input type="text" placeholder="请填写您的汽车颜色">
+                <input type="text" placeholder="请填写您的汽车颜色" v-model="carColor">
             </div>
         </div>
         <!--按钮-->
@@ -90,12 +90,13 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.getAllcar()
     this.params=this.$root.$mp.query.url
     //console.log(this.params)
     //console.log(this.city,"城市信息")
     let cityname=this.$root.$mp.query.city
     let lid=this.$root.$mp.query.id
-    console.log(cityname,lid)
+    //console.log(cityname,lid)
     if(lid==1){
       this.city=cityname
     }else if(lid==2){
@@ -108,11 +109,16 @@ export default {
   // },
   data () {
     return {
-        isshow:false,
+        isshow:true,
         data:0,
         city:"粤",
         num:"A",
         carNum:"",
+        carBrand:"",//车系
+        carSize:"",//车型
+        carColor:"",
+        userid: wx.getStorageSync("userid"),
+        token: wx.getStorageSync("token"),
         carinfolist:[
           {id:1,name:"东风本田-思域",carnum:"粤AJ6666",checked:true},
           {id:2,name:"日产-轩逸",carnum:"粤AJ6996",checked:false}
@@ -150,7 +156,14 @@ export default {
         title: "车辆信息"
       });
     },
-    
+    async getAllcar(){  //获取车辆信息
+        const params={
+            UserId: this.userid,
+            Token: this.token,
+        } 
+        const res=await post("/User/GetCarInfo",params);
+        console.log(res)
+    },
     radioChange(e){
       //console.log(e.target.value)
       var arrs = this.carinfolist;
@@ -164,8 +177,20 @@ export default {
       }
       
     },
-    saveCar(){
-        this.isshow=true
+    async saveCar(){
+        //this.isshow=true
+        const params = {
+          UserId:this.userid,
+          Token: this.token,
+          CarInfo:{
+            CarMumber:this.city+this.num+this.carNum,
+            CarBrand:this.carBrand,
+            CarType:this.carSize,
+            CarColor:this.carColor
+          }
+      }
+      const res=await post("/User/AddCarInfo",params)
+      console.log(res)
     },
     addCar(){
         this.isshow=false

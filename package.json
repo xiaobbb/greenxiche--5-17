@@ -29,7 +29,8 @@
     "node-sass": "^4.11.0",
     "sass": "^1.17.3",
     "sass-loader": "^7.1.0",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "wafer2-client-sdk": "^2.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",

@@ -87,16 +87,16 @@ export default {
     
   },
   mounted(){
-      const data ={
-          Mobile:'18123769378',
-          PassWord:'123456'
-      }
-    //   登录，设置缓存
-      post('Login/LoginByMobile',data).then(res=> {
-          wx.setStorageSync('userid',res.data.UserId)
-          wx.setStorageSync('token',res.data.Token)
-      })
-      console.log(wx.getStorageSync('userid'),wx.getStorageSync('token'))
+    //   const data ={
+    //       Mobile:'18123769378',
+    //       PassWord:'123456'
+    //   }
+    // //   登录，设置缓存
+    //   post('Login/LoginByMobile',data).then(res=> {
+    //       wx.setStorageSync('userid',res.data.UserId)
+    //       wx.setStorageSync('token',res.data.Token)
+    //   })
+    //   console.log(wx.getStorageSync('userid'),wx.getStorageSync('token'))
   },
   methods: {
     setBarTitle() {
