@@ -81,7 +81,7 @@ export default function logins() {
             }
           },
           fail(){
-            //   未授权，跳转授权
+            //   未授权，跳转授权   
             wx.navigateTo({url:'/pages/login/main'})
           }
         });
