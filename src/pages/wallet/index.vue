@@ -7,7 +7,7 @@
      <div class="white">
         <div class="flex-container waitem" @click="toSum">
             <img src="/static/images/sum.png" class="walletlogo">
-            <p>余额明细</p>
+            <p>余额充值</p>
         </div>
         <div class="flex-container waitem" @click="toMoneyDetail">
             <img src="/static/images/capital.png" class="walletlogo">

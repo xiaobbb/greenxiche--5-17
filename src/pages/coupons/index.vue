@@ -6,56 +6,69 @@
       </div>
       <div class="slide"></div>
       <!--没有优惠券-->
-      <div class="nodata"  v-if="isdata">
+      <div class="nodata"  v-if="couptlist.length<=0">
           <img src="/static/images/nodata.png" class="couppics">
           <p>暂无优惠券</p>
       </div>
       <!--排行list-->
       <div class="certlist">
           <div>
-              <div class="coupitem" v-for="item in couptlist" :key="item.id">
-                <img src="/static/images/huiyellow.png" class="bgcolor" v-if="isactive">
-                <img src="/static/images/gray3.png" class="bgcolor" v-else-if="ispadded">
-                <img src="/static/images/passbg3.png" class="bgcolor" v-else>
+              <div class="coupitem" v-for="(item,index) in couptlist"  :key="index">
+                <img src="/static/images/huiyellow.png" class="bgcolor" v-if="item.Enables===1">
+                <img src="/static/images/gray3.png" class="bgcolor" v-if="item.Enables===2">
+                <img src="/static/images/passbg3.png" class="bgcolor" v-if="item.Enables===3">
                 <div class="coupinfo">
                     <div class="main">
-                        <p><span>￥</span>30</p>
-                        <p>直接减免100元</p>
+                        <p v-if="item.DiscountType===2">{{item.Denomination}}<span>折</span></p>
+                        <p v-else><span>￥</span>{{item.Denomination}}</p>
+                        <p class="meetConditions"><span v-if="item.MeetConditions>0">满{{item.MeetConditions}}元可用</span><span v-else>直接减免</span></p>
                     </div>
                     <div class="right flex-container">
                         <div>
-                            <p class="coupname">{{item.name}}</p>
-                            <p class="couptime coupuse">2019.2.22-2019.2.24</p>
-                            <p class="couptime">用户购买商品服务可使用</p>
+                            <p class="coupname">{{item.Title}}</p>
+                            <p class="couptime coupuse">{{item.AddTime}}-{{item.EndTime}}</p>
+                            <p class="couptime">{{item.ScopeOfUse}}</p>
                         </div>
-                        <div class="btn" v-if="isactive">立即使用</div>
+                        <div class="btn" v-if="item.Enables===1" @click="gotoShopcenter(item.Id)">立即使用</div>
                     </div>
                 </div>
               </div>
           </div>
-      </div>    
+      </div>
+      <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
   </div>
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
+    // Enables:0:不可以使用；1：可使用；2：已使用；3：为已过期
+    this.couptlist = [];
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
     this.setBarTitle();
+    this.getCouponList();
   },
   data () {
     return {
-      active:"1",
-      isdata:false,
-      isactive:true,
-      ispadded:false,
+      active:"2",
+      userId:"",
+      token:"",
+      status:2,  //1--已过期,2--未使用,3--已使用
+      page:1,
+      pageSize:12,
+      couponType:0,
+      count:0,
+      allPage:0,
+      isLoad:false,
+      isOved:false,
       titlelist:[
-        {id:1,name:"未使用"},{id:2,name:"已使用"},{id:3,name:"已过期"}
+        {id:2,name:"未使用"},{id:3,name:"已使用"},{id:1,name:"已过期"}
       ],
-      couptlist:[
-        {id:1,name:"外观标准洗车券"},{id:2,name:"镀晶优惠券"},{id:3,name:"通用券-新人礼包"},{id:4,name:"通用优惠券"},
-      ]
+      couptlist:[]
     }
   },
  
@@ -68,24 +81,70 @@ export default {
         title: "优惠券"
       });
     },
+    async getCouponList(){
+      let result = await post("User/CouponList",{
+        UserId:this.userId,
+        Token:this.token,
+        Status:this.status,
+        page:this.page,
+        pageSize:this.pageSize,
+        Type:this.couponType
+      });
+      this.count = result.count;
+      if (parseInt(this.count) % this.pageSize === 0) {
+        this.allPage = this.count / this.pageSize;
+      } else {
+        this.allPage = parseInt(this.count / this.pageSize) + 1;
+      }
+      if(result.data.length>0){
+        for(let i=0;i<result.data.length;i++){
+          result.data[i].AddTime = result.data[i].AddTime.split(" ")[0].split("/").join(".");
+          result.data[i].EndTime = result.data[i].EndTime.split(" ")[0].split("/").join(".");
+        }
+        this.couptlist = this.couptlist.concat(result.data);
+      }
+      console.log("当前的page:"+this.page);
+      console.log("总页数："+this.allPage);
+      if(this.allPage >= this.page){
+        this.isLoad = true;
+      }else{
+        this.isLoad = false;
+      }
+    },
     change(e){
       //console.log(e)
-      this.active=e
-      if(e=="1"){
-          this.isactive=true
-      }else if(e=="2"){
-          this.isactive=false
-          this.ispadded=true
-      }else if(e=="3"){
-          this.ispadded=false
-          this.isused=false
-      }
+      this.active=e;
+      this.status=e;
+      this.page=1;
+      this.isLoad = false;
+      this.isOved = false;
+      this.couptlist = [];
+      this.getCouponList();
+    },
+    gotoShopcenter(id){
+      wx.switchTab({
+        url:"/pages/shopcenter/main?couponId="+id
+      })
     }
     
   },
 
   created () {
     // let app = getApp()
+  },
+  onReachBottom(){
+    console.log("gggggggg");
+    console.log(this.isLoad);
+    if(this.isLoad){
+      this.page++;
+      this.getCouponList();
+    }else{
+      if (this.page > 1) {
+        this.isOved = true;
+      } else {
+        this.isOved = false;
+      }
+    }
   }
 }
 </script>
