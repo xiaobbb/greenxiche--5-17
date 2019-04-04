@@ -1,3 +1,6 @@
+.detail{
+    padding-bottom:96rpx;
+}
 .shippic{
     width:750rpx;
     height:750rpx;
@@ -91,10 +94,10 @@
     width:85%;
 }
 .estimate{
-    padding:0 20rpx;
+    padding:0 0rpx;
 }
 .estititle{
-    padding: 20rpx 0;
+    padding: 20rpx;
     border-bottom:1rpx solid #eee;
 }
 .estititle p+p{
@@ -158,6 +161,11 @@
     display: flex;
     align-items: center;
     height:96rpx;
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#fff;
 }
 .bot{
     width:30%;
@@ -182,7 +190,7 @@
 }
 .mask{
     width:750rpx;
-    height:800rpx;
+    // height:800rpx;
     position:fixed;
     left:0;
     bottom:0;
@@ -372,11 +380,4 @@
     background: #fda33a;
     border-top-left-radius: 50rpx;
     border-bottom-left-radius: 50rpx;
-}
-.callback{
-    background: #fef4f0;
-    color:#7c726e;
-    padding:20rpx;
-    margin:0 20rpx 20rpx 20rpx;
-    border-radius:10rpx;
 }

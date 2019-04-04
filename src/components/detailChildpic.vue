@@ -3,42 +3,57 @@
         <div class="flex-container userinfo">
             <div class="flex-container">
                 <div>
-                    <img src="/static/images/avatar.png" class="avatar">
+                    <img :src="data.userImg" class="avatar">
                 </div>
                 <div>
                     <p>
-                        <text>筱风月忆</text>
+                        <text>{{data.userName}}</text>
                         <text  class="carname">奥迪A3</text>
                     </p>
                     <p>
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/gray1.png" class="xing-point">
+                        <img v-for="(rank,index) in data.rank" :key="index" src="/static/images/xing.png" class="xing-point">
+                        <img v-for="(rank,index) in (5-data.rank)" :key="index" src="/static/images/gray1.png" class="xing-point">
                     </p>
                 </div>
             </div>
-            <div class="usertime">01-20 10:50</div>
+            <div class="usertime">{{data.time}}</div>
         </div>
-        <div>工作人员很认真，服务态度很好</div>
-        <div class="flex-container picslist">
+        <div>{{data.content}}</div>
+        <div class="picslist">
+            <!-- <img v-for="(img,indexImg) in data.img" :key="indexImg" :src="img" class="pointpics"> -->
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
         </div>
         <div class="usertime">车御品汽车服务</div>
+        
+            <div class="callback">
+                [商家回复]：感谢您的评价，我们的价格可以说是龙华最 低、性价比最高、服务最好的洗车店了
+            </div>
     </div>
 </template>
 
 <script>
 export default {
   
+    props:{
+        data:function (){
+            return []
+        }
+    },
+    data(){
+        return {
+
+        }
+    },
+    mounted(){
+        console.log(this.data)
+    }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .point{
     padding:20rpx;
     box-sizing: border-box;
@@ -80,5 +95,18 @@ export default {
 .picslist{
     padding:20rpx 0;
     flex-wrap: wrap;
+    display:flex;
+    align-items:center;
+    margin-right:-10rpx;
+    img{
+        margin-right:10rpx;
+    }
+}
+.callback{
+    background: #fef4f0;
+    color:#7c726e;
+    padding:20rpx;
+    margin-top:10rpx;
+    border-radius:10rpx;
 }
 </style>

@@ -24,8 +24,7 @@
           <div class="flex-container citeminfo">
             <p class="itemtitle" @click="goDetail(item.id)">{{item.title}}</p>
             <p class="progress" @click="goDetail(item.id)">
-              <text>深度清洁</text>
-              <text>增加亮度</text>
+              <text v-for="(tab,tabIndex) in item.tab" :key="tabIndex">{{tab}}</text>
             </p>
             <p class="sales">销量{{item.sale}}</p>
             <div class="flex-container around">
@@ -44,7 +43,7 @@
     <div class="btn">
       <div class="btninfo">
         <div class="btn-shop">
-          <div class="cartshopbg">
+          <div class="cartshopbg" @click="goUrl('/pages/shopcart/main')">
             <img src="/static/images/shopcart.png" class="cartshop">
             <text class="numright">2</text>
           </div>
@@ -72,23 +71,34 @@ export default {
       productlist: [],
       //卡券
       cardlist: [
-        { id: 1, title: "普通洗车单次卡", sale: "425", price: "80.00" },
-        { id: 2, title: "镀晶服务两次卡", sale: "36", price: "368.00" },
-        { id: 3, title: "普通洗车单次卡", sale: "96", price: "25.00" },
-        { id: 4, title: "普通洗车单次卡", sale: "128", price: "96.00" }
       ],
       //套餐
       combolist: [
-        { id: 1, title: "清洗套餐卡", sale: "369", price: "63.00" },
-        { id: 2, title: "养护套餐卡", sale: "99", price: "156.00" },
-        { id: 3, title: "镀晶套餐卡", sale: "84", price: "23.00" },
-        { id: 4, title: "清洗套餐卡", sale: "328", price: "9.00" }
       ],
       activeId: Number,
-      isSelectAll: "true"
+      isSelectAll: "true",
+      carData:[],
+      carNum:0,
+      carPrice:0,
     };
   },
-
+  watch: {
+    // productlist:{
+    //     handler: function () {
+    //       const list =[]
+    //       for(let i=0;i<this.productlist.length;i+=1){
+    //         const data = this.productlist[i]
+    //         if(data.num){
+              
+    //           list.push(data)
+    //         }
+    //       }
+    //       this.carData = list;
+    //       console.log(this.carData)
+    //     },
+    //     deep: true
+    // }
+  },
   mounted() {
     this.setBarTitle();
     // 分类列表
@@ -103,7 +113,7 @@ export default {
     // 获取分类列表
     getClassify() {
       const that = this;
-      post("Server/GetCarWash").then(res => {
+      post("Server/GetCarWash",{BrandList:0}).then(res => {
         for (let i = 0; i < res.data.length; i += 1) {
           const datas = res.data[i];
           that.menulist.push({
@@ -129,8 +139,9 @@ export default {
               title: datas.Name,
               price: datas.Price,
               img: datas.ProductImg,
-              sale: 100,
-              num: 0
+              sale: datas.SalesVolume,
+              num: 0,
+              tab:datas.KeywordName
             });
           }
         }
@@ -141,8 +152,33 @@ export default {
         this.productlist[index].num -= 1;
       }
     },
-    addNumber(index) {
+    async addNumber(index) {
       this.productlist[index].num += 1;
+      const product = this.productlist[index]
+      const params ={
+        UserId:this.userid,
+        Token:this.token,
+        ProId: product.id,
+        Count:1,
+        SpecText:''
+      }
+      const res = await post('Cart/AddCart',params)
+      this.getCarData()
+    },
+    // 获取购物车信息
+    async getCarData(){
+      const params ={
+        UserId:this.userid,
+        Token:this.token,
+      }
+      const res = await post('Cart/CartList',params)
+      this.carNum=0;
+      this.carPrice =0;
+      for(let i=0;i<res.data.length;i+=1){
+        const datas = res.data[i]
+        this.carNum += datas.Number
+        this.carPrice += (datas.SalePrice*datas.Number)
+      }
     },
     change(e) {
       console.log(e);
@@ -175,6 +211,9 @@ export default {
     },
     toPAy() {
       wx.navigateTo({ url: "/pages/confirmorder/main" });
+    },
+    goUrl(url){
+      wx.navigateTo({url})
     }
   }
 };

@@ -26,12 +26,13 @@
 </template>
 
 <script>
+import { post } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.choosedate()
+    this.getData()
   },
   data () {
     return {
@@ -48,14 +49,8 @@ export default {
         title: "我的消息"
       });
     },
-    choosedate(){
-      var d=new Date()
-      //console.log(date)
-      var month=d.getMonth()+1
-      var date=d.getDate()
-      this.time=`${month}`+'月'+`${date}`+'日'
-      console.log(this.time)
-        
+    async getData(){
+      const res = await post('')
     },
     showDetail(){
       wx.navigateTo({ url: "/pages/messagedetail/main" });

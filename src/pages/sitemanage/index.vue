@@ -75,6 +75,7 @@ export default {
   },
   methods: {
     async getData() {
+      console.log(this.userid,this.token)
       const params = {
         UserId: this.userid,
         Token: this.token,

@@ -49,11 +49,11 @@
       </div>
       <!--组-->
       <div class="white minelist">
-          <div class="mineitem" @clcik="goItem(1)">
+          <div class="mineitem" @click="goItem(1)">
               <img src="/static/images/purple.png" class="mine1">
               <p>我的钱包</p>
           </div>
-          <div class="mineitem" @clcik="goItem(2)">
+          <div class="mineitem" @click="goItem(2)">
               <img src="/static/images/msg.png" class="mine2">
               <p>消息</p>
           </div>
@@ -61,7 +61,7 @@
               <img src="/static/images/ser.png" class="mine3">
               <p>客服</p>
           </div>
-          <div class="mineitem" @clcik="goItem(3)">
+          <div class="mineitem" @click="goItem(3)">
               <img src="/static/images/set.png" class="mine4">
               <p>设置</p>
           </div>
@@ -105,6 +105,7 @@ export default {
       });
     },
     goItem(e){
+        console.log(e)
       var a=e
       if(a==1){
           wx.navigateTo({ url: "/pages/wallet/main" });
@@ -117,7 +118,7 @@ export default {
       }
       
     },
-    choseItem(){
+    choseItem(e){
       var a=e
       if(a==1){
           wx.navigateTo({ url: "/pages/myorder/main" });

@@ -11,7 +11,7 @@
                         <text  class="carname">奥迪A3</text>
                     </p>
                     <p>
-                        <img v-for="(img,indexImg) in data.img" :key="indexImg" :src="img" class="xing-point">
+                       <img src="/static/images/xing.png" class="xing-point">
                         <img src="/static/images/xing.png" class="xing-point">
                         <img src="/static/images/xing.png" class="xing-point">
                         <img src="/static/images/gray1.png" class="xing-point">
@@ -20,7 +20,10 @@
             </div>
             <div class="usertime">01-20 10:50</div>
         </div>
-        <div>工作人员很认真，服务态度很好</div>
+        <div>{{data.content}}</div>
+        <div class="imgs">
+             <img v-for="(img,indexImg) in data.img" :key="indexImg" :src="img" class="xing-point">
+        </div>
         <div class="usertime">车御品汽车服务</div>
     </div>
 </template>
