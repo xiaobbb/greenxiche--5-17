@@ -47,6 +47,7 @@
 
 <script>
 import { host, post, get } from "../../utils";
+import logins from '@/utils/login'
 import "../../css/login.css";
 import "../../css/common.css";
 import "../../css/global.css";
@@ -75,8 +76,6 @@ export default {
     },
     //注册账号 访问接口:BindOrRegister
     async Register() {
-      //console.log("999999999999999");
-      console.log("666");
       if (
         this.phoneNumber == "" ||
         this.verifyCode == "" ||
@@ -95,7 +94,6 @@ export default {
           duration: 2000
         });
       } else {
-        console.log(333);
         //   var result = await post("/Login/MobileRegister",{
         //   Mobile:this.phoneNumber,
         //   VerifyCode:this.verifyCode,
@@ -120,7 +118,7 @@ export default {
             "content-type": "application/json" // 默认值
           },
           success: function(res) {
-            console.log(res);
+            console.log(res.data);
             if (res.data.meta.code === 1) {
               wx.showToast({
                 title: "绑定手机成功",
@@ -129,10 +127,12 @@ export default {
                 complete: function() {
                   //绑定手机成功之后,延时2秒跳转到会员中心
                   setTimeout(function() {
-                    wx.switchTab({
-                      url: "/pages/mine/main"
-                    });
-                  }, 2000);
+                    // 登录
+                    logins()
+                    // wx.switchTab({
+                    //   url: "/pages/mine/main"
+                    // });
+                  }, 1500);
                 }
               });
               //绑定手机成功之后，跳转到会员中心

@@ -1,3 +1,5 @@
+import logins from './login'
+
 function formatNumber(n) {
   const str = n.toString()
   return str[1] ? str : `0${str}`
@@ -45,11 +47,13 @@ function request(url, method, data, header = {}) {
           resolve(res.data);
           break;
           case 2:
-          reject(false)
           wx.showToast({
             title:'需要重新登录!',
             icon:'none'
           })
+          console.log(login,'a')
+          logins();
+          reject(false)
           break;
           default:
           reject(false)
