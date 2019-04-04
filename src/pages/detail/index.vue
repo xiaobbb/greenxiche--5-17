@@ -30,11 +30,11 @@
           <div>优惠</div>
           <div>
             <div class="couponmenu">
-              <div class="flex-container">
+              <div class="flex-container" v-if="coupon[0]">
                 <text class="itemname">优惠券</text>
                 <p class="couponmenuinfo">
                   <img src="/static/images/deatailbg.png" class="couponbg">
-                  <text>满188减20</text>
+                  <text>满{{coupon[0].meetConditions}}减{{coupon[0].price}}</text>
                 </p>
               </div>
               <div class="flex-container couptsild">
@@ -44,7 +44,7 @@
             </div>
           </div>
         </div>
-        <div class="flec-container" @click="getCoupon">
+        <div class="flec-container" @click="getCoupons">
           <text class="getcon">领券</text>
           <img src="/static/images/back.png" class="right">
         </div>
@@ -52,20 +52,12 @@
       <div class="slide"></div>
       <!--说明-->
       <div class="state">
-        <div class="flex-container statetips">
+        <div class="flex-container statetips" v-if="serviceTab">
           <p class="tipname">服务</p>
           <div class="flex-container stateinfo">
-            <p>
+            <p v-for="(item,index) in serviceTab" :key="index">
               <img src="/static/images/gou.png" class="pics">
-              <text>品质保证</text>
-            </p>
-            <p>
-              <img src="/static/images/gou.png" class="pics">
-              <text>破损补寄</text>
-            </p>
-            <p>
-              <img src="/static/images/gou.png" class="pics">
-              <text>及时发货</text>
+              <text>{{item}}</text>
             </p>
           </div>
         </div>
@@ -138,21 +130,21 @@
           <p class="maskitem">促销</p>
           <div class="maskdetail">
             <p class="maskcoupon">积分</p>
-            <text>购买可得200积分 拷贝</text>
+            <text>购买可得{{product.score||0}}积分 拷贝</text>
           </div>
           <p class="maskitem">领券</p>
-          <div class="maskcouponlist">
+          <div class="maskcouponlist" v-for="(coupon,couponIndex) in coupon" :key="couponIndex">
             <img src="/static/images/pinkbg.png" class="pink">
             <div class="maskser flex-container">
               <div>
                 <p class="maskprice">
                   ¥
-                  <span>20</span>
+                  <span>{{coupon.price}}</span>
                 </p>
-                <p class="maskask">满188使用</p>
-                <p class="maskask">有效期2018.10.01-2018.10.30</p>
+                <p class="maskask">满{{coupon.meetConditions}}使用</p>
+                <p class="maskask">有效期{{coupon.time}}</p>
               </div>
-              <div class="maskget">立即领取</div>
+              <div class="maskget" @click="nowGetCoupon(coupon.id)">立即领取</div>
             </div>
           </div>
         </div>
@@ -177,9 +169,9 @@
           <p>省份</p>
           <p class="pramastitle">{{product.province}}</p>
         </div>
-        <div class="pramasitem flex-container">
+        <div class="pramasitem flex-container" v-if="product.productParams.attr">
           <p>规格</p>
-          <p class="pramastitle">精选1年版（全国包施工）,经典1年版 （全国包施工）,优选版不含施工</p>
+          <p class="pramastitle">{{product.productParams.attr}}</p>
         </div>
         <div class="btnget pramasget" @click="canclePramas">完成</div>
       </div>
@@ -188,32 +180,32 @@
         <div class="flex-container choosetitle">
           <div class="flex-container">
             <!-- <img :src="activeImg" class="maskshop"> -->
-            <img src="/static/images/smallcar.png" class="maskshop">
+            <img :src="activeImg||product.img" class="maskshop">
             <div class="chooseinfo">
-              <p class="price">{{product.sku.price}}</p>
-              <p class="tips count">库存{{product.sku.num||product.stock}}件</p>
-              <p class="tips" v-if="product.sku[activeSkuIndex]">已选:“{{product.sku[activeSkuIndex].skuItem1}}{{product.sku[activeSkuIndex].skuItem2}}{{product.sku[activeSkuIndex].skuItem3}}”</p>
+              <p class="price">{{selectSkuPrice||product.price}}</p>
+              <p class="tips count">库存{{selectSkuNum||product.stock}}件</p>
+              <p class="tips" v-show="selectSkuValue">已选:“{{selectSkuValue}}”</p>
             </div>
           </div>
           <div>
             <img src="/static/images/close.png" @click="onMask" class="close">
           </div>
         </div>
-        <div class="spcestitle">规格</div>
-        <div class="flex-container specs">
+        <div class="spcestitle" v-if="product.sku.length>0">规格</div>
+        <div class="specs" v-if="product.sku.length>0">
           <!-- <div class="flex-container">
                       <img src="/static/images/specimg.png" class="specpic">
                       <text>精选1年版（全国包施工）</text>
           </div>-->
           <div
-            class="flex-container"
+            class="flex-container spec"
             :class="activeSkuIndex === index?'specactive':''"
             v-for="(item,index) in product.sku"
             :key="index"
-            @click="activeSkuIndex = index"
+            @click="selectSku(index)"
           >
             <img :src="item.img" class="specpic">
-            <text>{{item.skuItem1}}{{item.skuItem2}}{{item.skuItem3}}</text>
+            <text>{{item.value}}</text>
           </div>
           <!-- <div class="flex-container">
                       <img src="/static/images/specimg.png" class="specpic">
@@ -271,6 +263,8 @@ import "../../css/global.css";
 export default {
   data() {
     return {
+      userId: wx.getStorageSync("userId"),
+      token: wx.getStorageSync("token"),
       id: "",
       isshow: false,
       showDiscount: false,
@@ -279,11 +273,16 @@ export default {
       addcart: false,
       showNums: false,
       showEvaluate: true,
-      payNum:1,
+      payNum: 1,
       product: {},
       //   选择的sku图片
       activeImg: "",
-      activeSkuIndex: ""
+      activeSkuIndex: "",
+      selectSkuPrice: "",
+      selectSkuNum: "",
+      selectSkuValue: "",
+      // 优惠券
+      coupon: []
     };
   },
 
@@ -302,22 +301,26 @@ export default {
         title: "商品详情"
       });
     },
-    getData() {
+    async getData() {
       const that = this;
       const id = this.$root.$mp.query.id;
-      console.log(this.$root.$mp.query, "id?");
-      post("Goods/ProductInfo", { proId: id * 1 }).then(res => {
+      const res = await post("Goods/ProductInfo", { proId: id * 1 })
+
         const datas = res.data;
+        // 获取优惠券信息
+        that.getCoupon(datas.ShopId);
         that.product = {
-          img: datas.ProductImgList[0].PicUrl,
+          img: datas.ProductImgList[0].PicUrl||'',
           imgs: [],
           comment: [],
           sku: [],
           title: datas.ProductName,
+          id: datas.ProductId,
+          shopId: datas.ShopId,
           price: datas.ProductPrice,
           // 积分
           score: datas.Score,
-        //   库存
+          //   库存
           stock: datas.Stock,
           detail: datas.ContentDetail,
           // 销量
@@ -328,19 +331,23 @@ export default {
           province: datas.ProvinceName,
           // 城市
           city: datas.CityName,
+          serviceTab: datas.ServiceName?JSON.parse(datas.ServiceName):[],
           productParams: {
             // 品牌
             name: datas.BrandName,
             // 型号
             typeNum: datas.ModelName,
             // 服务类型
-            serviceType: datas.TypeName
+            serviceType: datas.TypeName,
+             attr:'',
           }
         };
-
+       console.log(that.product, "产品详情");
+        // 商品图片
         for (let i = 0; i < datas.ProductImgList.length; i += 1) {
           that.product.imgs.push(datas.ProductImgList[i].PicUrl);
         }
+        // 评论列表
         for (let i = 0; i < datas.EvaluateList.length; i += 1) {
           const comments = datas.EvaluateList[i];
           that.product.comment.push({
@@ -354,55 +361,118 @@ export default {
             img: comments.EvaluateImgList
           });
         }
+        // sku
         for (let i = 0; i < datas.ProductSpecList.length; i += 1) {
           const sku = datas.ProductSpecList[i];
+          // let value =JSON.parse(sku.SpecValue)
+          // console.log(value,'对象')
+          // for(let j in value){
+          //    console.log(j,value[j], "产品详情");
+          // }
           that.product.sku.push({
-            id: sku.Id,
-            skuName1: sku.ProSpecName1,
-            skuName2: sku.ProSpecName2,
-            skuName3: sku.ProSpecName3,
-            skuItem1: sku.ProSpec1,
-            skuItem2: sku.ProSpec2,
-            skuItem3: sku.ProSpec3,
-            price: sku.PunitPrice,
+            productId: sku.ProId,
             num: sku.ProStock,
-            img: sku.SpecImage
+            price: sku.PunitPrice,
+            img: sku.SpecImage,
+            text: sku.SpecText,
+            value: sku.SpecText.replace(/_/g, " ")
+          });
+          that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
+         }
+        
+    },
+    // 获取优惠券列表
+    async getCoupon(shopId) {
+      if (wx.getStorageSync("token") && wx.getStorageSync("userId")) {
+        const params = {
+          UserId: wx.getStorageSync("userId"),
+          Token: wx.getStorageSync("token"),
+          // ShopId:shopId,
+          page: 1
+        };
+        const res = await post("Coupon/CouponCenter", params);
+        for (let i = 0; i < res.data.length; i += 1) {
+          const _res = res.data[i];
+          this.coupon.push({
+            price: _res.Denomination,
+            time: _res.StartEndTimeStr,
+            meetConditions: _res.MeetConditions,
+            id: _res.Id
           });
         }
-        console.log(that.product, "产品详情");
-      });
+        console.log(this.coupon, "coupon");
+      }
     },
     // 点击遮罩层隐藏
-    onMask(){
-        this.isshow = false;
-        this.showDiscount = false;
-        this.showPram = false;
-        this.showNums = false;
-        this.showShare = false;
+    onMask() {
+      this.isshow = false;
+      this.showDiscount = false;
+      this.showPram = false;
+      this.showNums = false;
+      this.showShare = false;
     },
-    lessNum(){
-        if(this.payNum>1){
-            this.payNum-=1
-        }
+    lessNum() {
+      if (this.payNum > 1) {
+        this.payNum -= 1;
+      }
     },
-    addNum(){
-            this.payNum+=1
+    addNum() {
+      this.payNum += 1;
     },
-    goUrl(url){
-        wx.navigateTo({url})
+    goUrl(url) {
+      wx.navigateTo({ url });
     },
-    gotabBar(url){
-        wx.switchTab({url})
+    gotabBar(url) {
+      wx.switchTab({ url });
     },
     // 加入购物车
-    addCart() {
-    //   this.addcart = true;
+    async addCart() {
+      // 判断库存
+      if(!this.stockCheck()){
+        return false;
+      }
+      const params = {
+        UserId: this.userId,
+        Token: this.token,
+        ProId: this.product.id,
+        Count: this.payNum,
+        SpecText: this.selectSkuValue
+      };
+      const res = await post("Cart/AddCart", params);
+      wx.showToast({
+          title: "添加成功！",
+          icon: "success"
+        });
+    },
+    // 校验购买数量
+    stockCheck(){
+      const stock = this.selectSkuNum||this.product.stock
+      if (stock < this.payNum) {
+        wx.showToast({
+          title: "购买数量大于剩余库存！",
+          icon: "none"
+        });
+        return false;
+      }
+      return true;
     },
     // 购买
     confirm() {
+      // 判断库存
+      if(!this.stockCheck()){
+        return false;
+      }
       this.showNums = false;
       this.isshow = false;
-      wx.navigateTo({url:'/pages/confirmorder/main'})
+      wx.navigateTo({ url: "/pages/confirmorder/main" });
+    },
+    // 选择sku
+    selectSku(index) {
+      this.activeSkuIndex = index;
+      this.selectSkuPrice = this.product.sku[index].price;
+      this.activeImg = this.product.sku[index].img;
+      this.selectSkuNum = this.product.sku[index].num;
+      this.selectSkuValue = this.product.sku[index].value;
     },
     share() {
       this.isshow = true;
@@ -412,9 +482,28 @@ export default {
       this.isshow = false;
       this.showShare = false;
     },
-    getCoupon() {
+    // 展示优惠券
+    getCoupons() {
       this.isshow = true;
       this.showDiscount = true;
+    },
+    // 领取优惠券
+    async nowGetCoupon(id) {
+      const params = {
+        UserId: wx.getStorageSync("userId"),
+        Token: wx.getStorageSync("token"),
+        UseType: 0,
+        CouponId: id
+      };
+      const res = await post("Coupon/ReceiveCoupon", params);
+      wx.showToast({
+        title: "领取成功!",
+        icon: "success"
+      });
+      setTimeout(() => {
+        this.isshow = false;
+        this.showDiscount = false;
+      }, 1500);
     },
     cancleMask() {
       this.isshow = false;
@@ -429,11 +518,11 @@ export default {
       this.showPram = false;
     },
     chooseSpecs(pay) {
-        if(pay==='pay'){
-            this.addcart = true;
-        }else{
-            this.addcart = false;
-        }
+      if (pay === "pay") {
+        this.addcart = true;
+      } else {
+        this.addcart = false;
+      }
       this.isshow = true;
       this.showNums = true;
     },

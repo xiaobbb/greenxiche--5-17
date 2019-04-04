@@ -230,7 +230,7 @@
 }
 .maskcouponlist{
     position: relative;
-    margin:0 auto;
+    margin:0 auto 15rpx;
 }
 .maskser{
     position: absolute;
@@ -333,13 +333,21 @@
 }
 .specs{
     flex-wrap: wrap;
+    display:flex;
+    align-items:center;
 }
 .specs div{
     font-size:24rpx;
-    width:48%;
+    // width:48%;
     margin-top:20rpx;
-    padding:5rpx 2rpx;
+    padding:5rpx 20rpx;
     background: #f3f3f3;
+}
+.spec{
+    border:1rpx solid #fff;
+    border-radius:10rpx;
+    background: #fff7f4;
+    margin-right:20rpx;
 }
 .specactive{
     border:1rpx solid #ff6325;

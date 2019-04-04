@@ -45,9 +45,9 @@
         <div class="btn-shop">
           <div class="cartshopbg" @click="goUrl('/pages/shopcart/main')">
             <img src="/static/images/shopcart.png" class="cartshop">
-            <text class="numright">2</text>
+            <text class="numright">{{carNum}}</text>
           </div>
-          <div class="shopprice">￥428</div>
+          <div class="shopprice">￥{{carPrice}}</div>
         </div>
         <div class="btn-confirm" @click="toPAy">确定</div>
       </div>
@@ -80,6 +80,8 @@ export default {
       carData:[],
       carNum:0,
       carPrice:0,
+      userId: wx.getStorageSync('userId'),
+      token: wx.getStorageSync('token'),
     };
   },
   watch: {
@@ -144,6 +146,7 @@ export default {
               tab:datas.KeywordName
             });
           }
+        this.getCarData()
         }
       );
     },
@@ -152,11 +155,12 @@ export default {
         this.productlist[index].num -= 1;
       }
     },
+    // 添加购物车
     async addNumber(index) {
       this.productlist[index].num += 1;
       const product = this.productlist[index]
       const params ={
-        UserId:this.userid,
+        UserId:this.userId,
         Token:this.token,
         ProId: product.id,
         Count:1,
@@ -168,7 +172,7 @@ export default {
     // 获取购物车信息
     async getCarData(){
       const params ={
-        UserId:this.userid,
+        UserId:this.userId,
         Token:this.token,
       }
       const res = await post('Cart/CartList',params)
@@ -178,6 +182,13 @@ export default {
         const datas = res.data[i]
         this.carNum += datas.Number
         this.carPrice += (datas.SalePrice*datas.Number)
+        const productlist = this.productlist;
+        for(let j=0;j<productlist.length;j+=1){
+          const _productlist = productlist[j]
+          if(datas.ProductId === _productlist.id){
+            this.productlist[j].num = datas.Number;
+          }
+        }
       }
     },
     change(e) {

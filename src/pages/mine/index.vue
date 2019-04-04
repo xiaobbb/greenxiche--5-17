@@ -1,17 +1,18 @@
 <template>
   <div class="backgray">
-      <div class="avatarbg">
+      <div class="avatarbg" v-if="isHasInfo">
           <div class="flex-container clomn avahead">
-              <img src="/static/images/ava2.png" class="avatar">
-              <p class="person">筱风月忆</p>
+              <img v-if="memberInfo.Avatar" :src="memberInfo.Avatar" class="avatar">
+              <img v-else src="/static/images/default.png" class="avatar">
+              <p class="person">{{memberInfo.NickName}}</p>
           </div>
           <div class="flex-container avaitem">
               <div class="flex-container clomn">
-                  <p class="nums">0</p>
+                  <p class="nums">{{memberInfo.Wallet}}</p>
                   <p class="itemname">余额</p>
               </div>
               <div class="flex-container clomn">
-                  <p class="nums">0</p>
+                  <p class="nums">{{memberInfo.Score}}</p>
                   <p class="itemname">积分</p>
               </div>
           </div>
@@ -60,6 +61,7 @@
           <div class="mineitem">
               <img src="/static/images/ser.png" class="mine3">
               <p>客服</p>
+              <button class="btn_contact" open-type="contact"></button>
           </div>
           <div class="mineitem" @click="goItem(3)">
               <img src="/static/images/set.png" class="mine4">
@@ -75,28 +77,28 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
     this.setBarTitle();
+    this.getMemberInfo();
+  },
+  onShow(){
+      
   },
   data () {
     return {
-      showCar:true
+      showCar:true,
+      userId:"",
+      token:"",
+      memberInfo:{},
+      isHasInfo:false
     }
   },
- 
   components: {
     
   },
   mounted(){
-    //   const data ={
-    //       Mobile:'18123769378',
-    //       PassWord:'123456'
-    //   }
-    // //   登录，设置缓存
-    //   post('Login/LoginByMobile',data).then(res=> {
-    //       wx.setStorageSync('userid',res.data.UserId)
-    //       wx.setStorageSync('token',res.data.Token)
-    //   })
-    //   console.log(wx.getStorageSync('userid'),wx.getStorageSync('token'))
+    
   },
   methods: {
     setBarTitle() {
@@ -105,7 +107,6 @@ export default {
       });
     },
     goItem(e){
-        console.log(e)
       var a=e
       if(a==1){
           wx.navigateTo({ url: "/pages/wallet/main" });
@@ -135,6 +136,21 @@ export default {
       if(a==5){
           wx.navigateTo({ url: "/pages/mycar/main" });
       }
+    },
+    async getMemberInfo(){
+      let result = await post("User/GetMemberInfo",{
+         UserId: this.userId,
+         Token:this.token
+      });
+      if(Object.keys(result.data).length >0){
+          console.log("dddddd");
+        this.isHasInfo = true;
+        this.memberInfo = result.data;
+        console.log(this.memberInfo);
+      }
+      
+      
+    //   console.log(result);
     }
     
   },
