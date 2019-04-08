@@ -169,7 +169,7 @@ export default {
         this.couptlist = this.couptlist.concat(result.data);
       }
       console.log(this.couptlist);
-      if(this.allPage >= this.page){
+      if(this.allPage > this.page){
         this.isLoad = true;
       }else{
         this.isLoad = false;

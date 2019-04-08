@@ -26,15 +26,22 @@
 </template>
 
 <script>
+import { post } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
+    this.scoreList = [];
     this.setBarTitle();
+    this.getScoreList();
   },
   data () {
     return {
-      
+      userId:wx.getStorageSync('userId'),
+      token:wx.getStorageSync('token'),
+      page:1,
+      pageSize:15,
+      scoreList:[]
     }
   },
  
@@ -47,7 +54,14 @@ export default {
         title: "我的积分"
       });
     },
-    
+    async getScoreList(){
+      let result = await post("user/ScoreList",{
+        UserId:this.userId,
+        Token:this.token,
+        page:this.page,
+        pageSize:this.pageSize
+      })
+    }
     
   },
 

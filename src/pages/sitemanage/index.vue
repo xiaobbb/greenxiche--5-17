@@ -58,7 +58,7 @@ import "../../css/global.css";
 export default {
   data() {
     return {
-      userid: wx.getStorageSync("userid"),
+      userid: wx.getStorageSync("userId"),
       token: wx.getStorageSync("token"),
       isshow: false,
       data: 0,
