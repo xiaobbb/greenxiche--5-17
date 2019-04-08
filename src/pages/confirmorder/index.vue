@@ -107,6 +107,7 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.getData();
   },
   data () {
     return {
@@ -125,6 +126,43 @@ export default {
       wx.setNavigationBarTitle({
         title: "确认订单"
       });
+    },
+    
+    async getData() {
+      const that = this;
+      const id = this.$root.$mp.query.id;
+      const res = await post("Goods/ProductInfo", { proId: id * 1 })
+      that.product = {
+          img: datas.ProductImgList[0].PicUrl||'',
+          sku: [],
+          title: datas.ProductName,
+          id: datas.ProductId,
+          shopId: datas.ShopId,
+          price: datas.ProductPrice,
+          // 积分
+          score: datas.Score,
+          //   库存
+          stock: datas.Stock,
+          detail: datas.ContentDetail,
+          // 销量
+          salesNum: datas.SalesVolume,
+          // 邮费
+          freight: datas.freight || "免运费",
+          // 省份
+          province: datas.ProvinceName,
+          // 城市
+          city: datas.CityName,
+          serviceTab: datas.ServiceName?JSON.parse(datas.ServiceName):[],
+          productParams: {
+            // 品牌
+            name: datas.BrandName,
+            // 型号
+            typeNum: datas.ModelName,
+            // 服务类型
+            serviceType: datas.TypeName,
+             attr:'',
+          }
+        };
     },
     change(e){
       //console.log(e.target)
