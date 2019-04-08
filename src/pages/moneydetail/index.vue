@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -63,7 +64,9 @@ export default {
     orderpay(){
       wx.navigateTo({ url: "/pages/locationcomplete/main" });
     },
-    
+    getRechargeList(){
+
+    }
   },
 
   created () {

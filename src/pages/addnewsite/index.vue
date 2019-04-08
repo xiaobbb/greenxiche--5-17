@@ -213,7 +213,7 @@ export default {
     jiaoyan(){
       if(!this.name){
         return '请输入收货人'
-      }if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(this.phone))){
+      }if(!(/^1[3|4|5|6|7|8][0-9]\d{4,8}$/.test(this.phone))){
         return '请输入正确的手机号码'
       }if(!this.area){
         return '请选择省份'

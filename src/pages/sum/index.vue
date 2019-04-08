@@ -70,7 +70,7 @@ export default {
       wx.navigateTo({ url: "/pages/locationcomplete/main" });
     },
     async getRechargeList(){
-      let result = await post("Order/OrderDetails",{
+      let result = await post("Recharge/GetRechargeList",{
         UserId:this.userId,
         Token:this.token,
         page:this.page,

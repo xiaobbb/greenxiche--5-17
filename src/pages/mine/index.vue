@@ -7,11 +7,11 @@
               <p class="person">{{memberInfo.NickName}}</p>
           </div>
           <div class="flex-container avaitem">
-              <div class="flex-container clomn">
+              <div class="flex-container clomn" @click="gotoWallet">
                   <p class="nums">{{memberInfo.Wallet}}</p>
                   <p class="itemname">余额</p>
               </div>
-              <div class="flex-container clomn">
+              <div class="flex-container clomn" @click="gotoIntegral">
                   <p class="nums">{{memberInfo.Score}}</p>
                   <p class="itemname">积分</p>
               </div>
@@ -137,6 +137,12 @@ export default {
           wx.navigateTo({ url: "/pages/mycar/main" });
       }
     },
+    gotoIntegral(){
+     wx.navigateTo({ url: "/pages/integral/main" });
+    },
+    gotoWallet(){
+      wx.navigateTo({ url: "/pages/wallet/main" });
+    },
     async getMemberInfo(){
       let result = await post("User/GetMemberInfo",{
          UserId: this.userId,
@@ -148,8 +154,6 @@ export default {
         this.memberInfo = result.data;
         console.log(this.memberInfo);
       }
-      
-      
     //   console.log(result);
     }
     

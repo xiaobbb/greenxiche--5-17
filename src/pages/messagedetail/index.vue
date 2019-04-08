@@ -30,14 +30,19 @@
 </template>
 
 <script>
+import { post,filePath } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
-    this.setBarTitle()
+    this.id = this.$root.$mp.query.id;
+    this.setBarTitle();
+    this.getNewsInfo();
   },
   data () {
     return {
+      id:"",
+      info:{}
     }
   },
  
@@ -54,7 +59,11 @@ export default {
     orderpay(){
       wx.navigateTo({ url: "/pages/locationcomplete/main" });
     },
-    
+    async getNewsInfo(){
+      let result = await post("News/FindNewsList",{
+        FindId:this.id
+      })
+    }
   },
 
   created () {

@@ -105,7 +105,7 @@ export default {
       }
       console.log("当前的page:"+this.page);
       console.log("总页数："+this.allPage);
-      if(this.allPage >= this.page){
+      if(this.allPage > this.page){
         this.isLoad = true;
       }else{
         this.isLoad = false;
@@ -133,8 +133,6 @@ export default {
     // let app = getApp()
   },
   onReachBottom(){
-    console.log("gggggggg");
-    console.log(this.isLoad);
     if(this.isLoad){
       this.page++;
       this.getCouponList();

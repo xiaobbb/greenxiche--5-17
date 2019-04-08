@@ -2,7 +2,7 @@
   <div class="backgray">
       <div class="orange flex-container clomn">
         <p class="hint">余额(元)</p>
-        <p class="score">0.00</p>
+        <p class="score" v-if="isHasInfo"><span v-if="memberInfo.Wallet===0">0.00</span><span v-else>{{memberInfo.Wallet}}</span></p>
      </div>
      <div class="white">
         <div class="flex-container waitem" @click="toSum">
@@ -18,15 +18,22 @@
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
     this.setBarTitle();
+    this.getMemberInfo();
   },
   data () {
     return {
-      
+      isHasInfo:false,
+      userId:"",
+      token:"",
+      memberInfo:{}
     }
   },
  
@@ -44,6 +51,18 @@ export default {
     },
     toMoneyDetail(){
       wx.navigateTo({ url: "/pages/moneydetail/main" });
+    },
+    async getMemberInfo(){
+      let result = await post("User/GetMemberInfo",{
+         UserId: this.userId,
+         Token:this.token
+      });
+      if(Object.keys(result.data).length >0){
+        this.isHasInfo = true;
+        this.memberInfo = result.data;
+        console.log(this.memberInfo);
+      }
+    //   console.log(result);
     }
   },
 
