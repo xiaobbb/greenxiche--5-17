@@ -38,15 +38,22 @@
 </template>
 
 <script>
+import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
+    this.getRechargeList();
   },
   data () {
     return {
-      
+      userId:"",
+      token:"",
+      page:1,
+      pageSize:20
     }
   },
  
@@ -62,7 +69,15 @@ export default {
     orderpay(){
       wx.navigateTo({ url: "/pages/locationcomplete/main" });
     },
-    
+    async getRechargeList(){
+      let result = await post("Order/OrderDetails",{
+        UserId:this.userId,
+        Token:this.token,
+        page:this.page,
+        pageSize:this.pageSize
+      });
+      console.log(result);
+    }
   },
 
   created () {

@@ -15,7 +15,7 @@
             <img src="/static/images/bg1.png" class="pic" v-show="!(imgBase.length >3)" @click="chosseImg">
         </div>
     </div>
-    <div class="paybtn" @click="orderpay">确定</div>
+    <div class="paybtn" @click="submit">确定</div>
   </div>
 </template>
 
@@ -71,10 +71,11 @@ export default {
         this.deleteImgIndex=''
         console.log(this.deleteImgIndex)
     },
-    
-    orderpay(){
-      wx.navigateTo({ url: "/pages/locationcomplete/main" });
+    submit(){
+      let pList= JSON.stringify(this.imgBase)
+      // wx.navigateTo({ url: "/pages/locationcomplete/main?picList="+pList});
     },
+    
     
   },
 

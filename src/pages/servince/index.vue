@@ -45,12 +45,13 @@ import "../../css/global.css";
 export default {
    onLoad(){
     this.setBarTitle();
-    this.id=this.$root.$mp.query.id
+    this.parmas=this.$root.$mp.query.url
+    console.log(this.parmas)
     this.getMenulist();
   },
   data () {
     return {
-      id:"",
+      parmas:"",
       menulist:[],
       servicelist:[
         {id:1,title:"外观简单清洗",sale:"198",price:"30.00",isSelect:true},
@@ -76,14 +77,11 @@ export default {
       });
     },
     async getMenulist(){
-       var result=await post("/Server/GetCarWash")
+       var result=await post("/Server/GetServerType")
        if(result.code==0){
-         if(this.id==1){
-            this.menulist=result.data.slice(0,-2)
-         }else{
-           this.menulist=result.data
+         if(this.parmas=="location"){
+            this.menulist=result.data
          }
-          console.log(result.data)
          
        }
         

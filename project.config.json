@@ -33,7 +33,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 28,
+			"current": 17,
 			"list": [
 				{
 					"id": 0,
@@ -155,14 +155,14 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 17,
 					"name": "服务卡券",
 					"pathName": "pages/certical/main",
 					"query": "",
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 18,
 					"name": "优惠券",
 					"pathName": "pages/coupons/main",
 					"query": "",
@@ -295,14 +295,14 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 37,
 					"name": "我的钱包",
 					"pathName": "pages/wallet/main",
 					"query": "",
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 38,
 					"name": "余额充值",
 					"pathName": "pages/sum/main",
 					"query": "",
