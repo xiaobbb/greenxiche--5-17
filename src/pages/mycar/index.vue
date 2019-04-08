@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="page">
     <!--列表页面-->
     <div v-if="isshow" class="congray">
         <!--车辆列表-->
-        <div class="carlist">
-            <radio-group class="radio-group"  @change="radioChange">
-               <label class="radio"  v-for="item in carinfolist" :key="item.id">
+        <div class="carlist" v-if="carinfolist.length>0">
+            <radio-group class="radio-group" @change="changeIsDefault($event)">
+               <div class="radio"  v-for="(item,index) in carinfolist" :key="index">
                     <div class="caritem">
                     <div class="flex-container infostyle">
                       <div class="carlogo">
@@ -13,29 +13,31 @@
                           <img src="/static/images/car3.png" class="car">
                       </div>
                       <div class="flex-container coml">
-                        <p class="brand">品牌: {{item.name}}</p>
-                        <p class="carnum">车牌: {{item.carnum}}</p>
+                        <p class="brand">品牌: {{item.CarBrand}}-{{item.CarType}}</p>
+                        <p class="carnum">车牌: {{item.CarMumber}}</p>
                       </div>
                     </div>
                     <div class="flex-container choosemenu">
                       <div class="flex-container choose">
-                          <radio :value="item.id" :checked="item.checked"/>
-                          <span class="chosetitle" v-if="!item.checked">设为默认</span>
-                          <span class="chosetitle2" v-else>已设为默认</span>
+                          <label>
+                            <radio :value="item.Id" :checked="item.IsDefault===1"/>
+                            <span class="chosetitle2" v-if="item.IsDefault===1">已设为默认</span>
+                            <span class="chosetitle" v-else>设为默认</span> 
+                          </label>
                       </div>
                       <div class="flex-container edit">
-                          <p>
+                          <p @click="btnEaditCar(index,item.Id)">
                               <img src="/static/images/edit.png" class="menu">
                               <text>编辑</text>
                           </p>
-                          <p>
+                          <p @click="delCarInfo(index,item.Id)">
                               <img src="/static/images/del.png" class="menu">
                               <text>删除</text>
                           </p>
                       </div>
                     </div>
                 </div>
-              </label>
+              </div>
             </radio-group>
 
         </div>
@@ -48,7 +50,7 @@
         </div>
     </div>
     <!--添加车辆信息页面-->
-    <div v-else>
+    <div class="addCarContent" v-else>
         <div class="sel">
             <div><span class="zhi">*&nbsp;</span>车牌号码</div>
             <div class="flex-container line-input">
@@ -77,30 +79,36 @@
                 <input type="text" placeholder="请填写您的汽车颜色" v-model="carColor">
             </div>
         </div>
+        <div class="sel">
+            <div>设为默认车辆</div>
+            <div  class="line-input" style="text-align:right;">
+              <van-switch :checked="isDefault" size="24px" @change="isDefault = !isDefault"  active-color="#ff6325" />
+            </div>
+        </div>
         <!--按钮-->
-        <div class="paybtn btn-save" @click="saveCar">保存</div>
+        <div class="paybtn btn-save" @click="btnSave">保存</div>
     </div>
   </div>
 </template>
 
 <script>
-import { get, myget, mypost, post, toLogin } from "../../utils";
+import { post } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.getAllcar()
-    this.params=this.$root.$mp.query.url
+    this.getAllcar();
+    this.params=this.$root.$mp.query.url;
     //console.log(this.params)
     //console.log(this.city,"城市信息")
-    let cityname=this.$root.$mp.query.city
-    let lid=this.$root.$mp.query.id
+    let cityname=this.$root.$mp.query.city;
+    let lid=this.$root.$mp.query.id;
     //console.log(cityname,lid)
     if(lid==1){
-      this.city=cityname
+      this.city=cityname;
     }else if(lid==2){
-      this.num=cityname
+      this.num=cityname;
     }
   },
   // onShow(){
@@ -110,42 +118,41 @@ export default {
   data () {
     return {
         isshow:true,
-        data:0,
+        isDefault:false,
+        eaditType:0,  //0:为新建地址；1：编辑地址
+        eaditId:"",
+        // data:0,
         city:"粤",
         num:"A",
         carNum:"",
         carBrand:"",//车系
         carSize:"",//车型
         carColor:"",
-        userid: wx.getStorageSync("userid"),
+        userId: wx.getStorageSync('userId'),
         token: wx.getStorageSync("token"),
-        carinfolist:[
-          {id:1,name:"东风本田-思域",carnum:"粤AJ6666",checked:true},
-          {id:2,name:"日产-轩逸",carnum:"粤AJ6996",checked:false}
-          
-        ]
+        carinfolist:[]
     }
   },
   watch:{
-    carNum(){
-      var reg=new RegExp("[0-9A-Z]")
-      //console.log(reg.test(this.carNum))
-      if(reg.test(this.carNum)==false){
-          wx.showToast({
-            title: '格式不对',
-            icon: 'none',
-            image: '',
-            duration: 1500,
-            mask: false,
-            success: (result)=>{
-              this.carNum=""
-            },
-            fail: ()=>{},
-            complete: ()=>{}
-          });
+    // carNum(){
+    //   var reg=new RegExp("[0-9A-Z]")
+    //   //console.log(reg.test(this.carNum))
+    //   if(reg.test(this.carNum)==false){
+    //       wx.showToast({
+    //         title: '格式不对',
+    //         icon: 'none',
+    //         image: '',
+    //         duration: 1500,
+    //         mask: false,
+    //         success: (result)=>{
+    //           this.carNum=""
+    //         },
+    //         fail: ()=>{},
+    //         complete: ()=>{}
+    //       });
          
-      }
-    }
+    //   }
+    // }
   },
   components: {
     
@@ -156,13 +163,152 @@ export default {
         title: "车辆信息"
       });
     },
+    initData(){
+     this.isshow = true;
+      this.isDefault=false;
+      this.eaditType=0;  //0:为新建地址；1：编辑地址
+      this.eaditId="";
+      // this.data=0;
+      this.city="粤";
+      this.num="A";
+      this.carNum="";
+      this.carBrand="";//车系
+      this.carSize="";//车型
+      this.carColor="";
+      this.carinfolist = [];
+    },
+    valOther(){  //验证
+      let reg=new RegExp("[0-9A-Z]");
+      if(this.carNum==""){
+        wx.showToast({
+          title: '请输入车牌号!',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      }
+      if(!reg.test(this.carNum)){
+        wx.showToast({
+          title: '请输正确的车牌号格式!',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      }
+      if(this.carBrand ==""){
+        wx.showToast({
+          title: '请输入品牌车系!',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      }
+      return true;
+    },
     async getAllcar(){  //获取车辆信息
-        const params={
-            UserId: this.userid,
-            Token: this.token,
-        } 
-        const res=await post("/User/GetCarInfo",params);
-        console.log(res)
+      const params={
+        UserId: this.userId,
+        Token: this.token,
+      } 
+      let res=await post("/User/GetCarInfo",params);
+      if(res.data.length>0){
+        this.carinfolist = this.carinfolist.concat(res.data);
+      }
+    },
+    async setCarDefault(index,carId){  //设置默认车辆
+      let res = await post("User/SetCarDefault",{
+        UserId:this.userId,
+        Token:this.token,
+        CarInfo:{
+          id:carId,
+          IsDefault:1
+        }
+      });
+      for(let i=0;i<this.carinfolist.length;i++){
+        if(index===i){
+          this.$set(this.carinfolist[i],"IsDefault",1);
+        }else{
+          this.$set(this.carinfolist[i],"IsDefault",0);
+        }
+      }
+    },
+    async delCarInfo(index,carId){
+      let res = await post("User/DelCarInfo",{
+        UserId:this.userId,
+        Token:this.token,
+        CarInfo:{
+          Id:carId
+        }
+      });
+      if(res.code===0){
+        let _this = this;
+        wx.showToast({
+          title: '删除成功！',
+          icon: 'none',
+          duration: 2000,
+          success:function(){
+            _this.carinfolist.splice(index,1);
+          }
+        })
+
+      }
+    },
+    async editCarInfo(){
+      let res = await post("User/EditCarInfo",{
+        UserId:this.userId,
+        Token:this.token,
+        CarInfo:{
+          Id:this.eaditId,
+          CarMumber:this.city+this.num+this.carNum,
+          CarBrand:this.carBrand,
+          CarType:this.carSize,
+          CarColor:this.carColor
+        }
+      });
+      let _this = this;
+      if(res.code===0){
+        wx.showToast({
+          title: '修改成功！',
+          icon: 'none',
+          duration: 2000,
+          success:function(){
+            _this.isshow = true;
+            _this.initData();
+            _this.getAllcar();
+          }
+        })
+      }
+    },
+    btnEaditCar(index,id){  //编辑信息
+      this.isshow = false;
+      this.city = this.carinfolist[index].CarMumber.substring(0,1);
+      this.num = this.carinfolist[index].CarMumber.substring(1,2);
+      this.carNum = this.carinfolist[index].CarMumber.substring(2);
+      this.carBrand = this.carinfolist[index].CarBrand;//车系
+      this.carSize= this.carinfolist[index].CarType;//车型
+      this.carColor=this.carinfolist[index].CarColor;
+      if(this.carinfolist[index].isDefault===1){
+        this.isDefault = true;
+      }else{
+        this.isDefault = false;
+      }
+      this.eaditType = 1;
+      this.eaditId = id;
+    },
+    changeIsDefault(e){
+      console.log("__________");
+      console.log(e.target.value);
+      var arrs = this.carinfolist;
+      for (let i=0;i<arrs.length;i++) {
+        if (arrs[i].Id == e.target.value) {
+          this.setCarDefault(i,arrs[i].Id);
+        }
+      }
+      // if(this.carinfolist[index].IsDefault===1){   //已经是默认的时候
+      //   this.setCarDefault(index,id,false);
+      // }else{
+      //   this.setCarDefault(index,id,true);
+      // }
     },
     radioChange(e){
       //console.log(e.target.value)
@@ -177,23 +323,44 @@ export default {
       }
       
     },
+    btnSave(){
+      if(this.valOther()){
+        if(this.eaditType===1){  //编辑地址
+          this.editCarInfo();
+        }else{
+          this.saveCar();
+        }
+      }
+    },
     async saveCar(){
         //this.isshow=true
-        const params = {
-          UserId:this.userid,
-          Token: this.token,
-          CarInfo:{
-            CarMumber:this.city+this.num+this.carNum,
-            CarBrand:this.carBrand,
-            CarType:this.carSize,
-            CarColor:this.carColor
-          }
+      const params = {
+        UserId:this.userId,
+        Token: this.token,
+        CarInfo:{
+          CarMumber:this.city+this.num+this.carNum,
+          CarBrand:this.carBrand,
+          CarType:this.carSize,
+          CarColor:this.carColor
+        }
       }
-      const res=await post("/User/AddCarInfo",params)
-      console.log(res)
+      let res=await post("/User/AddCarInfo",params);
+      let _this  = this;
+      if(res.code===0){
+        wx.showToast({
+          title: '新增成功！',
+          icon: 'none',
+          duration: 2000,
+          success:function(){
+            _this.isshow = true;
+            _this.initData();
+            _this.getAllcar();
+          }
+        })
+      }
     },
     addCar(){
-        this.isshow=false
+      this.isshow=false
     },
     chooseCity(e){
       console.log(e)

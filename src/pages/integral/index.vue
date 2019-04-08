@@ -2,26 +2,20 @@
   <div>
      <div class="orange flex-container clomn">
         <p>当前可用积分</p>
-        <p><span class="score">160</span>分</p>
+        <p><span class="score" v-if="isHasInfo">{{memberInfo.Score}}</span>分</p>
      </div>
      <div class="scorerecord"><text>积分记录</text></div>
-     <div class="scorelist">
-        <div class="scoreitem flex-container">
+     <div class="scorelist" v-if="scoreList.length>0">
+        <div class="scoreitem flex-container" v-for="(item,index) in scoreList" :key="index">
             <div class="flex-container clomn iteminfo">
-                <p>注册会员</p>
-                <p>2019-03-12</p>
+                <p>{{item.Remark}}</p>
+                <p>{{item.AddTime}}</p>
             </div>
-            <div class="itembig">+50</div>
-        </div>
-        <div class="scoreitem flex-container">
-            <div class="flex-container clomn iteminfo">
-                <p>注册会员</p>
-                <p>2019-03-12</p>
-            </div>
-            <div class="itembig active">+50</div>
+            <div class="itembig">{{item.Change}}</div>
         </div>
      </div>
-
+     <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="scoreList.length===0">暂无数据</p>
+    <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
   </div>
 </template>
 
@@ -32,7 +26,9 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.scoreList = [];
+    this.memberInfo = {};
     this.setBarTitle();
+    this.getMemberInfo();
     this.getScoreList();
   },
   data () {
@@ -41,7 +37,13 @@ export default {
       token:wx.getStorageSync('token'),
       page:1,
       pageSize:15,
-      scoreList:[]
+      scoreList:[],
+      isHasInfo:false,
+      isLoad:false,
+      isOved:false,
+      count:0,
+      allPage:0,
+      memberInfo:{}
     }
   },
  
@@ -58,15 +60,54 @@ export default {
       let result = await post("user/ScoreList",{
         UserId:this.userId,
         Token:this.token,
-        page:this.page,
-        pageSize:this.pageSize
+        page:this.page
       })
+      this.count = result.count;
+      if (parseInt(this.count) % this.pageSize === 0) {
+        this.allPage = this.count / this.pageSize;
+      } else {
+        this.allPage = parseInt(this.count / this.pageSize) + 1;
+      }
+      if(result.data.length>0){
+        for(let i=0;i<result.data.length;i++){
+          result.data[i].Change = result.data[i].Change.split(".")[0];
+        }
+        this.scoreList = this.scoreList.concat(result.data);
+      }
+      if(this.allPage > this.page){
+        this.isLoad = true;
+      }else{
+        this.isLoad = false;
+      }
+    },
+    async getMemberInfo(){
+      let result = await post("User/GetMemberInfo",{
+         UserId: this.userId,
+         Token:this.token
+      });
+      if(Object.keys(result.data).length >0){
+        this.isHasInfo = true;
+        this.memberInfo = result.data;
+      }
+    //   console.log(result);
     }
     
   },
 
   created () {
     // let app = getApp()
+  },
+  onReachBottom(){
+    if(this.isLoad){
+      this.page++;
+      this.getScoreList();
+    }else{
+      if (this.page > 1) {
+        this.isOved = true;
+      } else {
+        this.isOved = false;
+      }
+    }
   }
 }
 </script>

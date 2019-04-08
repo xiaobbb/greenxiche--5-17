@@ -37,7 +37,7 @@
           </div>
       </div>
       <!--切换-->
-      <div class="flex-container caritem white">
+      <div class="flex-container caritem white"  @click="choseItem(5)">
           <div class="flex-container">
               <img src="/static/images/car22.png" class="car">
               <p v-if="showCar">我的车辆</p>
@@ -46,7 +46,7 @@
                   <p>粤AJ6688</p>
               </div>
           </div>
-          <img src="/static/images/back.png" class="right" @click="choseItem(5)">
+          <img src="/static/images/back.png" class="right">
       </div>
       <!--组-->
       <div class="white minelist">

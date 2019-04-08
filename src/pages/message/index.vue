@@ -23,6 +23,7 @@
               </div>
           </div> -->
       </div>
+      <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="newsList.length===0">暂无数据</p>
       <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
   </div>
 </template>
