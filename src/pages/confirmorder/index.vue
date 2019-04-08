@@ -25,19 +25,19 @@
                   <div class="infotitle">{{product.title}}</div>
                   <div class="infospec">{{sku}}</div>
                   <div class="infoprice flex-container">
-                      <p>￥{{total}}</p>
+                      <p>￥{{price}}</p>
                       <p>x{{buyNum}}</p>
                   </div>
               </div>
           </div>
-          <div class="flex-container infoslide white pad">
+          <!-- <div class="flex-container infoslide white pad">
               <div>购买数量</div>
               <div class="flex-container">
                   <img src="/static/images/add5.png" @click="addNum" class="specpic"> 
                   <input class="num" v-model="buyNum" type="number" />
                   <img src="/static/images/shot5.png" @click="lessNum" class="specpic">
               </div>
-          </div>
+          </div> -->
           <div class="flex-container infoslide white pad">
               <div>支付方式</div>
               <div class="infoway">在线支付</div>
@@ -45,7 +45,7 @@
           <div class="flex-container infoslide white pad" @click="goSelectCoupon">
               <div>优惠券</div>
               <div>
-                  -50.00
+                  -{{couponPrice}}
                   <img src="/static/images/back.png" class="right">
               </div>
           </div>
@@ -131,7 +131,9 @@ export default {
         name:'',
         phone:'',
         address:'',
-      }
+      },
+      // 优惠券价格
+      couponPrice:0.00,
     }
   },
  
@@ -143,13 +145,19 @@ export default {
       let totals = 0;
       if(this.skuPrice){
         console.log('存在sku')
-      totals =  this.skuPrice*this.buyNum
+      totals =  this.skuPrice*this.buyNum - this.couponPrice
       }else if(this.product.price){
         console.log('不存在sku')
-        totals = this.product.price * this.buyNum
+        totals = this.product.price * this.buyNum - this.couponPrice
       }
       return  totals.toFixed(2)
+    },
+    price(){
+      return (this.product.price*this.buyNum).toFixed(2)
     }
+  },
+  watch:{
+
   },
   methods: {
     setBarTitle() {
@@ -162,13 +170,13 @@ export default {
       const that = this;
       // 获取页面传参,在store里获取
       const store = this.$store.state
-      const id = store.productId;
-      const skuId = store.skuId;
-      this.buyNum = store.buyNum||1;
+      const id = store.confirmOrder.productId;
+      const skuId = store.confirmOrder.skuId;
+      this.buyNum = store.confirmOrder.buyNum||1;
+      this.couponPrice = this.$store.state.couponPrice.toFixed(2)
+      const res = await post("Goods/ProductInfo", { proId: id * 1 })
+      console.log('store',store)
 
-      const res = await post("Goods/ProductInfo", { proId: 308 * 1 })
-      console.log('skuINfo',id,skuId,this.buyNum)
-    
       const datas = res.data;
       that.product = {
           shopName:datas.ShopName,
@@ -183,33 +191,12 @@ export default {
           //   库存
           stock: datas.Stock,
           detail: datas.ContentDetail,
-          // 销量
-          salesNum: datas.SalesVolume,
           // 邮费
           freight: datas.freight || "免运费",
-          // 省份
-          province: datas.ProvinceName,
-          // 城市
-          city: datas.CityName,
-          serviceTab: datas.ServiceName?JSON.parse(datas.ServiceName):[],
-          productParams: {
-            // 品牌
-            name: datas.BrandName,
-            // 型号
-            typeNum: datas.ModelName,
-            // 服务类型
-            serviceType: datas.TypeName,
-             attr:'',
-          }
         };
         // sku
         for (let i = 0; i < datas.ProductSpecList.length; i += 1) {
           const sku = datas.ProductSpecList[i];
-          // let value =JSON.parse(sku.SpecValue)
-          // console.log(value,'对象')
-          // for(let j in value){
-          //    console.log(j,value[j], "产品详情");
-          // }
           that.product.sku.push({
             productId: sku.ProId,
             num: sku.ProStock,
@@ -232,6 +219,14 @@ export default {
     async getAddress(){
       // 重置store选择地址
       this.$store.commit('setSelectAddress',{
+        url:'',
+        status:false
+      })
+       // 重置store选择优惠券
+      this.$store.commit('setSelectCoupon',{
+        price:0,
+        productId:0,
+        classifyId:0,
         url:'',
         status:false
       })
@@ -260,16 +255,16 @@ export default {
         address:_res.addressinfo,
       }
     },
-    addNum(){
-      let num = this.buyNum*1
-        num +=1;
-        this.buyNum = num
-    },
-    lessNum(){
-      if(this.buyNum>1){
-        this.buyNum -=1;
-      }
-    },
+    // addNum(){
+    //   let num = this.buyNum*1
+    //     num +=1;
+    //     this.buyNum = num
+    // },
+    // lessNum(){
+    //   if(this.buyNum>1){
+    //     this.buyNum -=1;
+    //   }
+    // },
     change(e){
       //console.log(e.target)
       this.a=e.target.dataset.eventid
@@ -293,6 +288,7 @@ export default {
       this.showpay=false,
       this.showway=false
     },
+    // 跳转选择收货地址
     goSelectAddress(){
       this.$store.commit('setSelectAddress',{
         url:'/pages/confirmorder/main',
@@ -300,9 +296,21 @@ export default {
       })
       wx.navigateTo({url:'/pages/sitemanage/main'})
     },
+    // 跳转选择优惠券
     goSelectCoupon(){
+      // 设置提交订单参数
+      const confirmOrder = this.$store.state.confirmOrder;
+      this.$store.commit('setConfirmOrder',{
+        addressId:confirmOrder.addressId,
+      productId:confirmOrder.productId,
+      skuId:confirmOrder.skuId,
+      buyNum:this.buyNum,
+      couponId:confirmOrder.couponId
+      })
       this.$store.commit('setSelectCoupon',{
-        price:this.product.price,
+        price:this.total,
+        // price:200,
+        // productId:0,
         productId:this.product.id,
         classifyId:0,
         url:'/pages/confirmorder/main',

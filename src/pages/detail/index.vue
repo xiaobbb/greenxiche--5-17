@@ -488,7 +488,7 @@ export default {
       this.activeSkuId = this.product.sku[index].id;
       this.selectSkuPrice = this.product.sku[index].price;
       this.activeImg = this.product.sku[index].img;
-      this.selectSkuNum = this.product.sku[index].num;
+      this.selectSkuNum = this.payNum;
       this.selectSkuValue = this.product.sku[index].value;
       this.selectSkuValueSubmit = this.product.sku[index].sbumitValue;
     },
