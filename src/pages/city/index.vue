@@ -3,44 +3,49 @@
       <!--顶部输入框-->
       <div class="white">
           <div class="topinput">
-              <input type="text" placeholder="搜索商户">
+              <input type="text" placeholder="请输入城市名称">
               <img src="/static/images/search.png" class="searchpic absolu">
               <img src="/static/images/cancle.png" class="canclepic absolu">
           </div>
       </div>
-      <scroll-view scroll-y="true" v-bind:style="{height: winHeight + 'px'}" :scroll-into-view="scrollTopId">
-        <!--定位当前城市-->
-        <div class="item">定位当前城市</div>
-        <div class="itemlocat">
-            <div class="name">{{cityname}}</div>
-            <!-- <div class="chose" @click="choseCIty">
-              <img src="/static/images/can.png" class="can">
-              <text>重新定位</text>
-            </div> -->
-        </div>
-        <div class="item">热门城市</div>
-        <div class="flex-container cityhot">
-            <div class="name" v-for="item in hotCity" :key="item.id">{{item.name}}</div>
-        </div>
-        <!--城市列表-->
-        <!-- <div class="citylist">
-            <div class="citynum">
-                <div class="item">A</div>
-                <div class="cityindo">
-                  <div class="">阿坝</div>
-                  <div>阿克苏</div>
-                  <div>阿拉尔</div>
-                  <div>阿拉善盟</div>
-                </div>
+      <!--右侧字母 左侧列表-->
+      <div class="container-inner">
+          <div class="searchLetter touchClass">
+            <div class="thishotText" @click="hotCity">
+              <div style="margin-top:0;">当前</div>
+              <div style="margin-top:0;">热门</div>
             </div>
-        </div> -->
-          <div class="citylist" v-for="(item, idx) in allCity" :key="idx">
-            <div class="item" :id="item.initial">{{ item.initial }}</div>
-            <div v-for="(cityItem, index) in item.cityInfo" :key="index" :data-code="cityItem.code" :data-city="cityItem.city" @click="bindCity">
-                {{cityItem.city}}
+            <div v-for="(item, idx) in searchLetter" :key="idx" style="color:#ff6325;font-size:20rpx;" :data-letter="item.name" @click="clickLetter">
+              {{ item }}
             </div>
           </div>
-      </scroll-view>
+          <div class="container">
+              
+              <!--定位当前城市-->
+              <div class="item mylocal">定位当前城市</div>
+              <div class="itemlocat mylocal">
+                  <div class="name">{{cityname}}</div>
+                  <!-- <div class="chose" @click="choseCIty">
+                    <img src="/static/images/can.png" class="can">
+                    <text>重新定位</text>
+                  </div> -->
+              </div>
+              <scroll-view scroll-y="true" v-bind:style="{height: winHeight + 'px'}" :scroll-into-view="scrollTopId">
+                <div class="item">热门城市</div>
+                <div class="flex-container cityhot">
+                    <div class="name" v-for="item in hotCity" :key="item.id" :data-city="item.name" @click="bindCity">{{item.name}}</div>
+                </div>
+                <!--城市列表-->
+                  <div class="citylist" v-for="(item, idx) in citylist" :key="idx">
+                    <div class="item" :id="item.initial">{{ item.initial }}</div>
+                    <div style="padding:20rpx 30rpx;border-bottom:1rpx solid #f4f4f4" v-for="(cityItem, index) in item.cityInfo" :key="index" :data-code="cityItem.code" :data-city="cityItem.city" @click="bindCity">
+                        {{cityItem.city}}
+                    </div>
+                  </div>
+              </scroll-view>
+          </div>
+      </div>
+      
   </div>
 </template>
 
@@ -54,9 +59,10 @@ export default {
   },
   data () {
     return {
+        winHeight:"",
         searchLetter:['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z'],
         cityname:"深圳",
-        itemlist:[],
+        citylist:[],
         hotCity:[
           {id:1,name:"深圳"},{id:2,name:"上海"},{id:3,name:"杭州"},{id:4,name:"广州"},{id:5,name:"南京"},{id:6,name:"武汉"},{id:7,name:"成都"},{id:8,name:"北京"},
         ],
@@ -71,6 +77,10 @@ export default {
   },
  
   methods: {
+    bindCity(e){
+      console.log(e)
+      this.cityname=e.currentTarget.dataset.city
+    },
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "选择城市"
@@ -78,34 +88,24 @@ export default {
     },
     // 对城市信息进行分组
     cityList(){
-    let obj=[]
-    let tempArr =[];
-    for(var i=0;i<20;i++){
-        if(this.allCity[i].initial==this.allCity[i].initial){
-            tempArr.push(this.allCity[i].city)
-        }else{
-         
+      this.searchLetter.map(
+      initial => {
+        let tempObj = {};
+          // let cityInfo = [];
+
+       tempObj.initial = initial;
+         tempObj.cityInfo = this.allCity.filter(
+           city => city.initial === initial
+           );
+
+           this.citylist.push(tempObj);
         }
-        console.log(tempArr)
-    }
-    // this.searchLetter.map(
-    //   initial => {
-    //     let tempObj = {};
-    //     // let cityInfo = [];
-
-    //     tempObj.initial = initial;
-    //     tempObj.cityInfo = allCity.filter(
-    //       city => city.initial === initial
-    //       );
-
-    //       tempArr.push(tempObj);
-    //     }
-    //   );
-
-    //   // console.log(JSON.stringify(tempArr));
+     );
+        //this.citylist=JSON.stringify(this.citylist)  不用转码
+        console.log(this.citylist);
     //   //return tempArr;
-    //   this.itemlist=tempArr
-    //   console.log(this.itemlist)
+    
+    
     },
     choseCIty(){
         wx.getLocation({
@@ -125,6 +125,9 @@ export default {
 
   created () {
     // let app = getApp()
+    const sysInfo = wx.getSystemInfoSync();
+    //console.log(sysInfo); 获取设备信息
+    this.winHeight = sysInfo.windowHeight;
   }
 }
 </script>
@@ -132,4 +135,78 @@ export default {
 <style lang="scss" scoped>
   @import "./style";
   @import "../../css/common.css";
+  .container-inner {
+  display: flex;
+  flex-direction: row-reverse;
+}
+.mylocal{
+  width:100%;
+}
+.container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10rpx;
+  border:1px solid blue
+}
+
+.searchLetter {
+  flex-shrink: 0;
+  width: 80rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  color: #666;
+  border:1px solid red;
+
+}
+
+.searchLetter div {
+  margin-top: 20rpx;
+}
+
+.touchClass {
+  background-color: #fff;
+  color: #fff;
+  padding-top: 16rpx;
+  padding-bottom: 16rpx;
+}
+
+.showSlectedLetter {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: -100rpx;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 20rpx;
+  font-size: 52rpx;
+  z-index: 1;
+}
+.thisCityName {
+  display: inline-block;
+  border: 1rpx solid #ff6325;
+  border-radius: 8rpx;
+  padding: 10rpx 0;
+  font-size: 24rpx;
+  color: #ff6325;
+  text-align: center;
+  min-width: 149.5rpx;
+  margin: 16rpx 0;
+}
+
+.thishotText {
+  color: #ff6325;
+  font-size: 20rpx;
+  margin: 0 !important;
+}
+input {
+  background-color: #eee;
+}
+
 </style>

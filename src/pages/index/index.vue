@@ -13,36 +13,15 @@
             <img src="/static/images/list.png" class="list">
           </div>
         </div>
-        <!--中部定位图片-->
-        <!-- <div class="location glo-relative">
-          <img src="/static/images/tupian.png" class="dingwei">
-          <img src="/static/images/location.png" class="location-logo">
-          <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
-          <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
-          <img src="/static/images/cart.png" class="car-small" v-if="!isshow">
-        </div> -->
         <div class="location glo-relative">
           <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
-          <map
-            id="map"
-            :longitude="longitude"
-            :latitude="latitude"
-            scale="14"
-            :controls="controls"
-            bindcontroltap="controltap"
-            :markers="markers"
-            bindmarkertap="markertap"
-            :include-points="points"
-            :polyline="polyline"
-            bindregionchange="regionchange"
-            show-location
-            style="width: 100%; height: 1000rpx;"
-          ></map>
+          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height: 1000rpx;"></map>
           <!-- <img src="/static/images/location.png" class="location-logo"> -->
-          <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
+          <!-- <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
           <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
-          <img src="/static/images/cart.png" class="car-small" v-if="!isshow">
+          <img src="/static/images/cart.png" class="car-small" v-if="!isshow"> -->
         </div>
+        <div id="cont"></div>
         <!--弹框遮罩-->
         <div class="mask-modal" v-if="isshow"></div>
         <!--领取会员弹框-->
@@ -87,7 +66,7 @@
         <div class="modal-xiche" v-if="isXiche">
           <p class="line">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">展涛科技大厦c座</span>
+            <span class="location-self">{{nowPlace}}</span>
             <img src="/static/images/back.png" class="back">
           </p>
           <p class="wash" @click="washCar">我要洗车</p>
@@ -123,6 +102,7 @@
   </div>
 </template>
 
+
 <script>
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import amapFile from "../../utils/amap-wx"; //高德地图API调用JS SDK
@@ -133,53 +113,39 @@ import "../../css/global.css";
 export default {
   onLoad() {
     this.getCityName()
-    this.getMapShow()
+    this.getShopinfo()
   },
   data () {
     return {
       latitude:"",
       longitude:"",
+      markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
-      img1:'../../static/images/1.png',
-      img2:'../../static/images/2.png',
-       markers: [
-         { //标记点
-          iconPath:this.img1,
-          id: 0,
-          latitude: "20.00",
-          longitude: "115.00",
-          width: 50,
-          height: 50
-      },
-      { //标记点
-          iconPath:this.mg2 ,
-          id: 0,
-          latitude: "21.00",
-          longitude: "109.00",
-          width: 50,
-          height: 50
-      },
-      ],
-      polyline: [{  //路线
-        points: [{
+      markers: [{
+        iconPath: '/static/images/cart.png',
+        id: 2,
+        latitude: "23.099994",
+        longitude: "113.324520",
+        width: 50,
+        height: 50
+      }], //不显示
+      circle:[{
+          latitude:this.latitude,
           longitude:this.longitude,
-          latitude:this.latitude
-        }, {
-          longitude:this.longitude,
-          latitude:this.latitude
-        }],
-        color: '#FF0000DD',
-        width: 2,
-        dottedLine: true
-      }],
+          color:"#f00",
+          fillColor:"#f4f4f4",
+          radius:20,
+          strokeWidth:5
+
+      }],   //不显示
       controls: [{  //控件不随着地图移动
         id: 1,
-        iconPath: '../../static/images/location.png',
+        iconPath: '/static/images/location.png',
         position: {
           left: 0,
-          top: 300,
-          width: 50,
-          height: 50
+          top: 200,
+          width: 40,
+          height: 40
         },
         clickable: true
       }],
@@ -196,7 +162,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["cityName"])
+    ...mapState(["cityName","nowPlace"])
   },
   components: {
     shoplist
@@ -211,13 +177,20 @@ export default {
       myAmapFun.getRegeo({
         success:(data)=> {
           console.log(data,"高德地图")
+          let { name, desc, latitude, longitude } = data[0];
+          let { city } =data[0].regeocodeData.addressComponent;
           this.update({
-              cityName:data[0].regeocodeData.addressComponent.city
-              .toString()
-              .split(" ")[0]
+              // cityName:data[0].regeocodeData.addressComponent.city
+              cityName:city.toString().split(" ")[0],
+              nowPlace:name
           })
+          
+          this.latitude=latitude
+          this.longitude=longitude
           //console.log(this.cityName)
           wx.setStorageSync("cityName",this.cityName)
+          wx.setStorageSync("latitude",latitude)
+          wx.setStorageSync("longitude",longitude)
         },
         fail:(info)=>{
           //失败回调
@@ -230,27 +203,57 @@ export default {
       });
       
     },
-    getMapShow(){
-          wx.getLocation({   //获取当前位置的经纬度
-            type: 'gcj02', // map 组件使用的经纬度是火星坐标系，调用 wx.getLocation 接口需要指定 type 为 gcj02
-            success:(res)=>{
-              //console.log(res,"这是getLocation")
-              this.latitude = res.latitude
-              this.longitude = res.longitude
-              wx.setStorageSync("latitude", this.latitude)
-              wx.setStorageSync("longitude", this.longitude)
-              //console.log(this.latitude,this.longitude)
-              
-            }
-          })
-          this.mapCtx=wx.createMapContext("map")
-          this.mapCtx.getCenterLocation({
-            success:(res)=>{
-                //console.log(res)
-            }
-          })
-          
-        
+    
+    //根据手机所在地经纬度获取周围商铺信息
+    async getShopinfo(){
+      var res=await post("/Shop/NearbyShop",{
+          Lat:this.latitude,
+          Lng:this.longitude
+      })
+      //console.log(res)
+      if(res.code==0){
+        let arr=[]
+        for (let i=0;i<res.data.length;i++){
+          //console.log(res.data[i])
+          let latitude =res.data[i].Lat; 
+          let longitude =res.data[i].Lng;
+          let marker= {
+            iconPath: "/static/images/cart.png",
+            id:i || 0,
+            name:res.data[i].ShopNick || '',
+            latitude: latitude,
+            longitude: longitude,
+            width:48,
+            height: 55
+          };
+          arr.push(marker)
+        }
+        this.markers=arr
+        console.log(this.markers,"markers数组")
+      }
+    },
+    
+    makertap(e){  //点击标记点
+        console.log(e)
+        let { markerId } = e;
+        let { markers } = this.data;
+        let marker = markers[markerId];
+        this.showMarkerInfo(marker);//展示标记的信息
+        this.changeMarkerColor(markerId); //更改样式
+    },
+    changeMarkerColor(markerId) { //更改用户选中的标记样式
+      let { markers } = this.data;
+      markers.forEach((item, index) => {
+        item.iconPath = "/static/images/cart.png";
+        if (index == markerId){
+          item.iconPath = "/static/images/bigcar.png";
+          item.width=80;
+          item.height=95
+        } 
+      })
+      //this.setData({ markers, markerId });
+      this.markers=markers
+      this.markerId=markerId
     },
     close:function(){
       this.isnew=true
@@ -297,6 +300,8 @@ export default {
   }
 }
 </script>
+
+
 
 <style lang="scss" scoped>
   @import "./style";
