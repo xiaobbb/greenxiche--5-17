@@ -6,8 +6,25 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    cityName: "定位中..",
-    nowPlace:"正在定位中..."
+    confirmOrder:{
+      addressId:'',
+      productId:'',
+      skuId:'',
+      buyNum:1,
+      couponId:''
+    },
+    // 是否正在选择地址
+    selectAddress:{
+      url:'',
+      status:false
+    },
+    selectCoupon:{
+      price:0,
+      productId:0,
+      classifyId:0,
+      url:'',
+      status:false
+    }
   },
   mutations: {
     /**
@@ -30,7 +47,20 @@ const store = new Vuex.Store({
       Object.keys(config).map((item, key) => {
         state[item] = config[item]
       })
+    },
+    // 设置提交订单数据
+    setConfirmOrder(state,params){
+      state.confirmOrder = params;
+    },
+    // 选择地址
+    setSelectAddress(state,params){
+      state.selectAddress = params
+    },
+    // 选择优惠券
+    setSelectCoupon(state,params){
+      state.selectCoupon = params
     }
+    
   }
 })
 

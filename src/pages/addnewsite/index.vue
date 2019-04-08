@@ -104,7 +104,7 @@ export default {
       // isshow: false,
       // index: 0,
       token: wx.getStorageSync("token"),
-      userid: wx.getStorageSync('userid'),
+      userid: wx.getStorageSync('userId'),
       buttonText:'保存'
       // provArray: ["A", "B", "C"]
     };
