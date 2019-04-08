@@ -29,7 +29,7 @@
             <p class="sales">销量{{item.sale}}</p>
             <div class="flex-container around">
               <p class="price">￥{{item.price}}</p>
-              <div>
+              <div v-show="item.isAttr">
                 <img src="/static/images/s1.png" @click="lessNumber(index)" class="tippic">
                 <text class="nums">{{item.num}}</text>
                 <img src="/static/images/addcart.png" @click="addNumber(index)" class="tippic">
@@ -143,21 +143,55 @@ export default {
               img: datas.ProductImg,
               sale: datas.SalesVolume,
               num: 0,
-              tab:datas.KeywordName
+              // tab:datas.KeywordName?JSON.parse(datas.KeywordName):[]
+              isAttr:datas.SpecificationValue==='{}'
             });
+            console.log('123', that.productlist[i].isAttr)
           }
-        this.getCarData()
+        that.getCarData()
         }
       );
     },
-    lessNumber(index) {
-      if (this.productlist[index].num > 0) {
-        this.productlist[index].num -= 1;
+    // 删除购物车
+    async lessNumber(index) {
+
+      // if (this.productlist[index].num > 0) {
+      //   this.productlist[index].num -= 1;
+      // }
+      const product = this.productlist[index]
+      let carId = '';
+      let num = ''
+      for(let i=0;i<this.carData.length;i+=1){
+        if(this.carData[i].ProductId === product.id ){
+          carId = this.carData[i].Id;
+          num = this.carData[i].Number-1
+        }
       }
+      const data = [{
+        "CartId":carId,
+        "Total":num,
+        "SpecText":''
+      }]
+      const params ={
+        UserId:this.userId,
+        Token:this.token,
+        data:data
+      }
+      // 数量大于0，编辑购物车
+      // 数量等于0，删除购物车
+      if(num!==0){
+      await post('Cart/EditCart',params)
+      }else{
+      const res = await post('Cart/DelCart',params)
+        if((res.code*1) === 0){
+          this.productlist[index].num =0
+        }
+      }
+      this.getCarData()
     },
     // 添加购物车
     async addNumber(index) {
-      this.productlist[index].num += 1;
+      // this.productlist[index].num += 1;
       const product = this.productlist[index]
       const params ={
         UserId:this.userId,
@@ -182,6 +216,7 @@ export default {
         const datas = res.data[i]
         this.carNum += datas.Number
         this.carPrice += (datas.SalePrice*datas.Number)
+        this.carData.push(datas)
         const productlist = this.productlist;
         for(let j=0;j<productlist.length;j+=1){
           const _productlist = productlist[j]

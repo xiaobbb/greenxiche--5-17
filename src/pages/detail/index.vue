@@ -71,7 +71,7 @@
         <div class="flex-container statetips" @click="getPramas">
           <p class="tipname">参数</p>
           <div class="flex-container stateinfo">
-            <text>汽车服务类型 品牌...</text>
+            <text>服务类型 品牌...</text>
             <img src="/static/images/back.png" class="right">
           </div>
         </div>
@@ -81,7 +81,7 @@
       <div class="estimate">
         <div class="flex-container estititle">
           <p>宝贝评价</p>
-          <p @click="showAll">
+          <p @click="commentList">
             <text class="seeall">查看全部</text>
             <img src="/static/images/back.png" class="right">
           </p>
@@ -154,7 +154,7 @@
       <div class="mask" v-if="showPram">
         <div class="masktitle">产品参数</div>
         <div class="pramasitem flex-container" v-if="product.productParams.setviceType">
-          <p>汽车服务类型</p>
+          <p>服务类型</p>
           <p class="pramastitle">{{product.productParams.setviceType}}</p>
         </div>
         <div class="pramasitem flex-container" v-if="product.productParams.name">
@@ -281,6 +281,7 @@ export default {
       selectSkuPrice: "",
       selectSkuNum: "",
       selectSkuValue: "",
+      selectSkuValueSubmit:'',
       // 优惠券
       coupon: []
     };
@@ -342,7 +343,6 @@ export default {
              attr:'',
           }
         };
-       console.log(that.product, "产品详情");
         // 商品图片
         for (let i = 0; i < datas.ProductImgList.length; i += 1) {
           that.product.imgs.push(datas.ProductImgList[i].PicUrl);
@@ -370,12 +370,14 @@ export default {
           //    console.log(j,value[j], "产品详情");
           // }
           that.product.sku.push({
+            id:sku.Id,
             productId: sku.ProId,
             num: sku.ProStock,
             price: sku.PunitPrice,
             img: sku.SpecImage,
             text: sku.SpecText,
-            value: sku.SpecText.replace(/_/g, " ")
+            value: sku.SpecText.replace(/_/g, " "),
+            sbumitValue:sku.SpecText
           });
           that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
          }
@@ -436,13 +438,19 @@ export default {
         Token: this.token,
         ProId: this.product.id,
         Count: this.payNum,
-        SpecText: this.selectSkuValue
+        SpecText: this.selectSkuValueSubmit
       };
-      const res = await post("Cart/AddCart", params);
-      wx.showToast({
-          title: "添加成功！",
-          icon: "success"
-        });
+      try {
+       const res = await post("Cart/AddCart", params);
+        wx.showToast({
+            title: "添加成功！",
+            icon: "success"
+          });
+      }
+      catch(e){
+        console.log('e')
+        console.log(e)
+      }
     },
     // 校验购买数量
     stockCheck(){
@@ -464,15 +472,25 @@ export default {
       }
       this.showNums = false;
       this.isshow = false;
-      wx.navigateTo({ url: "/pages/confirmorder/main" });
+      
+    this.$store.commit('setConfirmOrder',{
+      addressId:'',
+      productId:this.product.id,
+      skuId:this.activeSkuId,
+      buyNum:this.selectSkuNum,
+      couponId:''
+    })
+      wx.navigateTo({ url: `/pages/confirmorder/main` });
     },
     // 选择sku
     selectSku(index) {
       this.activeSkuIndex = index;
+      this.activeSkuId = this.product.sku[index].id;
       this.selectSkuPrice = this.product.sku[index].price;
       this.activeImg = this.product.sku[index].img;
-      this.selectSkuNum = this.product.sku[index].num;
+      this.selectSkuNum = this.payNum;
       this.selectSkuValue = this.product.sku[index].value;
+      this.selectSkuValueSubmit = this.product.sku[index].sbumitValue;
     },
     share() {
       this.isshow = true;
@@ -526,8 +544,10 @@ export default {
       this.isshow = true;
       this.showNums = true;
     },
-    showAll() {
-      this.showEvaluate = false;
+    commentList() {
+      wx.navigateTo({
+        url:'/pages/comment-list/main'
+      })
     }
   },
 
