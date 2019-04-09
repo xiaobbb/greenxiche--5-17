@@ -15,7 +15,7 @@
         </div>
         <div class="location glo-relative">
           <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
-          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height: 1000rpx;"></map>
+          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="14" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
           <!-- <img src="/static/images/location.png" class="location-logo"> -->
           <!-- <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
           <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
@@ -23,54 +23,59 @@
         </div>
         <div id="cont"></div>
         <!--弹框遮罩-->
-        <div class="mask-modal" v-if="isshow"></div>
+        <cover-view class="mask-modal" v-if="isshow"></cover-view>
         <!--领取会员弹框-->
-        <div v-if="showmember" class="mask">
-            <img src="/static/images/modal.png" class="mask-img">
-            <img src="/static/images/close3.png" class="close"  @click="close">
-            <div class="text text1">
-              <p>优惠洗车</p>
-              <p>到店洗车减免20%</p>
-            </div>
-            <div class="text text2">
-              <p>服务卡券</p>
-              <p>不定期赠送洗车的卡券</p>
-            </div>
-            <div class="text text3">
-              <p>预约便捷</p>
-              <p>预约洗车更方便快捷</p>
-            </div>
-        </div>
-        <div v-if="showmember" @click="close">
-            <img src="/static/images/vip.png" class="vipbtn"> <!--立即开通vip-->
-        </div>
+        <cover-view v-if="showmember" >
+            <cover-view class="mask">
+                <cover-image src="/static/images/modal.png" class="mask-img"/>
+                <cover-image src="/static/images/close3.png" class="close"  @click="close"/>
+                <cover-view class="text text1">
+                  <cover-view>优惠洗车</cover-view>
+                  <cover-view>到店洗车减免20%</cover-view>
+                </cover-view>
+                <cover-view class="text text2">
+                  <cover-view>服务卡券</cover-view>
+                  <cover-view>不定期赠送洗车的卡券</cover-view>
+                </cover-view>
+                <cover-view class="text text3">
+                  <cover-view>预约便捷</cover-view>
+                  <cover-view>预约洗车更方便快捷</cover-view>
+                </cover-view>
+            </cover-view>
+            <cover-view @click="close">
+              <cover-image src="/static/images/vip.png" class="vipbtn"/> <!--立即开通vip-->
+            </cover-view>
+        </cover-view>
+        
         <!--提示不在服务范围内-->
-        <div v-if="showShop" class="maskshop">
-            <div class="title">
-              <text>您的当前位置不在服务范围内，无法提供上门服务，是否到店服务？</text>
-            </div>
-            <div class="flex-container bottombtn">
-                <div>取消</div>
-                <div @click="confirmDel">确认</div>
-            </div>
-        </div>
+        <cover-view v-if="showShop" class="maskshop">
+            <cover-view class="title">
+              <cover-view>您的当前位置不在服务范围内，无法提供上门服务，是否到店服务？</cover-view>
+            </cover-view>
+            <cover-view class="flex-container bottombtn">
+                <cover-view>取消</cover-view>
+                <cover-view @click="confirmDel">确认</cover-view>
+            </cover-view>
+        </cover-view>
         <!--新用户礼券-->
-        <div v-if="isnew" class="newgroup">
-            <img src="/static/images/newbg.png" class="newpic">
-            <img src="/static/images/close3.png" class="close"  @click="closemodal">
-            <div class="tuantile">送10元立减券</div>
-            <div class="tuannew">绿妞新用户专享</div>
-            <div class="tuanpick" @click="closemodal">立即领取</div>
-        </div>
+        <cover-view v-if="isnew" class="newgroup">
+            <cover-image src="/static/images/newbg.png" class="newpic"/>
+            <cover-image src="/static/images/close3.png" class="close"  @click="closemodal"/>
+            <cover-view class="tuantile cover-text">送10元立减券</cover-view>
+            <cover-view class="tuannew cover-text">绿妞新用户专享</cover-view>
+            <cover-view class="tuanpick cover-text" @click="closemodal">立即领取</cover-view>
+        </cover-view>
         <!--我要洗车-->
-        <div class="modal-xiche" v-if="isXiche">
-          <p class="line">
-            <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">{{nowPlace}}</span>
-            <img src="/static/images/back.png" class="back">
-          </p>
-          <p class="wash" @click="washCar">我要洗车</p>
-        </div>
+        <cover-view class="modal-xiche" v-if="isXiche">
+          <cover-view class="line flex-container" style="padding:30rpx">
+            <cover-view class="flex-container">
+                <cover-image src="/static/images/yellow.png" class="diandian"/>
+                <cover-view class="location-self">{{nowPlace}}</cover-view>
+            </cover-view>
+            <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;border:1px solid red" @click="choseLocation"/>
+          </cover-view>
+          <cover-view class="wash" @click="washCar">我要洗车</cover-view>
+        </cover-view>
         <!--到店-->
         <div class="modal-goshop" v-if="isGoshop" @click="goTo(3)">
           <div>
@@ -107,7 +112,6 @@
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import amapFile from "../../utils/amap-wx"; //高德地图API调用JS SDK
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
-import shoplist from "@/components/shoplist";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -115,19 +119,31 @@ export default {
     this.getCityName()
     this.getShopinfo()
   },
+  watch:{
+    '$store.state':{
+      handler:function() {   
+        const state = this.$store.state;
+        //console.log('state',state.longitude,state.latitude)
+        this.longitude = state.longitude;
+        this.latitude = state.latitude;
+        this.getCityinfo();
+        },
+        deep: true 
+    }
+  },
   data () {
     return {
-      latitude:"",
-      longitude:"",
+      // latitude:"",
+      // longitude:"",
       markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       markers: [{
-        iconPath: '/static/images/cart.png',
-        id: 2,
-        latitude: "23.099994",
-        longitude: "113.324520",
-        width: 50,
-        height: 50
+        iconPath: '/static/images/person.png',
+        id: 1,
+        latitude: "22.72174",
+        longitude: "114.06031",
+        width: 40,
+        height: 46
       }], //不显示
       circle:[{
           latitude:this.latitude,
@@ -158,39 +174,34 @@ export default {
       showmember:false,
       isXiche:false,
       isGoshop:false,
-      isnew:true
+      isnew:true,
     }
   },
   computed:{
-    ...mapState(["cityName","nowPlace"])
+    ...mapState(["cityName","nowPlace","longitude","latitude"])
   },
-  components: {
-    shoplist
-  },
-
+  
   methods: {
     ...mapMutations(["update"]),
+    
+    controltap(){  //点击地图上control 回到当前定位点
+        this.getCityName()
+    },
+    choseLocation(){
+        wx.navigateTo({ url: "/pages/locationorder/main" });
+    },
     getCityName(){
-        var myAmapFun = new amapFile.AMapWX({
-        key: "3fab6f1c5564f0c55818b26348612d3d" //高德地图注册的API KEY
-      });
-      myAmapFun.getRegeo({
-        success:(data)=> {
-          console.log(data,"高德地图")
-          let { name, desc, latitude, longitude } = data[0];
-          let { city } =data[0].regeocodeData.addressComponent;
-          this.update({
-              // cityName:data[0].regeocodeData.addressComponent.city
-              cityName:city.toString().split(" ")[0],
-              nowPlace:name
-          })
-          
-          this.latitude=latitude
-          this.longitude=longitude
-          //console.log(this.cityName)
-          wx.setStorageSync("cityName",this.cityName)
-          wx.setStorageSync("latitude",latitude)
-          wx.setStorageSync("longitude",longitude)
+      //console.log(this.latitude,this.longitude,"首页")
+      wx.getLocation({
+          type: 'wgs84',
+          success:(data)=> {
+          // console.log(data,"微信地图")
+          // this.latitude=data.latitude
+          // this.longitude=data.longitude
+          this.$store.commit('update',{ latitude:data.latitude,
+                        longitude:data.longitude
+                        });
+          this.getCityinfo()
         },
         fail:(info)=>{
           //失败回调
@@ -201,9 +212,29 @@ export default {
           this.update({ cityName: "北京市" });
         }
       });
-      
     },
-    
+    getCityinfo(){
+      // KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG
+         wx.setStorageSync("latitude",this.latitude)
+         wx.setStorageSync("longitude",this.longitude)
+       //console.log(this.latitude,this.longitude,"首页获取商户")
+        wx.request({
+            url: "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&location="+this.latitude+","+this.longitude+"&output=json&src=webapp.baidu.openAPIdemo",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+                //console.log(res,"地理转码")
+                this.update({
+                  cityName:res.data.result.addressComponent.city,
+                  nowPlace:res.data.result.formatted_address
+              })
+              //console.log(this.cityName,this.nowPlace)
+            wx.setStorageSync("cityName",this.cityName)
+          }
+        })
+        
+    },
     //根据手机所在地经纬度获取周围商铺信息
     async getShopinfo(){
       var res=await post("/Shop/NearbyShop",{
@@ -281,18 +312,18 @@ export default {
     washCar(){
        wx.navigateTo({ url: "/pages/location/main" });
     },
-    goTo(e){
-        var id=e
-        if(id==1){
-            wx.navigateTo({ url: "/pages/city/main" });
-        }
-        if(id==2){
-            wx.navigateTo({ url: "/pages/shoplist/main" });
-        }
-        if(id==3){
-            wx.navigateTo({ url: "/pages/shopdetail/main" });
-        }
-    }
+    // goTo(e){
+    //     var id=e
+    //     if(id==1){
+    //         wx.navigateTo({ url: "/pages/city/main" });
+    //     }
+    //     if(id==2){
+    //         wx.navigateTo({ url: "/pages/shoplist/main" });
+    //     }
+    //     if(id==3){
+    //         wx.navigateTo({ url: "/pages/shopdetail/main" });
+    //     }
+    // }
   },
 
   created () {

@@ -6,12 +6,16 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    cityName: "定位中..",
+    nowPlace:"正在定位中...",
+    latitude:"",
+    longitude:"",
     confirmOrder:{
       addressId:'',
       productId:'',
       skuId:'',
       buyNum:1,
-      couponId:''
+      couponId:'',
     },
     // 是否正在选择地址
     selectAddress:{

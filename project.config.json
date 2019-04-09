@@ -33,7 +33,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 38,
+			"current": 0,
 			"list": [
 				{
 					"id": 0,
@@ -78,8 +78,8 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "填写订单",
+					"id": 6,
+					"name": "填写订单选择时间",
 					"pathName": "pages/writeorder/main",
 					"query": "",
 					"scene": null
