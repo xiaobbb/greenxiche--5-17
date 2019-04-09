@@ -144,9 +144,8 @@ export default {
               sale: datas.SalesVolume,
               num: 0,
               tab:datas.KeywordName?JSON.parse(datas.KeywordName):[],
-              isAttr:datas.SpecificationValue==='{}'
+              isAttr:datas.SpecificationValue
             });
-            console.log('123', that.productlist[i].isAttr)
           }
         that.getCarData()
         }

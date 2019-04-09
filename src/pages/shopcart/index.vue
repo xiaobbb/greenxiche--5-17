@@ -12,11 +12,13 @@
     <div class="slider"></div>
     <!--右列表-->
     <div class="list">
-        <div class="flex-container shopitem white" v-for="(item,pindex) in servicelist" :key="item.id">
+        <div class="flex-container shopitem white" v-for="(item,pindex) in carData" :key="item.id">
             <div class="left">
               <input type="checkbox" class="checkbox-cart" :checked="item.isSelect" @click="oneClick(pindex)"/>
             </div>
-            <orderChild :showButton="isShow"></orderChild>
+            <orderChild :showButton="!isShow" :data="item"
+              @addNum="addNum" @lessNum="lessNum"
+            ></orderChild>
         </div>
     </div>
     <!--底部按钮-->
@@ -50,6 +52,7 @@
 </template>
 
 <script>
+import { post } from "@/utils/index";
 import orderChild from "@/components/orderChild"
 import specChild from "@/components/specChild"
 import "../../css/common.css";
@@ -57,9 +60,14 @@ import "../../css/global.css";
 export default {
    onLoad(){
     this.setBarTitle();
+    this.getCarData();
   },
   data () {
     return {
+      userId: wx.getStorageSync('userId'),
+      token: wx.getStorageSync('token'),
+      carData:[],
+
       showMask:false,
       isShow:true,
       showDelete:false,
@@ -95,6 +103,31 @@ export default {
       });
     },
     
+    // 获取购物车信息
+    async getCarData(){
+      console.log('a')
+      const params ={
+        UserId:this.userId,
+        Token:this.token,
+      }
+      const res = await post('Cart/CartList',params)
+      for(let i=0;i<res.data.length;i+=1){
+        const datas = res.data[i]
+        this.carData.push({
+          id:datas.Id,
+          img:datas.ProductImg,
+          title: datas.ProductName,
+          sku: datas.SpecText.replace(/_/g,' '),
+          skuSubmit: datas.SpecText,
+          shopName: datas.ShopName,
+          shopId:datas.ShopId,
+          price: datas.SalePrice,
+          num: datas.Number,
+          stock:datas.Stock,
+          isSelect:false
+        })
+      }
+    },
     selectProduct:function(){
         //遍历servicelist，全部取反
         this.isSelectAll=!this.isSelectAll
@@ -114,9 +147,47 @@ export default {
         }
         this.isSelectAll=true
     },
+    // 添加数量
+    addNum(id){
+      console.log(id)
+      this.editCar(id)
+    },
+    // 减少数量
+    lessNum(id){
+      console.log(id)
+    },
+    async editCar(id){
+      
+      let num = ''
+      for(let i=0;i<this.carData.length;i+=1){
+        if(this.carData[i].id === id ){
+          num = this.carData[i].num+1
+        }
+      }
+      const data = [{
+        "CartId":id,
+        "Total":num,
+        "SpecText":''
+      }]
+      const params ={
+        UserId:this.userId,
+        Token:this.token,
+        data
+      }
+      // 数量大于0，编辑购物车
+      // 数量等于0，删除购物车
+      if(num!==0){
+      await post('Cart/EditCart',params)
+      }else{
+      const res = await post('Cart/DelCart',params)
+        if((res.code*1) === 0){
+          this.productlist[index].num =0
+        }
+      }
+    },
     editPro(){
-      this.isShow=false
-      this.showDelete=false
+      this.isShow=!this.isShow
+      // this.showDelete=!this.showDelete
     },
     Delete(){
       this.showMask=true
