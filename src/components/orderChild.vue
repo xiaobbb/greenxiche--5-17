@@ -74,17 +74,8 @@ export default {
       });
     },
     addNum(){
-      if(this.data.num<this.data.stock){
-        let num = this.data.num*1
-         this.data.num= num+1
+        console.log('加数量')
          this.$emit('addNum',this.data.id)
-      }else{
-        wx.showToast({
-                    title: "超出可用库存！",
-                    icon: "none",
-                    duration: 2000
-        });
-      }
     },
     lessNum(){
       if(this.data.num>1){
