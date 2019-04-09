@@ -53,7 +53,7 @@
         <p class="hr"></p>
         <div class="item">
              <img src="/static/images/yellow.png" class="diandian">
-             <p class="location-self">手机 <input  placeholder="请输入您的手机号码" v-model="personPhone"/></p>
+             <p class="location-self">手机 <input  placeholder="请输入您的手机号码" v-model="personPhone" @blur="checkPhone"/></p>
         </div>
         <p class="hr"></p>
         <div class="item sign">
@@ -84,8 +84,14 @@ export default {
         latitude: wx.getStorageSync("latitude"),
         longitude: wx.getStorageSync("longitude"),
         timetip:"请选择服务时间",
-        personName:"",
-        personPhone:"",
+        personName:"",//姓名
+        personPhone:"",//手机
+        CarInfoId:"",//车子id
+        ServiceItem:"",//服务项目id
+        AppointmentStartTime:"",//预约开始时间
+        AppointmentEndTime:"",//预约结束时间
+        PicList:"",//图片合集; JsonString格式(多图)
+        Remarks:"",//备注
         controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',
@@ -119,20 +125,38 @@ export default {
     choseItem(){  //选择服务项目
         wx.navigateTo({ url: "/pages/servince/main?url=location"});
     },
+    choseMoney(){
+      wx.navigateTo({ url: "/pages/sum/main" }); //充值
+    },
     choseTime(){
-        wx.navigateTo({ url: "/pages/writeorder/main" })
+        wx.navigateTo({ url: "/pages/writeorder/main" }) //时间
     },
     choseCar(){
-        wx.navigateTo({ url: "/pages/mycar/main" });
+        wx.navigateTo({ url: "/pages/mycar/main" }); //我的车辆
     },
     addpics() {
-      wx.navigateTo({ url: "/pages/sceneplace/main" });
+      wx.navigateTo({ url: "/pages/sceneplace/main" }); //添加图片
     },
     addinfo() {
-      wx.navigateTo({ url: "/pages/signinfo/main" });
+      wx.navigateTo({ url: "/pages/signinfo/main" });//添加备注
+    },
+    checkPhone(){ //验证手机号
+      const phoneNum = this.personPhone;
+      if (!(/^1[3|4|5|6|7|8][0-9]\d{4,8}$/.test(phoneNum))) {
+        wx.showToast({
+          title: "请输入正确的手机号码！",
+          icon: "none",
+          duration: 2000
+        });
+        this.personPhone=""
+        return false
+        
+      } 
     },
     toPay(){
       console.log("支付啦")
+      //验证手机号
+      
 
       //wx.navigateTo({ url: "/pages/orderpay/main" });
     }
