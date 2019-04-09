@@ -2,25 +2,21 @@
   <div>
     <!--填写订单-->
     <div class="glo-relative">
-        <img src="/static/images/shangmen.png" class="shopbg">
-        <img src="/static/images/location.png" class="location-logo">
+        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="16" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width:750rpx; height: 516rpx;"></map>
+        <!-- <cover-view class="cover-pic">
+            <cover-image src="/static/images/location.png" class="cover-logo"/>
+        </cover-view> -->
     </div>
     <!--列表-->
     <div class="list">
-      <div class="item" v-for="item in locationlist" :key="item.id"   @click="change(item.id)">
+      <div class="item" v-for="(item,index) in locationlist" :key="index" @click="change(index)">
             <div class="iteminfo">
               <span class="location-self">{{item.name}}</span>
-              <p class="sub">{{item.subname}}</p>
+              <p class="sub">{{item.address}}</p>
             </div>
-            <img src="/static/images/choose2.png" class="choose" :class="{active:active==item.id}">
+            <img src="/static/images/choose2.png" class="choose" :class="{active:active==index}">
         </div>
-        
-        
     </div>
- 
-
-  
-
   </div>
 </template>
 
@@ -31,23 +27,30 @@ import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
-    this.getShopinfo()
+    this.getAround()
   },
   data () {
     return {
-      latitude:wx.getStorageSync("latitude"),
-      longitude:wx.getStorageSync("longitude"),
-      locationlist:[
-        {id:1,name:"展涛科技大厦C座(深圳市龙华区)"},
-        {id:2,name:"展涛科技大厦B座",subname:"广东省深圳市龙华区民治大道1079展涛科技大厦"},
-        {id:3,name:"展涛科技大厦A座",subname:"广东省深圳市龙华区民治大道1079展涛科技大厦"},
-        {id:4,name:"锦湖大厦B座",subname:"广东省深圳市龙华区民治大道1079展涛科技大厦"},
-      ],
-      active:'1',
+      // latitude:wx.getStorageSync("latitude"),
+      // longitude:wx.getStorageSync("longitude"),
+      locationlist:[ ],
+      active:'0',
+      markers:[],
+      controls: [{  //控件不随着地图移动
+          id: 1,
+          iconPath: '/static/images/location.png',
+          position: {
+            left: 0,
+            top: 150,
+            width: 30,
+            height: 30
+          },
+          clickable: true
+      }],
     }
   },
   computed:{
-    ...mapState(["cityName","nowPlace"])
+   ...mapState(["cityName","nowPlace","longitude","latitude"])
   },
   components: {
     
@@ -59,20 +62,65 @@ export default {
         title: "位置"
       });
     },
-    async getShopinfo(){
-      var res=await post("/Shop/NearbyShop",{
-          Lat:this.latitude,
-          Lng:this.longitude
-      })
-      //console.log(res)
-      if(res.code==0){
-        console.log(res.data)
-          //this.locationlist=rea.data
-      }
+    getAround(){
+      wx.request({
+            url:"https://api.map.baidu.com/place/search?&query=大厦&location="+this.latitude+","+this.longitude+"&radius=1000&output=json&key=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+                //console.log(res.data.results,"poi检索")
+                this.locationlist=res.data.results
+          }
+        })
+    },
+    controltap(){
+        wx.getLocation({
+          type: 'wgs84',
+          success:(data)=> {
+          // console.log(data,"微信地图")
+          // this.latitude=data.latitude
+          // this.longitude=data.longitude
+          this.$store.commit('update',
+                  { latitude:data.latitude,longitude:data.longitude
+                  });
+                  this.getAround()
+        },
+        fail:(info)=>{
+          //失败回调
+          console.log(info);
+          //如果用户拒绝授权
+          // 默认为北京
+          this.cityName = "北京市";
+          this.update({ cityName: "北京市" });
+        }
+      });
     },
     change:function(e){
       this.active=e
+      // this.latitude=this.locationlist[e].location.lat
+      // this.longitude=this.locationlist[e].location.lng
+      let address=this.locationlist[e].address
+     // console.log(address)
+       wx.request({
+            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+address+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+              const _res = res.data.result.location
+                console.log(_res.lat,_res.lng,"state")
+                // this.longitude=res.data.result.location.lng
+                // this.latitude=res.data.result.location.lat
+                this.update({ latitude:res.data.result.location.lat,
+                              longitude:res.data.result.location.lng
+                        });
+                //console.log(this,"选择位置页面")
+          }
+        })
+      
     },
+    
   },
 
   created () {

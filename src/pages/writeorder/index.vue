@@ -41,8 +41,8 @@
     </div>
     <!--底部按钮组-->
     <div class="tagflex bottomstyle">
-        <div class="btn-cancle">取消</div>
-        <div class="btn-order">立即下单</div>
+        <div class="btn-cancle" @click="cancle">取消</div>
+        <div class="btn-order" @click="choseTime">立即下单</div>
     </div>
   </div>
 </template>
@@ -55,14 +55,17 @@ export default {
     this.setBarTitle();
     this.choosedate();
     this.gethous();
-    this.getMinutes()
+    this.getMinutes();
+    this.datetip=this.datelist[this.active]
   },
   data () {
     return {
       datelist:[],
       active:'0',
       hourses:[],
-      minutes:[]
+      minutes:[],
+      datetip:"",//日期
+      time:[]//时间
     }
   },
  
@@ -80,6 +83,7 @@ export default {
     },
     changebg(item){
       this.active=item
+      this.datetip=this.datelist[this.active]
     },
     choosedate(){
       var d=new Date()
@@ -110,15 +114,61 @@ export default {
       }
     },
     bindDateChangeStart (e) {
-        //console.log(e)
+          console.log(e)
           // valIndex 是获取到的年月日在各自集合中的下标
-          const valIndex = e.mp.detail.value
+          this.time = e.mp.detail.value
           // console.log(JSON.stringify(e.mp.detail.value))
-          let hourses = this.hourses[valIndex[0]]
-          let minutes = this.minutes[valIndex[1]]
+          // let hourses = this.hourses[valIndex[0]]
+          // let minutes = this.minutes[valIndex[1]]
           // 滚动时再动态 通过年和月获取 这个月下对应有多少天
+    },
+    choseTime(){
+      let mon=this.datetip.slice(0,1)
+      let dd=this.datetip.slice(2,3)
+      if(mon.length<2){
+        mon="0"+mon
+      }
+       if(dd.length<2){
+        dd="0"+dd
+      }
+      let tt=mon+"-"+dd  //日期
+      const time1=[]
+      for (let i of this.time){
+        if(i.toString().length<2){
+            i="0"+i
+        }
+        time1.push(i)
+      }
+      
+       const timeValue=time1[0]+":"+time1[1]+"-"+time1[2]+":"+time1[3] //时间
+       if(this.time[0]>this.time[2]){
+         wx.showToast({
+            title: '开始时间不能大于结束时间',
+            icon: 'none',
+            duration: 2000,
+            complete: function (){
+              
+            }
+        });
+        return false
+      }else{
+          //console.log(time1)
+          if(dd && time1.length>0){
+              wx.navigateTo({ url: "/pages/location/main?tt="+tt+"&mm="+timeValue });
+          }else{
+                wx.showToast({
+                  title: '请选择时间',
+                  icon: 'none',
+                  duration: 2000,
+                  complete: function (){
+                    
+                  }
+              });
+              return false
+            }
+            
+          }
     }
-    
   },
 
   created () {
