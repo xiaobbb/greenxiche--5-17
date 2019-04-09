@@ -31,13 +31,21 @@ export default function logins() {
                   "content-type": "application/x-www-form-urlencoded"
                 },
                 success: function(res) {
+                  if(!res.data.meta||res.data.meta.code===undefined){
+                    wx.showToast({
+                      title: "登录失败！请重新尝试",
+                      icon: "none",
+                      duration: 2000
+                    });
+                    return false;
+                  }
+                  console.log("登陆成功",res.data.meta,res.data.meta.code);
+                  if (res.data.meta.code=== 0) {
                   wx.setStorageSync("token", res.data.data.accessToken); //保存的令牌 accessToken
                   wx.setStorageSync("userId", res.data.data.uid); //保存用户Id到本地缓存
                   wx.setStorageSync("unionid", res.data.data.unionid);
                   wx.setStorageSync("openId", res.data.data.openId);
                   console.log(res.data.data,'res?');
-                  if (res.data.meta.code=== 0) {
-                    console.log("登陆成功");
                     wx.showToast({
                       title: "登陆成功",
                       icon: "success",
@@ -64,7 +72,13 @@ export default function logins() {
                     });
                   }
                 },
-                fail: function(error) {},
+                fail: function(error) {
+                  wx.showToast({
+                    title: "登录失败！请重新尝试",
+                    icon: "none",
+                    duration: 2000
+                  });
+                },
                 complete: function() {
                   wx.hideLoading();
                 }
