@@ -4,11 +4,11 @@
       <radio-group class="radio-group" @change="radioChange">
         <div v-for="(item,index) in carinfolist" :key="item.id">
           <div class="caritem white commonpad">
-            <div class="flex-container person">
+            <div class="flex-container person" @click="onSelect(item.id)">
               <p>{{item.name}}</p>
-              <p class="phonenum">{{item.phone}}</p>
+              <p class="phonenum" >{{item.phone}}</p>
             </div>
-            <div>{{item.site}}</div>
+            <div @click="onSelect(item.id)">{{item.site}}</div>
             <div class="flex-container choosemenu">
               <label class="radio flex-container choose" @click="changeDefault(index)">
                 <radio :value="item.id" :checked="item.checked"/>
@@ -58,11 +58,11 @@ import "../../css/global.css";
 export default {
   data() {
     return {
-      userid: wx.getStorageSync("userid"),
+      userid: wx.getStorageSync("userId"),
       token: wx.getStorageSync("token"),
       isshow: false,
       data: 0,
-      carinfolist: []
+      carinfolist: [],
     };
   },
 
@@ -145,6 +145,29 @@ export default {
     },
     editAddress(id){
       wx.redirectTo({ url: "/pages/addnewsite/main?id="+id});
+    },
+    onSelect(id){
+      const confirmOrder = this.$store.state.confirmOrder;
+      const selectAddress = this.$store.state.selectAddress;
+      if(!selectAddress.status){
+        return false
+      }
+      // 设置提交订单参数
+      this.$store.commit('setConfirmOrder',{
+        addressId:id,
+      productId:confirmOrder.productId,
+      skuId:confirmOrder.skuId,
+      buyNum:confirmOrder.buyNum,
+      couponId:confirmOrder.couponId
+      })
+
+      wx.redirectTo({ url: selectAddress.url});
+      // 重置选择地址
+      this.$store.commit('setSelectAddress',{
+        url:'',
+        status:false
+      })
+
     }
   },
 

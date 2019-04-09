@@ -7,11 +7,11 @@
               <p class="person">{{memberInfo.NickName}}</p>
           </div>
           <div class="flex-container avaitem">
-              <div class="flex-container clomn">
+              <div class="flex-container clomn" @click="gotoWallet">
                   <p class="nums">{{memberInfo.Wallet}}</p>
                   <p class="itemname">余额</p>
               </div>
-              <div class="flex-container clomn">
+              <div class="flex-container clomn" @click="gotoIntegral">
                   <p class="nums">{{memberInfo.Score}}</p>
                   <p class="itemname">积分</p>
               </div>
@@ -37,7 +37,7 @@
           </div>
       </div>
       <!--切换-->
-      <div class="flex-container caritem white">
+      <div class="flex-container caritem white"  @click="choseItem(5)">
           <div class="flex-container">
               <img src="/static/images/car22.png" class="car">
               <p v-if="showCar">我的车辆</p>
@@ -46,7 +46,7 @@
                   <p>粤AJ6688</p>
               </div>
           </div>
-          <img src="/static/images/back.png" class="right" @click="choseItem(5)">
+          <img src="/static/images/back.png" class="right">
       </div>
       <!--组-->
       <div class="white minelist">
@@ -137,6 +137,12 @@ export default {
           wx.navigateTo({ url: "/pages/mycar/main" });
       }
     },
+    gotoIntegral(){
+     wx.navigateTo({ url: "/pages/integral/main" });
+    },
+    gotoWallet(){
+      wx.navigateTo({ url: "/pages/wallet/main" });
+    },
     async getMemberInfo(){
       let result = await post("User/GetMemberInfo",{
          UserId: this.userId,
@@ -148,8 +154,6 @@ export default {
         this.memberInfo = result.data;
         console.log(this.memberInfo);
       }
-      
-      
     //   console.log(result);
     }
     
