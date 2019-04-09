@@ -124,6 +124,7 @@ export default {
       buyNum:1,
       sku:'',
       skuId:'',
+      sbumitValue:'',
       skuPrice:0,
       message:'',
       address:{
@@ -211,7 +212,8 @@ export default {
           if(sku.Id === skuId){
             this.sku = sku.SpecText.replace(/_/g, " ");
             this.skuPrice = sku.PunitPrice;
-            this.skuImg = sku.SpecImage
+            this.skuImg = sku.SpecImage;
+            this.sbumitValue = sku.SpecText
           }
          }
     },
@@ -269,9 +271,29 @@ export default {
       //console.log(e.target)
       this.a=e.target.dataset.eventid
     },
-    goPay(){
-      this.isshow=true,
-      this.showpay=true
+    // 提交订单
+    async goPay(){
+      // this.isshow=true,
+      // this.showpay=true
+      const res = await post('Order/BuyNowSubmitOrder',{
+        UserId:this.userId,
+        Token:this.token,
+        ProId:this.product.id,
+        Number:this.buyNum,
+        AddressId:this.address.id,
+        // sku
+        SpecText:this.sbumitValue,
+        // 是否开发票
+        InvoiceId:0,
+        InvoiceEmail:'',
+        // InvoiceType:2,
+        // 优惠券id
+        MemberCouponId:0,
+        // 备注
+        Remark:'',
+        // 服务卡券
+        MemberCardId:0
+      })
     },
     goWay(){
       this.isshow=true,

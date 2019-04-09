@@ -143,7 +143,7 @@ export default {
               img: datas.ProductImg,
               sale: datas.SalesVolume,
               num: 0,
-              // tab:datas.KeywordName?JSON.parse(datas.KeywordName):[]
+              tab:datas.KeywordName?JSON.parse(datas.KeywordName):[],
               isAttr:datas.SpecificationValue==='{}'
             });
             console.log('123', that.productlist[i].isAttr)
