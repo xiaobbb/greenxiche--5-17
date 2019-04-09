@@ -1,29 +1,42 @@
 <template>
     <div class="proinfo flex-container pad">
         <div>
-        <img src="/static/images/orderimg.png" class="orderimg">
+        <img :src="data.img" class="orderimg">
         </div>
         <div class="inforight">
-            <div class="infotitle">绿妞长效镀晶9H汽车度镀晶纳米水晶镀膜包施工新全车辆车漆面德国</div>
-            <div class="infospec">精选1年版（全国包施工） </div>
+            <div class="infotitle">{{data.title}}</div>
+            <div class="infospec">{{data.sku}}</div>
             <div class="infoprice flex-container">
-                <p>￥1288</p>
-                <p v-if="showButton">x1</p>
-                <div v-else>
-                  <img src="/static/images/add5.png" class="specpic"> 
-                  <text class="shopnum">1</text>
-                  <img src="/static/images/shot5.png" class="specpic">
+                <p>￥{{price}}</p>
+                <p v-if="showButton">x{{data.num}}</p>
+                <div v-else class="flex-center">
+                  <img src="/static/images/add5.png" @click="addNum" class="specpic"> 
+                  <input class="shopnum" v-model="data.num" type="number" />
+                  <img src="/static/images/shot5.png" @click="lessNum" class="specpic">
               </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+// 该组件使用的数据格式：
+//       {
+//           img:datas.ProductImg,
+//           title: datas.ProductName,
+//           sku: datas.SpecText,
+//           skuSubmit: datas.SpecText,
+//           shopName: datas.ShopName,
+//           shopId:datas.ShopId,
+//           price: datas.SalePrice,
+//           num: datas.Number,
+//           stock:datas.Stock,
+//         }
+    // showButton；为数量是否可编辑，true--显示数量；false--显示编辑按钮
 export default {
   onLoad(){
-    this.setBarTitle();
+    // this.setBarTitle();
   },
-   props: ["showButton"],
+   props: ["showButton",'data'],
   data () {
     return {
       isshow:false,
@@ -32,7 +45,25 @@ export default {
       a:4,
     }
   },
- 
+  computed:{
+    price(){
+      let num =0;
+      num = (this.data.price*this.data.num).toFixed(2)
+      return num
+    }
+  },
+  watch:{
+    'data.num'(){
+      if(this.data.num>this.data.stock){
+        wx.showToast({
+                    title: "超出可用库存！",
+                    icon: "none",
+                    duration: 2000
+        });
+        this.data.num = this.data.stock
+      }
+    }
+  },
   components: {
     
   },
@@ -42,7 +73,25 @@ export default {
         title: ""
       });
     },
-  
+    addNum(){
+      if(this.data.num<this.data.stock){
+        let num = this.data.num*1
+         this.data.num= num+1
+         this.$emit('addNum',this.data.id)
+      }else{
+        wx.showToast({
+                    title: "超出可用库存！",
+                    icon: "none",
+                    duration: 2000
+        });
+      }
+    },
+    lessNum(){
+      if(this.data.num>1){
+         this.data.num-=1
+         this.$emit('lessNum',this.data.id)
+      }
+    }
   },
 
   created () {
@@ -93,6 +142,13 @@ export default {
 .shopnum{
     margin:0 20rpx;
     color:#1a1a1a;
-    font-size:24rpx
+    font-size:24rpx;
+    width:40rpx;
+    text-align:center;
+}
+.flex-center{
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 </style>
