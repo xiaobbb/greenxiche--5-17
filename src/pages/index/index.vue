@@ -28,7 +28,7 @@
         <cover-view v-if="showmember" >
             <cover-view class="mask">
                 <cover-image src="/static/images/modal.png" class="mask-img"/>
-                <cover-image src="/static/images/close3.png" class="close"  @click="close"/>
+                <cover-image src="/static/images/close3.png" class="close"  @click="closeModal"/>
                 <cover-view class="text text1">
                   <cover-view>优惠洗车</cover-view>
                   <cover-view>到店洗车减免20%</cover-view>
@@ -42,9 +42,9 @@
                   <cover-view>预约洗车更方便快捷</cover-view>
                 </cover-view>
             </cover-view>
-            <cover-view @click="close">
-              <cover-image src="/static/images/vip.png" class="vipbtn"/> <!--立即开通vip-->
-            </cover-view>
+            <!-- <cover-view @click="close">
+              <cover-image src="/static/images/vip.png" class="vipbtn"/>
+            </cover-view> -->
         </cover-view>
         
         <!--提示不在服务范围内-->
@@ -60,19 +60,19 @@
         <!--新用户礼券-->
         <cover-view v-if="isnew" class="newgroup">
             <cover-image src="/static/images/newbg.png" class="newpic"/>
-            <cover-image src="/static/images/close3.png" class="close"  @click="closemodal"/>
+            <cover-image src="/static/images/close3.png" class="close"  @click="closeModal"/>
             <cover-view class="tuantile cover-text">送10元立减券</cover-view>
             <cover-view class="tuannew cover-text">绿妞新用户专享</cover-view>
-            <cover-view class="tuanpick cover-text" @click="closemodal">立即领取</cover-view>
+            <cover-view class="tuanpick cover-text" @click="getNewConpon">立即领取</cover-view>
         </cover-view>
         <!--我要洗车-->
         <cover-view class="modal-xiche" v-if="isXiche">
           <cover-view class="line flex-container" style="padding:30rpx">
-            <cover-view class="flex-container">
+            <cover-view class="flex-container"  @click="choseLocation">
                 <cover-image src="/static/images/yellow.png" class="diandian"/>
                 <cover-view class="location-self">{{nowPlace}}</cover-view>
             </cover-view>
-            <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;border:1px solid red" @click="choseLocation"/>
+            <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;border:1px solid red"/>
           </cover-view>
           <cover-view class="wash" @click="washCar">我要洗车</cover-view>
         </cover-view>
@@ -116,14 +116,18 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
     this.getCityName()
     this.getShopinfo()
+    this.getCoupon()//是否新用户
+    this.isNewVip() //是否vip
   },
   watch:{
     '$store.state':{
       handler:function() {   
         const state = this.$store.state;
-        //console.log('state',state.longitude,state.latitude)
+        console.log('state',state.longitude,state.latitude)
         this.longitude = state.longitude;
         this.latitude = state.latitude;
         this.getCityinfo();
@@ -135,25 +139,11 @@ export default {
     return {
       // latitude:"",
       // longitude:"",
+      userId:"",
+      token:"",
       markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
-      markers: [{
-        iconPath: '/static/images/person.png',
-        id: 1,
-        latitude: "22.72174",
-        longitude: "114.06031",
-        width: 40,
-        height: 46
-      }], //不显示
-      circle:[{
-          latitude:this.latitude,
-          longitude:this.longitude,
-          color:"#f00",
-          fillColor:"#f4f4f4",
-          radius:20,
-          strokeWidth:5
-
-      }],   //不显示
+      markers: [], //不显示
       controls: [{  //控件不随着地图移动
         id: 1,
         iconPath: '/static/images/location.png',
@@ -170,11 +160,11 @@ export default {
       ],
       active:'上门',
       isshow:true,
-      showShop:false,
-      showmember:false,
-      isXiche:false,
-      isGoshop:false,
-      isnew:true,
+      showShop:false, //提示不在服务范围
+      showmember:true,  //是否是vip
+      isXiche:false,  //我要洗车
+      isGoshop:false,//到店洗车最近的一家商铺
+      isnew:false,   //是否是新人
     }
   },
   computed:{
@@ -191,7 +181,6 @@ export default {
         wx.navigateTo({ url: "/pages/locationorder/main" });
     },
     getCityName(){
-      //console.log(this.latitude,this.longitude,"首页")
       wx.getLocation({
           type: 'wgs84',
           success:(data)=> {
@@ -214,6 +203,7 @@ export default {
       });
     },
     getCityinfo(){
+       console.log(this.latitude,this.longitude,"首页")
       // KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG
          wx.setStorageSync("latitude",this.latitude)
          wx.setStorageSync("longitude",this.longitude)
@@ -286,12 +276,78 @@ export default {
       this.markers=markers
       this.markerId=markerId
     },
+    async getCoupon(){ //判断是否是新人  三天内
+      const res=await post("/Coupon/IsNewUser",{ 
+          UserId: this.userId,
+          Token:this.token
+      })
+      console.log(res,"判断是否是新人")
+      if(res.data.IsNewUser==0){
+        //   wx.showToast({
+        //     title: '您已经不是新用户啦。。。',
+        //     icon: 'none',
+        //     duration: 2000,
+        //     complete: function (){
+              
+        //     }
+        // });
+        // 
+      }else{
+        //是新人 弹出领取新人礼券
+        this.isshow=true
+        this.isnew=true
+        if(res.data.IsNewCoupon==0){
+            wx.showToast({
+            title: '活动已经结束啦。。。',
+            icon: 'none',
+            duration: 2000,
+            complete: function (){
+            }
+          });
+        return false
+        }else{
+          this.getNewConpon()
+        }
+      }
+      
+    },
+    async getNewConpon(){  //领取新人礼券
+        let res=await post("/Coupon/GetNewCoupon",{
+            UserId: this.userId,
+            Token:this.token
+        })
+        console.log(res,"领取新人礼券")
+        if(res.code==0){
+          wx.showToast({
+            title: '领取成功',
+            icon: 'success',
+            duration: 2000,
+            complete: function (){
+              
+            }
+          });
+        }
+    },
+    async isNewVip(){  //验证是否vip
+        let res=await post("/User/VerifyVIP",{
+            UserId: this.userId,
+            Token:this.token
+        })
+        console.log(res,"领取vip  ")
+        if(res.code==0){
+          if(res.data.IsVip==1){
+            //不是vip弹出领取vip点击开通vip
+            this.isshow=true
+            this.showmember=true
+          }
+        }
+    },
     close:function(){
       this.isnew=true
       this.showmember=false,
       this.isXiche=false
     },
-    closemodal(){
+    closeModal(){
         this.isnew=false,
         this.isshow=false,
         this.showmember=false,
@@ -337,4 +393,8 @@ export default {
 <style lang="scss" scoped>
   @import "./style";
   @import "../../css/common.css";
+  .cover-text{
+    position:absolute;
+    color:#fff
+}
 </style>

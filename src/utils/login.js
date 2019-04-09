@@ -21,7 +21,7 @@ export default function logins() {
             if (code) {
               wx.request({
                 method: "POST",
-                url: "http://carapi.wtvxin.com/api/Login/SignIn_New", //提交数据到服务器，如果没有绑定手机号码，则提示用户需要绑定手机号码
+                url: "https://carapi.wtvxin.com/api/Login/SignIn_New", //提交数据到服务器，如果没有绑定手机号码，则提示用户需要绑定手机号码
                 data: {
                   iv: ivata,
                   code: code,
@@ -58,10 +58,10 @@ export default function logins() {
                     });
                   }else{
                       wx.showToast({
-                    title: "登录失败！请重新尝试",
-                    icon: "none",
-                    duration: 2000
-                  });
+                      title: "登录失败！请重新尝试",
+                      icon: "none",
+                      duration: 2000
+                    });
                   }
                 },
                 fail: function(error) {},

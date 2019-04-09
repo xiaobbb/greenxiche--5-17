@@ -104,7 +104,7 @@ export default {
         var token = wx.getStorageSync("token");
         var unionid = wx.getStorageSync("unionid");
         wx.request({
-          url: "http://carapi.wtvxin.com/api/Login/BindOrRegister", //仅为示例，并非真实的接口地址
+          url: "https://carapi.wtvxin.com/api/Login/BindOrRegister", //仅为示例，并非真实的接口地址
           method: "POST",
           data: {
             mobile: this.phoneNumber,

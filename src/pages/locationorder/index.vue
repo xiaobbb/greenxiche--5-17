@@ -100,24 +100,27 @@ export default {
       this.active=e
       // this.latitude=this.locationlist[e].location.lat
       // this.longitude=this.locationlist[e].location.lng
-      let address=this.locationlist[e].address
+      let address=this.locationlist[e].address;
+      this.update({ latitude:this.locationlist[e].location.lat,
+                longitude:this.locationlist[e].location.lng
+          });
      // console.log(address)
-       wx.request({
-            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+address+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
-            header: {
-              "content-type": "application/x-www-form-urlencoded"
-            },
-            success:(res)=>{
-              const _res = res.data.result.location
-                console.log(_res.lat,_res.lng,"state")
-                // this.longitude=res.data.result.location.lng
-                // this.latitude=res.data.result.location.lat
-                this.update({ latitude:res.data.result.location.lat,
-                              longitude:res.data.result.location.lng
-                        });
-                //console.log(this,"选择位置页面")
-          }
-        })
+      //  wx.request({
+      //       url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+address+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+      //       header: {
+      //         "content-type": "application/x-www-form-urlencoded"
+      //       },
+      //       success:(res)=>{
+      //         const _res = res.data.result.location
+      //           console.log(_res.lat,_res.lng,"state")
+      //           // this.longitude=res.data.result.location.lng
+      //           // this.latitude=res.data.result.location.lat
+      //           this.update({ latitude:res.data.result.location.lat,
+      //                         longitude:res.data.result.location.lng
+      //                   });
+      //           //console.log(this,"选择位置页面")
+      //     }
+      //   })
       
     },
     

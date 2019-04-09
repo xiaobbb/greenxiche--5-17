@@ -2,9 +2,7 @@
   <div class="contain">
     <!--大图片-->
     <div class="glo-relative bg-cart">
-        <img src="/static/images/cartbg5.png" class="shopbg">
-        <img src="/static/images/location.png" class="location-logo">
-        <img src="/static/images/cart.png" class="cart-img pic-center">
+        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="14" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 500rpx;"></map>
     </div>
     <div class="pad">
         <!--预约时间-->
@@ -50,6 +48,7 @@
 <script>
 import "../../css/common.css";
 import "../../css/global.css";
+import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
@@ -57,6 +56,7 @@ export default {
     this.gethous();
     this.getMinutes();
     this.datetip=this.datelist[this.active]
+    
   },
   data () {
     return {
@@ -65,10 +65,23 @@ export default {
       hourses:[],
       minutes:[],
       datetip:"",//日期
-      time:[]//时间
+      time:[],//时间
+      controls: [{  //控件不随着地图移动
+          id: 1,
+          iconPath: '/static/images/location.png',
+          position: {
+            left: 0,
+            top: 150,
+            width: 30,
+            height: 30
+          },
+          clickable: true
+      }],
     }
   },
- 
+  computed:{
+   ...mapState(["cityName","nowPlace","longitude","latitude"])
+  },
   components: {
     
   },
@@ -114,7 +127,7 @@ export default {
       }
     },
     bindDateChangeStart (e) {
-          console.log(e)
+          //console.log(e)
           // valIndex 是获取到的年月日在各自集合中的下标
           this.time = e.mp.detail.value
           // console.log(JSON.stringify(e.mp.detail.value))
