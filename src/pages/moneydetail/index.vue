@@ -5,13 +5,13 @@
       </div>
       <div class="slide"></div>
       <div class="recordlist" v-if="list.length>0">
-          <div class="recorditem commonpad flex-container">
+          <div class="recorditem commonpad flex-container" v-for="(item,index) in list" :key="index">
               <div>
-                  <p>充值入账</p>
-                  <p class="minisize">2019-03-12  11:06</p>
+                  <p>{{item.Remark}}</p>
+                  <p class="minisize">{{item.AddTime}}</p>
               </div>
               <div>
-                  <p class="addshort add">＋300.00</p>
+                  <p class="addshort add">＋{{item.Change}}</p>
                   <p class="minisize">余额：300.00</p>
               </div>
           </div>
@@ -86,6 +86,9 @@ export default {
         this.allPage = parseInt(this.count / this.pageSize) + 1;
       }
       if(result.data.length>0){
+        for(let i=0;i<result.data.length;i++){
+          result.data[i].AddTime = result.data[i].AddTime.split("/").join("-");
+        }
         this.list = this.list.concat(result.data);
       }
       if(this.allPage > this.page){

@@ -13,10 +13,11 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "绿妞洗车",
     "navigationBarTextStyle": "black",
-    "enablePullDownRefresh": true 
+    "enablePullDownRefresh": true ,
+    "backgroundColor":"#fffff"
   },
   "tabBar": {
-    "backgroundColor": "#ffff",
+    "backgroundColor": "#fffff",
     "borderStyle": "white",
     "selectedColor": "#ff6325",
     "color": "black",

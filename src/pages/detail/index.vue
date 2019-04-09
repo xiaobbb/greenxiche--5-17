@@ -52,10 +52,10 @@
       <div class="slide"></div>
       <!--说明-->
       <div class="state">
-        <div class="flex-container statetips" v-if="serviceTab">
+        <div class="flex-container statetips" v-if="product.serviceTab&&product.serviceTab.length>0">
           <p class="tipname">服务</p>
           <div class="flex-container stateinfo">
-            <p v-for="(item,index) in serviceTab" :key="index">
+            <p v-for="(item,index) in product.serviceTab" :key="index">
               <img src="/static/images/gou.png" class="pics">
               <text>{{item}}</text>
             </p>

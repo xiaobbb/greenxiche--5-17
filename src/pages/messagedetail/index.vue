@@ -1,36 +1,27 @@
 <template>
-  <div class="commonpad">
-      <div class="title">买了带涡轮的汽车保养注意事项，做到以下几点使用寿命延长很多年</div>
+  <div class="commonpad" v-if="hasData">
+      <div class="title">{{info.Title}}</div>
       <div class="flex-container tips">
-          <text>03-15 09:30</text>
-          <text>5000人浏览</text>
+          <text>{{time}}</text>
+          <text>{{info.BrowseNum}}人浏览</text>
       </div>
-      <div class="question">
-          现在带涡轮的车越来越多,问涡轮增压的质量也越来越好,提前带涡轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮现在带涡轮的车越来越多,问涡轮增压的质量也越来越好,提前带涡轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮现在带涡轮的车越来越多,问涡轮增压的质量也越来越好,提前带涡轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮
-      </div>
-      <img src="/static/images/112.png" class="pic1">
-      <div class="question whitebg">
-          小义用加就使用什么级别的。要是随车手册没有写的话,那么我们可以看看4S店换润滑油的时候使用的是什么型号,不过一般带涡轮的汽车都提前带涡轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮现在带涡轮的车越来越多,问涡轮增压的质量也越来越好,提前带涡轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮
-      </div>
-      <img src="/static/images/111.png" class="pic1">
-      <div class="question whitebg">
-          而且全合成的润滑油对涡轮的保障也比较好。润滑油更换时间不能说过一段时间,因为润滑油要是使用公里跟时间到了以后,润滑油是有杂质的轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮现在带涡轮的车越来越多,问涡轮增压的质量也越来越好,提前带涡轮的车走十万公里就报废车了,而且涡轮更换的价格也不低。而现在的涡轮
-      </div>
+       
+      <div class="content" v-html="info.ContentDetails"></div>
       <div class="btnset flex-container">
           <div class="flex-container">
               <img src="/static/images/zan.png" class="zan">
               <text>60</text>
           </div>
-          <div class="flex-container">
+          <button class="flex-container" open-type="share">
               <img src="/static/images/share.png" class="share">
               <text>分享</text>
-          </div>
+          </button>
       </div>
   </div>
 </template>
 
 <script>
-import { post,filePath } from "@/utils/index";
+import { post,filePath,getCurrentPageUrlWithArgs } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -38,16 +29,20 @@ export default {
     this.id = this.$root.$mp.query.id;
     this.setBarTitle();
     this.getNewsInfo();
+   this.curPage = getCurrentPageUrlWithArgs();
   },
   data () {
     return {
       id:"",
-      info:{}
+      info:{},
+      time:"",
+      hasData:false,
+      curPage: ""
     }
   },
  
   components: {
-    
+
   },
   methods: {
     setBarTitle() {
@@ -61,13 +56,29 @@ export default {
     },
     async getNewsInfo(){
       let result = await post("News/FindNewsList",{
-        FindId:this.id
-      })
+        FindId:this.id,
+        page:1,
+        pagesize:1
+      });
+
+      this.info = result.data[0];
+      this.time = this.info.Addtime.split("T").join(" ");
+      this.hasData = true;
     }
   },
 
   created () {
     // let app = getApp()
+  },
+   onShareAppMessage(res) {
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+    }
+    return {
+      title: this.info.Title,
+      imageUrl: filePath+this.info.PicNo,
+      path: this.curPage
+    }
   }
 }
 </script>

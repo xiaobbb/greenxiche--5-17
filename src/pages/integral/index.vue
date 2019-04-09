@@ -11,7 +11,7 @@
                 <p>{{item.Remark}}</p>
                 <p>{{item.AddTime}}</p>
             </div>
-            <div class="itembig">{{item.Change}}</div>
+            <div class="itembig" :class="{'active': !item.direction}">{{item.Change}}</div>
         </div>
      </div>
      <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="scoreList.length===0">暂无数据</p>
@@ -57,6 +57,7 @@ export default {
       });
     },
     async getScoreList(){
+      
       let result = await post("user/ScoreList",{
         UserId:this.userId,
         Token:this.token,
@@ -71,6 +72,11 @@ export default {
       if(result.data.length>0){
         for(let i=0;i<result.data.length;i++){
           result.data[i].Change = result.data[i].Change.split(".")[0];
+          if(result.data[i].Change.substring(0,1)=="+"){
+            this.$set(result.data[i],"direction",true);
+          }else{
+            this.$set(result.data[i],"direction",false);
+          }
         }
         this.scoreList = this.scoreList.concat(result.data);
       }
@@ -79,6 +85,8 @@ export default {
       }else{
         this.isLoad = false;
       }
+      console.log("bbbbb");
+      console.log(this.scoreList);
     },
     async getMemberInfo(){
       let result = await post("User/GetMemberInfo",{
@@ -96,6 +104,9 @@ export default {
 
   created () {
     // let app = getApp()
+  },
+  onPullDownRefresh(){
+     
   },
   onReachBottom(){
     if(this.isLoad){
