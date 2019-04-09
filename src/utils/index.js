@@ -24,7 +24,7 @@ export function formatTime(date) {
 //API接口地址
 const host = 'https://carapi.wtvxin.com/api/';
 //const host = 'http://localhost:801/api/';
-const filePath = 'http://car.wtvxin.com';
+const filePath = 'https://car.wtvxin.com';
 export {
     host,
     filePath

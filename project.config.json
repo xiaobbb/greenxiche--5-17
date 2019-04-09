@@ -1,7 +1,7 @@
 {
     "description": "项目配置文件。",
     "setting": {
-        "urlCheck": false,
+        "urlCheck": true,
         "es6": true,
         "postcss": true,
         "minified": true,
@@ -189,7 +189,7 @@
                     "scene": null
                 },
                 {
-                    "id": 22,
+                    "id": -1,
                     "name": "防保质量查询",
                     "pathName": "pages/qualityQuery/main",
                     "query": "",

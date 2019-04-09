@@ -43,17 +43,17 @@
               <span class="goods">充值有优惠</span>
               <img src="/static/images/white.png" class="yuan">
             </p>
-            <img src="/static/images/back.png" class="back">
+            <img src="/static/images/back.png" class="back" @click="choseMoney">
         </div>
         <p class="hr"></p>
         <div class="item">
              <img src="/static/images/yellow.png" class="diandian">
-             <p class="location-self">姓名 <input placeholder="请输入您的姓名"/></p>
+             <p class="location-self">姓名 <input placeholder="请输入您的姓名" v-model="personName"/></p>
         </div>
         <p class="hr"></p>
         <div class="item">
              <img src="/static/images/yellow.png" class="diandian">
-             <p class="location-self">手机 <input  placeholder="请输入您的手机号码"/></p>
+             <p class="location-self">手机 <input  placeholder="请输入您的手机号码" v-model="personPhone"/></p>
         </div>
         <p class="hr"></p>
         <div class="item sign">
@@ -84,6 +84,8 @@ export default {
         latitude: wx.getStorageSync("latitude"),
         longitude: wx.getStorageSync("longitude"),
         timetip:"请选择服务时间",
+        personName:"",
+        personPhone:"",
         controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',
@@ -118,7 +120,7 @@ export default {
         wx.navigateTo({ url: "/pages/servince/main?url=location"});
     },
     choseTime(){
-        wx.navigateTo({ url: "/pages/writeorder/main" });
+        wx.navigateTo({ url: "/pages/writeorder/main" })
     },
     choseCar(){
         wx.navigateTo({ url: "/pages/mycar/main" });
@@ -130,7 +132,9 @@ export default {
       wx.navigateTo({ url: "/pages/signinfo/main" });
     },
     toPay(){
-      wx.navigateTo({ url: "/pages/orderpay/main" });
+      console.log("支付啦")
+
+      //wx.navigateTo({ url: "/pages/orderpay/main" });
     }
   },
 
