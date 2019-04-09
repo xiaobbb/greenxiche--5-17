@@ -8,11 +8,11 @@
        
       <div class="content" v-html="info.ContentDetails"></div>
       <div class="btnset flex-container">
-          <div class="flex-container">
+          <div class="flex-container" @click="btnOperation">
               <img src="/static/images/zan.png" class="zan">
-              <text>60</text>
+              <text>{{info.LikeNum}}</text>
           </div>
-          <button class="flex-container" open-type="share">
+          <button class="flex-container btn" open-type="share">
               <img src="/static/images/share.png" class="share">
               <text>分享</text>
           </button>
@@ -25,7 +25,10 @@ import { post,filePath,getCurrentPageUrlWithArgs } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onShow(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync("token");
+    this.initData();
     this.id = this.$root.$mp.query.id;
     this.setBarTitle();
     this.getNewsInfo();
@@ -33,6 +36,8 @@ export default {
   },
   data () {
     return {
+      userId:"",
+      token:"",
       id:"",
       info:{},
       time:"",
@@ -50,7 +55,10 @@ export default {
         title: "消息详情"
       });
     },
-    
+    initData(){
+      this.hasData = false;
+      this.info = {};
+    },
     orderpay(){
       wx.navigateTo({ url: "/pages/locationcomplete/main" });
     },
@@ -64,11 +72,70 @@ export default {
       this.info = result.data[0];
       this.time = this.info.Addtime.split("T").join(" ");
       this.hasData = true;
+    },
+    btnOperation(){
+      if(this.userId && this.token){
+         this.findlikeOperation();
+      }else{
+        wx.showModal({
+          content: "亲，您已掉线，是否重新登录",
+          success(e) {
+            if (e.confirm) {
+              wx.redirectTo({
+                url: "/pages/login/main"
+              });
+            } else if (e.cancel) {
+
+            }
+          }
+        });
+      }
+    },
+    async findlikeOperation(){
+      let result = await post("News/FindlikeOperation",{
+        UserId:this.userId,
+        Token:this.token,
+        FindId:this.id
+      });
+      if(result.code===0){
+        let _this = this;
+        if(_this.info.likeNum===1){  //取消点赞
+          //取消点赞
+          let num = parseInt(_this.info.LikeNum) - 1;
+          wx.showToast({
+            title: "取消点赞成功",
+            icon: "none",
+            duration: 1000,
+            success:function(){
+              _this.$set(_this.info,"LikeNum",num);
+              _this.$set(_this.info,"likeNum",0);
+              return false;
+            }
+          });
+        }
+        if (_this.info.likeNum === 0) {
+          let num = parseInt(_this.info.LikeNum) + 1;
+          wx.showToast({
+            title: "点赞成功",
+            icon: "none",
+            duration: 1000,
+            success:function(){
+              _this.$set(_this.info,"LikeNum",num);
+              _this.$set(_this.info,"likeNum",1);
+              return false;
+            }
+          });
+        }
+      }
     }
   },
 
   created () {
     // let app = getApp()
+  },
+  onPullDownRefresh(){
+    this.initData();
+    this.getNewsInfo();
   },
    onShareAppMessage(res) {
     if (res.from === 'button') {

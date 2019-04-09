@@ -22,7 +22,7 @@ import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.setBarTitle();

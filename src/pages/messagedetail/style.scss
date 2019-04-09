@@ -57,9 +57,14 @@
     padding: 20rpx 100rpx;
     line-height: inherit;
     font-size: 30rpx;
-    position: static;
+    // position: static;
 }
 
 .btnset button.flex-container {
     margin-right: 0;
+}
+
+.btnset button.flex-container::after,
+.btnset button.flex-container::before {
+    display: none;
 }

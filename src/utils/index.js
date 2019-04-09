@@ -22,7 +22,7 @@ export function formatTime(date) {
 
 
 //API接口地址
-const host = 'http://carapi.wtvxin.com/api/';
+const host = 'https://carapi.wtvxin.com/api/';
 //const host = 'http://localhost:801/api/';
 const filePath = 'http://car.wtvxin.com';
 export {
@@ -53,7 +53,6 @@ function request(url, method, data, header = {}) {
                             title: '需要重新登录!',
                             icon: 'none'
                         })
-                        console.log(login, 'a')
                         logins();
                         reject(false)
                         break;

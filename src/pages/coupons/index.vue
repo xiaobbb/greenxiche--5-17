@@ -44,7 +44,7 @@ import {post} from '@/utils/index'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onShow(){
     // Enables:0:不可以使用；1：可使用；2：已使用；3：为已过期
     this.couptlist = [];
     this.userId = wx.getStorageSync('userId');

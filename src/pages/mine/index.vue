@@ -77,13 +77,16 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
-    this.userId = wx.getStorageSync('userId');
-    this.token = wx.getStorageSync('token');
-    this.setBarTitle();
-    this.getMemberInfo();
+    
   },
   onShow(){
-      
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
+    this.initData();
+    this.setBarTitle();
+    this.getMemberInfo();
+    console.log("userId:"+this.userId);
+    console.log("userId:"+this.token);
   },
   data () {
     return {
@@ -105,6 +108,10 @@ export default {
       wx.setNavigationBarTitle({
         title: "我的"
       });
+    },
+    initData(){
+      this.memberInfo = {};
+      this.isHasInfo = false;
     },
     goItem(e){
       var a=e

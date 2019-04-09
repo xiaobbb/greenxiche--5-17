@@ -24,7 +24,7 @@ import { post } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onShow(){
     this.scoreList = [];
     this.memberInfo = {};
     this.setBarTitle();

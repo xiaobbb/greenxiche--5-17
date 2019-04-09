@@ -33,7 +33,7 @@ import { post,filePath } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onShow(){
     this.newsList = [];
     this.setBarTitle();
     this.getFindNewsList();
