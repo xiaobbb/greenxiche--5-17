@@ -26,7 +26,7 @@
             @click="oneClick(pindex)"
           >
         </div>
-        <orderChild :showButton="!isShow" :data="item" @addNum="addNum" @lessNum="lessNum"></orderChild>
+        <orderChild :showButton="!isShow" :data="item" @editCar="editCar"></orderChild>
       </div>
     </div>
     <!--底部按钮-->
@@ -34,7 +34,7 @@
       <div class="botbtn" v-if="isShow">
         <div class="price white">
           合计:
-          <span>￥1288.00</span>
+          <span>￥{{total}}</span>
         </div>
         <div class="btnconfir" @click="goPay">结算</div>
       </div>
@@ -49,8 +49,8 @@
     <div v-if="showDelete" class="maskdelete flex-container clomn">
       <div>您确定要删除所选商品吗？</div>
       <div class="flex-container bottombtn">
-        <div>取消</div>
-        <div @click="confirmDel">确认</div>
+        <div @click="cancelDel">取消</div>
+        <div @click="deleteCar">确认</div>
       </div>
     </div>
     <!--参数遮罩层-->
@@ -124,7 +124,18 @@ export default {
     orderChild,
     specChild
   },
-  computed: {},
+  computed: {
+    total(){
+      let total=0
+      for (var i = 0; i < this.carData.length; i++) {
+        const _carData = this.carData[i]
+        if (_carData.isSelect) {
+          total += _carData.price * _carData.num
+        }
+      }
+      return total.toFixed(2)
+    }
+  },
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
@@ -161,15 +172,15 @@ export default {
       //遍历servicelist，全部取反
       this.isSelectAll = !this.isSelectAll;
       //console.log(this.isSelectAll)
-      for (var i = 0, len = this.servicelist.length; i < len; i++) {
-        this.servicelist[i].isSelect = this.isSelectAll;
-        console.log(this.servicelist[i].isSelect);
+      for (var i = 0, len = this.carData.length; i < len; i++) {
+        this.carData[i].isSelect = this.isSelectAll;
+        console.log(this.carData[i].isSelect);
       }
     },
     oneClick(i) {
-      this.servicelist[i].isSelect = !this.servicelist[i].isSelect;
-      for (var i = 0; i < this.servicelist.length; i++) {
-        if (!this.servicelist[i].isSelect) {
+      this.carData[i].isSelect = !this.carData[i].isSelect;
+      for (var i = 0; i < this.carData.length; i++) {
+        if (!this.carData[i].isSelect) {
           this.isSelectAll = false;
           return;
         }
@@ -178,37 +189,28 @@ export default {
     },
     // 添加数量
     addNum(id) {
-        this.editCar(id,'add');
-        // let num = this.data.num*1
-        //  this.data.num= num+1
+      this.editCar(id, "add");
     },
     // 减少数量
     lessNum(id) {
-        this.editCar(id,'less');
+      this.editCar(id, "less");
     },
-    async editCar(id,type) {
-      let num = "";
-      let sku=""
+    // 编辑购物车
+    async editCar(id,num) {
+      console.log(id,num)
+      num = num*1
+      let index = "";
       for (let i = 0; i < this.carData.length; i += 1) {
         const _carData = this.carData[i];
         if (_carData.id === id) {
-          if (_carData.num < _carData.stock) {
-            if(type==='add'){
-              num = this.carData[i].num + 1;
-            }else{
-              num = this.carData[i].num - 1;
-            }
-            sku = _carData.skuSubmit
-          }else{
-            return false;
-          }
+          index = i;
         }
       }
       const data = [
         {
           CartId: id,
           Total: num,
-          SpecText: sku
+          SpecText: this.carData[index].skuSubmit
         }
       ];
       const params = {
@@ -218,14 +220,53 @@ export default {
       };
       // 数量大于0，编辑购物车
       // 数量等于0，删除购物车
-      if (num !== 0) {
-        await post("Cart/EditCart", params);
-      } else {
-        const res = await post("Cart/DelCart", params);
-        if (res.code * 1 === 0) {
-          this.productlist[index].num = 0;
+      if (num < 1) {
+        wx.showToast({
+          title: "受不了了，宝贝不能再减少了哦！",
+          icon: "none"
+        });
+        this.carData[index].num = 1;
+        return false;
+      }
+      if (num > this.carData[index].stock) {
+        wx.showToast({
+          title: "超出库存数量了哦！",
+          icon: "none"
+        });
+        this.carData[index].num = this.carData[index].stock;
+        return false;
+      }
+      await post("Cart/EditCart", params);
+      this.carData[index].num = num;
+      return true;
+    },
+    // 删除购物车
+    async deleteCar() {
+      let data = [];
+      for (let i = 0; i < this.carData.length; i += 1) {
+        const _carData = this.carData[i];
+        if (_carData.isSelect) {
+          data.push({
+            CartId: _carData.id,
+            Total: _carData.num,
+            SpecText: _carData.skuSubmit
+          });
         }
       }
+
+      this.showMask = false;
+      this.showDelete = false;
+      const params = {
+        UserId: this.userId,
+        Token: this.token,
+        data
+      };
+      await post("Cart/DelCart", params);
+      wx.showToast({
+        title: "删除成功！",
+        icon: "success",
+        duration: 2000
+      });
       this.getCarData();
     },
     editPro() {
@@ -236,6 +277,13 @@ export default {
       this.showMask = true;
       this.showDelete = true;
     },
+    // 取消删除
+    cancelDel() {
+      this.showMask = false;
+      this.showDelete = false;
+      // this.isShow = true;
+    },
+    // 确定删除
     confirmDel() {
       this.showMask = false;
       this.showDelete = false;
