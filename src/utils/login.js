@@ -83,7 +83,20 @@ export default function logins() {
                                 wx.hideLoading();
                             }
                         });
+                    }else {
+                      wx.hideLoading();
+                      console.log("获取用户登录态失败：" + res.errMsg);
+                      wx.showToast({
+                        title: "获取授权信息失败",
+                        icon: "none",
+                        duration: 2000
+                      });
+                      return;
                     }
+                },
+                fail(){
+                  //   未授权，跳转授权   
+                  wx.navigateTo({url:'/pages/login/main'})
                 }
             })
 
