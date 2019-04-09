@@ -4,7 +4,10 @@
     <div class="glo-relative bg-cart">
         <!-- <img src="/static/images/cartbg5.png" class="shopbg"> -->
         <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:560rpx;"></map>
-        <img src="/static/images/cart.png" class="cart-img">
+        <cover-view>
+            <cover-image src="/static/images/cart.png" class="cart-img"/>
+        </cover-view> 
+        
     </div>
     <!--列表-->
     <div class="list">
@@ -22,7 +25,7 @@
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">03-13 13:08-15:08</span>
+            <span class="location-self">{{timetip}}</span>
             <img src="/static/images/back.png" class="back" @click="choseTime">
         </div>
         <p class="hr"></p>
@@ -69,12 +72,18 @@ import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
    onLoad(){
     this.setBarTitle();
-    //console.log(this.longitude)
+    const tt=this.$root.$mp.query.tt
+    const mm=this.$root.$mp.query.mm
+    if(tt&&mm){
+       this.timetip=tt+"  "+mm
+    }
+   
   },
   data () {
     return {
         latitude: wx.getStorageSync("latitude"),
         longitude: wx.getStorageSync("longitude"),
+        timetip:"请选择服务时间",
         controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',

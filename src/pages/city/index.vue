@@ -3,9 +3,9 @@
       <!--顶部输入框-->
       <div class="white">
           <div class="topinput">
-              <input type="text" placeholder="请输入城市名称">
+              <input type="text" placeholder="请输入城市名称" :value="inputName" @input="bindKeyInput">
               <img src="/static/images/search.png" class="searchpic absolu">
-              <img src="/static/images/cancle.png" class="canclepic absolu">
+              <img src="/static/images/cancle.png" class="canclepic absolu" style="z-index:40" @click="bindBlur">
           </div>
       </div>
       <!--右侧字母 左侧列表-->
@@ -15,8 +15,8 @@
               <div style="margin-top:0;">当前</div>
               <div style="margin-top:0;">热门</div>
             </div>
-            <div v-for="(item, idx) in searchLetter" :key="idx" style="color:#ff6325;font-size:20rpx;" :data-letter="item.name" @click="clickLetter">
-              {{ item }}
+            <div v-for="(item, idx) in searchLetter" :key="idx" style="color:#ff6325;font-size:20rpx;" :data-letter="item" @click="clickLetter">
+              {{ item }}   
             </div>
           </div>
           <div class="container">
@@ -59,6 +59,8 @@ export default {
   },
   data () {
     return {
+        scrollTopId:"",//置顶id
+        inputName:"",
         winHeight:"",
         searchLetter:['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z'],
         cityname:"深圳",
@@ -77,6 +79,25 @@ export default {
   },
  
   methods: {
+     bindBlur(e) {
+      this.inputName = '';
+      
+    },
+    bindKeyInput(e){
+      console.log(e)
+       this.inputName = e.mp.detail.value;
+       // 空搜索框时 取消匹配显示
+        if (this.inputName.length < 1) {
+          this.cityList()
+        }
+        this.scrollTopId = 'citylist';
+        
+    },
+    clickLetter(e){
+        console.log(e)
+        const showLetter=e.currentTarget.dataset.letter
+        this.scrollTopId = showLetter;
+    },
     bindCity(e){
       console.log(e)
       this.cityname=e.currentTarget.dataset.city
@@ -147,7 +168,6 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 10rpx;
-  border:1px solid blue
 }
 
 .searchLetter {
@@ -157,7 +177,6 @@ export default {
   display: flex;
   flex-direction: column;
   color: #666;
-  border:1px solid red;
 
 }
 
