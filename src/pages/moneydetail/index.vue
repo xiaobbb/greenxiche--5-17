@@ -11,8 +11,8 @@
                   <p class="minisize">{{item.AddTime}}</p>
               </div>
               <div>
-                  <p class="addshort add">＋{{item.Change}}</p>
-                  <p class="minisize">余额：300.00</p>
+                  <p class="addshort add" :class="{'add':item.Type==11}"><span v-if="item.Type==11">＋</span><span v-else>-</span>{{item.Change}}</p>
+                  <p class="minisize">余额：{{item.After}}</p>
               </div>
           </div>
       </div>

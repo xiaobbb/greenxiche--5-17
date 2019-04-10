@@ -256,6 +256,13 @@ export default {
       }
     },
     async editCarInfo(){
+      let type = 0;
+      //this.isshow=true
+      if(this.isDefault){
+        type=1;
+      }else{
+        type=0;
+      }
       let res = await post("User/EditCarInfo",{
         UserId:this.userId,
         Token:this.token,
@@ -264,7 +271,8 @@ export default {
           CarMumber:this.city+this.num+this.carNum,
           CarBrand:this.carBrand,
           CarType:this.carSize,
-          CarColor:this.carColor
+          CarColor:this.carColor,
+          IsDefault:type
         }
       });
       let _this = this;
@@ -335,7 +343,13 @@ export default {
       }
     },
     async saveCar(){
-        //this.isshow=true
+      let type = 0;
+      //this.isshow=true
+      if(this.isDefault){
+        type=1;
+      }else{
+        type=0;
+      }
       const params = {
         UserId:this.userId,
         Token: this.token,
@@ -343,7 +357,8 @@ export default {
           CarMumber:this.city+this.num+this.carNum,
           CarBrand:this.carBrand,
           CarType:this.carSize,
-          CarColor:this.carColor
+          CarColor:this.carColor,
+          IsDefault:type
         }
       }
       let res=await post("/User/AddCarInfo",params);
