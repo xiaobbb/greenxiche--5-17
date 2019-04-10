@@ -16,7 +16,7 @@
               </div>
           </div>
       </div>
-      <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="list.length===0">暂无数据</p>
+      <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="hasData">暂无数据</p>
       <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
   </div>
 </template>
@@ -41,6 +41,7 @@ export default {
       pageSize:15,
       isLoad:false,
       isOved:false,
+      hasData:false,
       count:0,
       allPage:0,
       active:0,
@@ -65,6 +66,7 @@ export default {
       this.page = 1;
       this.isLoad = false;
       this.isOved = false;
+      this.hasData = false;
       this.count = 0;
       this.allPage = 0;
       this.list = [];
@@ -86,6 +88,9 @@ export default {
         this.allPage = this.count / this.pageSize;
       } else {
         this.allPage = parseInt(this.count / this.pageSize) + 1;
+      }
+      if(result.data.length===0&&this.page===1){
+        this.hasData = true;
       }
       if(result.data.length>0){
         for(let i=0;i<result.data.length;i++){

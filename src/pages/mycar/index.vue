@@ -97,6 +97,8 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onShow(){
+    // this.isshow = true;
+    this.carinfolist = [];
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync("token");
     this.setBarTitle();
@@ -297,7 +299,7 @@ export default {
       this.carBrand = this.carinfolist[index].CarBrand;//车系
       this.carSize= this.carinfolist[index].CarType;//车型
       this.carColor=this.carinfolist[index].CarColor;
-      if(this.carinfolist[index].isDefault===1){
+      if(this.carinfolist[index].IsDefault===1){
         this.isDefault = true;
       }else{
         this.isDefault = false;
