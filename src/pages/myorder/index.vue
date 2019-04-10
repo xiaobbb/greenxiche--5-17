@@ -1,102 +1,144 @@
 <template>
   <div class="backgray">
-    <!--商城订单-->
-    <div v-if="showShop">
-        <div class="menuhead flex-container white">
-          <p v-for="item in menulist" :key="item.id" :class="{active:active==item.id}">{{item.name}}</p>
-        </div>
-        <div class="shoplist">
-            <div class="shopitem white" @click="toOrderDetail(1)">
-                <div class="flex-container commonpad">
-                    <p class="number">订单编号：TH53316886</p>
-                    <p class="tips">待付款</p>
-                </div>
-                <div class="bgindo">
-                    <orderChild :showButton="showButton"></orderChild>
-                </div>
-                <div class="itemtotal">共1件商品(含配送费)<span> 合计￥1300.00</span></div>
-                <div class="menubtn flex-container">
-                    <text>取消订单</text><text>付款</text>
-                </div>
-            </div>
-            <div class="shopitem white">
-                <div class="flex-container commonpad">
-                    <p class="number">订单编号：TH53316886</p>
-                    <p class="tips">待付款</p>
-                </div>
-                <div class="bgindo">
-                    <orderChild :showButton="showButton"></orderChild>
-                </div>
-                <div class="itemtotal">共1件商品(含配送费)<span> 合计￥1300.00</span></div>
-                <div class="menubtn flex-container">
-                    <text>取消订单</text><text>付款</text>
-                </div>
-            </div>
-        </div>
+    <div class="menuTypeBox">
+      <div class="menuType">
+        <span class="item" :class="{'active':orderBigType===0}" @click="shiftOrderBigType(0)">商城订单</span>
+        <span class="item" :class="{'active':orderBigType===1}" @click="shiftOrderBigType(1)">预约订单</span>
+      </div>
     </div>
-    <!--预约订单-->
-    <div v-if="showVisit">
-        <div class="menuhead flex-container white visit">
-          <p v-for="item in visitlist" :key="item.id" :class="{active:active==item.id}" @click="change(item.id)">{{item.name}}</p>
+    <div class="menuContent">
+      <!--商城订单-->
+      <div v-if="orderBigType===0">
+        <div class="menuhead flex-container white">
+          <p v-for="item in menulist" :key="item.id" :class="{active:active==item.id}" @click="shiftStatus(item.id)">{{item.name}}</p>
         </div>
         <div class="shoplist">
-            <div class="shopitem white" @click="toOrderDetail(2)">
-                <div class="flex-container commonpad">
-                    <p class="number">订单编号：TH53316886</p>
-                    <p class="tips">待付款</p>
+          <div>
+            <div
+              class="shopitem white"
+              v-for="(item,index) in orderList" :key="index">
+              <div class="flex-container commonpad">
+                <p class="number">订单编号：{{item.OrderNumber}}</p>
+                <p class="tips">{{item.StatusName}}</p>
+              </div>
+              <div class="bgindo">
+                <div class="proinfo flex-container pad" v-for="(item2,index2) in item.orderDetails" :key="index2">
+                  <div>
+                    <img :src="item2.ProductImg" class="orderimg">
+                  </div>
+                  <div class="inforight flex1">
+                    <div class="infotitle">{{item2.ProductName}}</div>
+                    <div class="flex-container">
+                      <div class="infospec flex1" v-if="item2.ProductSkuName">{{item2.ProductSkuName}}</div>
+                      <div class="infospec flex1" v-else>无规格属性</div>
+                      <p>x{{item2.ProductCount}}</p>
+                    </div>
+                    <div class="infoprice flex-container">
+                      <p>￥{{item2.UnitPrice}}</p>
+                    </div>
+                  </div>
                 </div>
-                <!--切换上门服务-->
-                <div class="seritem" v-if="active==1">
-                    <p>项目：外观简单清洗洗车</p>
-                    <p>地址：广东省深圳市福田区福华三路116号</p>
-                    <p>车辆：别克-凯越 红色 粤AH6688</p>
-                    <p>时间：2019-03-18 14:00-16:00</p>
-                    <p>手机号：13682293390</p>
-                </div>
-                <!--切换到店服务-->
-                <div class="seritem" v-if="active==2">
-                    <p>项目：外观简单清洗洗车</p>
-                    <p>门店：车御品汽车服务</p>
-                    <p>车辆：别克-凯越 红色 粤AH6688</p>
-                    <p>手机号：13682293390</p>
-                </div>
-                <div class="menubtn flex-container">
-                    <text class="leftbtn">取消订单</text><text class="rightbtn">付款</text>
-                </div>
+              </div>
+              <div class="itemtotal">
+                共{{item.allNum}}件商品(含配送费<span v-if="item.isExpress">￥{{item.ExpressPrice}}</span>)
+                <span>合计￥{{item.TotalPrice}}</span>
+              </div>
+              <div class="menubtn flex-container flexEnd">
+                <text class="btn">取消订单</text>
+                <text class="btn active">付款</text>
+              </div>
             </div>
-            
+          </div>
         </div>
-
-    </div>  
-      
+      </div>
+      <!--预约订单-->
+      <div v-if="orderBigType===1">
+        <div class="menuhead flex-container white visit">
+          <p
+            v-for="item in visitlist"
+            :key="item.id"
+            :class="{active:active==item.id}"
+            @click="change(item.id)"
+          >{{item.name}}</p>
+        </div>
+        <div class="shoplist">
+          <div class="shopitem white" v-for="(item,index) in bookList" :key="index" @click="toOrderDetail(2)">
+            <div class="flex-container commonpad">
+              <p class="number">订单编号：{{item.OrderNumber}}</p>
+              <p class="tips">{{item.StatusName}}</p>
+            </div>
+            <!--切换上门服务-->
+            <div class="seritem" v-if="active==1">
+              <p>项目：{{}}</p>
+              <p>地址：广东省深圳市福田区福华三路116号</p>
+              <p>车辆：别克-凯越 红色 粤AH6688</p>
+              <p>时间：2019-03-18 14:00-16:00</p>
+              <p>手机号：13682293390</p>
+            </div>
+            <!--切换到店服务-->
+            <div class="seritem" v-if="active==2">
+              <p>项目：外观简单清洗洗车</p>
+              <p>门店：车御品汽车服务</p>
+              <p>车辆：别克-凯越 红色 粤AH6688</p>
+              <p>手机号：13682293390</p>
+            </div>
+            <div class="menubtn flex-container flexEnd">
+              <text class="btn">取消订单</text>
+              <text class="btn active">付款</text>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import orderChild from "@/components/orderChild.vue"
+import { post } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onLoad() {
     this.setBarTitle();
   },
-  data () {
-    return {
-      showShop:false,
-      showVisit:true,
-      active:"1",
-      showButton:true,
-      menulist:[
-        {id:1,name:"全部"},{id:2,name:"待使用"},{id:3,name:"代付款"},{id:4,name:"待评价"},{id:5,name:"已完成"}
-      ],
-      visitlist:[
-        {id:1,name:"上门服务"},{id:2,name:"到店服务"}
-      ]
-    }
+  onShow() {
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
+    this.orderList = [];
+    this.bookList = [];
+    this.getOrderList();
   },
- 
+  data() {
+    return {
+      userId: "",
+      token: "",
+      status: 0, //商城订单的状态
+      page: 1,
+      pageSize: 10,
+      count:0,
+      allPage:0,
+      isLoad:false,
+      isOved:false,
+      hasData:false,
+      orderBigType: 0,
+      active: "0",
+      showButton: true,
+      serviceMode:1,
+      menulist: [
+        { id: 0, name: "全部" },
+        { id: 1, name: "待付款" },
+        { id: 2, name: "代付款" },
+        { id: 4, name: "待评价" },
+        { id: 5, name: "已完成" }
+      ],
+      visitlist: [{ id: 1, name: "上门服务" }, { id: 2, name: "到店服务" }],
+      orderList: [],
+      bookList:[]
+    };
+  },
+
   components: {
-    orderChild
+
   },
   methods: {
     setBarTitle() {
@@ -104,28 +146,118 @@ export default {
         title: "我的订单"
       });
     },
-    change(e){
-      //console.log(e)
-      this.active=e
+    shiftOrderBigType(e) {
+      this.initData();
+      this.orderBigType = e;
+     if(this.orderBigType===0){
+       this.getOrderList();
+     }
+     if(this.orderBigType===1){
+        this.getReserveOrderList();
+     }
     },
-    toOrderDetail(e){
-      if(e==1){
-        wx.navigateTo({ url: "/pages/orderdetail/main"});
+    change(e) {
+      //console.log(e)
+      this.active = e;
+    },
+    toOrderDetail(e) {
+      if (e == 1) {
+        wx.navigateTo({ url: "/pages/orderdetail/main" });
       }
-      if(e==2){
-        wx.navigateTo({ url: "/pages/appointorderdet/main"});
+      if (e == 2) {
+        wx.navigateTo({ url: "/pages/appointorderdet/main" });
+      }
+    },
+    initData() {
+      this.page = 1;
+      this.count =0;
+      this.allPage =0;
+      this.isLoad=false;
+      this.isOved=false;
+      this.hasData=false;
+      this.orderList = [];
+      this.bookList = [];
+    },
+    getOrderList(e){
+      
+    },
+    async getOrderList() {
+      //商城订单
+      let result = await post("Order/OrderList", {
+        UserId: this.userId,
+        Token: this.token,
+        Status: this.status,
+        Page: this.page,
+        pageSize: this.pageSize
+      });
+      if (result.data.length > 0) {
+        this.count = result.count;
+        if (parseInt(this.count) % this.pageSize === 0) {
+          this.allPage = this.count / this.pageSize;
+        } else {
+          this.allPage = parseInt(this.count / this.pageSize) + 1;
+        }
+        for(let i=0;i<result.data.length;i++){
+          if(parseFloat(result.data[i].ExpressPrice).toFixed(2)>0){
+            this.$set(result.data[i],'isExpress',true);
+          }else{
+            this.$set(result.data[i],'isExpress',false);
+          }
+          let num = 0;
+          for(let j=0;j<result.data[i].orderDetails.length;j++){
+            num += result.data[i].orderDetails[j].ProductCount;
+          }
+          this.$set(result.data[i],'allNum',num);
+        }
+        // Express
+        this.orderList = this.orderList.concat(result.data);
+        if(this.allPage > this.page){
+          this.isLoad = true;
+        }else{
+          this.isLoad = false;
+        }
+        console.log(this.orderList);
+      }
+    },
+    async getReserveOrderList(){
+      let result = await post("Order/ReserveOrderList",{
+        UserId:this.userId,
+        Token:this.token,
+        page:this.page,
+        pageSize:this.pageSize,
+        ServiceMode:this.serviceMode
+      });
+      if(result.data.length>0){
+        this.bookList = this.bookList.concat(result.data);
       }
     }
-    
   },
 
-  created () {
+  created() {
     // let app = getApp()
+  },
+  onReachBottom(){
+    if(this.isLoad){
+      this.page++;
+      if(this.orderBigType===0){  //商城订单
+         this.getOrderList();
+      }
+      if(this.orderBigType===1){  //预约订单
+
+      }
+      
+    }else{
+      if (this.page > 1) {
+        this.isOved = true;
+      } else {
+        this.isOved = false;
+      }
+    }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-  @import "./style";
-  @import "../../css/common.css";
+@import "./style";
+@import "../../css/common.css";
 </style>

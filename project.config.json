@@ -33,7 +33,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 47,
+			"current": 23,
 			"list": [
 				{
 					"id": 0,
@@ -197,7 +197,7 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 23,
 					"name": "购物车",
 					"pathName": "pages/shopcart/main",
 					"query": "",
@@ -288,7 +288,7 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 36,
 					"name": "我的订单",
 					"pathName": "pages/myorder/main",
 					"query": "",
