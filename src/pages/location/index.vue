@@ -57,7 +57,7 @@
         </div>
         <p class="hr"></p>
         <div class="item sign">
-            <span @click="addpics">添加现场照片</span><span @click="addinfo">备注</span>
+            <span @click="addpics">添加现场照片 ({{PicList.length}})</span><span @click="addinfo">{{Remarks}}</span>
         </div>
         <div class="chase" @click="toPay">立即下单</div>
     </div>
@@ -71,19 +71,44 @@ import "../../css/global.css";
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
    onLoad(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
     this.setBarTitle();
+    //时间
     const tt=this.$root.$mp.query.tt
     const mm=this.$root.$mp.query.mm
     if(tt&&mm){
        this.timetip=tt+"  "+mm
     }
-   
+    //备注
+    const textinfo=this.$root.$mp.query.textinfo
+    if(textinfo){
+      this.Remarks=textinfo
+      console.log(this.Remarks,"接收的备注")
+    }else{
+      this.Remarks="备注信息"
+    }
+    //图片
+    //const pList=this.$root.$mp
   },
+  watch:{
+    '$store.state.pList':{
+        handler:function(){
+          const state=this.$store.state
+          this.PicList=state.pList
+          //console.log(this.PicList,"添加图片")
+        },
+        deep:true
+    }
+  },
+ 
   data () {
     return {
         latitude: wx.getStorageSync("latitude"),
         longitude: wx.getStorageSync("longitude"),
         timetip:"请选择服务时间",
+        userId:"",
+        token:"",
         personName:"",//姓名
         personPhone:"",//手机
         CarInfoId:"",//车子id
@@ -91,7 +116,7 @@ export default {
         AppointmentStartTime:"",//预约开始时间
         AppointmentEndTime:"",//预约结束时间
         PicList:"",//图片合集; JsonString格式(多图)
-        Remarks:"",//备注
+        Remarks:"备注信息",//备注
         controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',
@@ -153,12 +178,16 @@ export default {
         
       } 
     },
-    toPay(){
+    async toPay(){
       console.log("支付啦")
       //验证手机号
-      
-
-      //wx.navigateTo({ url: "/pages/orderpay/main" });
+      if(this.personName&&this.personPhone&&this.CarInfoId&&this.ServiceItem&&this.PicList&&this.Remarks&&this.timetip){
+      let res=await post("/Order/SubmitDoorOrders",{
+          UserId:this.UserId
+      }) 
+      //如果有订单编号跳转支付页面
+        //wx.navigateTo({ url: "/pages/orderpay/main" });
+      }
     }
   },
 

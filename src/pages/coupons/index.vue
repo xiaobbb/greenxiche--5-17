@@ -153,10 +153,10 @@ export default {
       // 设置提交订单参数
       this.$store.commit('setConfirmOrder',{
         addressId:confirmOrder.addressId,
-      productId:confirmOrder.productId,
-      skuId:confirmOrder.skuId,
-      buyNum:confirmOrder.buyNum,
-      couponId:id
+        productId:confirmOrder.productId,
+        skuId:confirmOrder.skuId,
+        buyNum:confirmOrder.buyNum,
+        couponId:id
       })
       // 设置优惠券价格
       this.$store.commit('update',{"couponPrice":price})

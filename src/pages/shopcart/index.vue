@@ -169,7 +169,7 @@ export default {
       }
     },
     selectProduct: function() {
-      //遍历servicelist，全部取反
+      //遍历list，全部取反
       this.isSelectAll = !this.isSelectAll;
       //console.log(this.isSelectAll)
       for (var i = 0, len = this.carData.length; i < len; i++) {
