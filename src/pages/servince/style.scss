@@ -27,7 +27,7 @@
 }
 .list{
     width:78%;
-    padding:0 30rpx;
+    padding:0 20rpx;
 }
 .itemtitle,.price{
     font-weight:bold;
@@ -42,18 +42,22 @@
 .iteminfo{
     margin-left:25rpx;
     align-items: flex-start;
-    height:180rpx;
     box-sizing: border-box;
+}
+.progress{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap:wrap;
+    margin-bottom:10rpx;
+    width:100%;
 }
 .progress text{
     background:#f1f1f1;
-    padding:6rpx 10rpx;
+    padding:5rpx 8rpx;
     color:#333333;
-    display: inline-flex;
 }
-.progress text+text{
-    margin-left:15rpx;
-}
+
 .sales{
     color:#b3b3b3;
 }

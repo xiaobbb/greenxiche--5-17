@@ -33,11 +33,11 @@
 /*立即下单的按钮样式*/
 .paybtn{
   width:660rpx;
-  height:96rpx;
+  height:90rpx;
   margin:0 auto;
   background: #ff6325;
   border-radius:10rpx;
-  line-height:96rpx;
+  line-height:90rpx;
   color:#fff;
   text-align: center;
 }

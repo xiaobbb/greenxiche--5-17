@@ -183,6 +183,7 @@ export default {
     // let app = getApp()
   },
   onReachBottom(){
+  
     if(this.isLoad){
       this.page++;
       this.getCouponList();

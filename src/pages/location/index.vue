@@ -19,7 +19,7 @@
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">请选择服务项目</span>
+            <span class="location-self" style="width:90%;">{{serTip}}</span>
             <img src="/static/images/back.png" class="back" @click="choseItem">
         </div>
         <p class="hr"></p>
@@ -57,7 +57,7 @@
         </div>
         <p class="hr"></p>
         <div class="item sign">
-            <span @click="addpics">添加现场照片 ({{PicList.length}})</span><span @click="addinfo">{{Remarks}}</span>
+            <span @click="addpics">添加现场照片 ({{PicList.length}})</span><span @click="addinfo">备注信息: {{Remarks}}</span>
         </div>
         <div class="chase" @click="toPay">立即下单</div>
     </div>
@@ -74,24 +74,19 @@ export default {
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.setBarTitle();
-    //时间
-    const tt=this.$root.$mp.query.tt
-    const mm=this.$root.$mp.query.mm
-    if(tt&&mm){
-       this.timetip=tt+"  "+mm
-    }
+    //转换时间
+    this.changeTime();
+    //服务项目
+    this.getSerItem()
     //备注
     const textinfo=this.$root.$mp.query.textinfo
     if(textinfo){
       this.Remarks=textinfo
-      console.log(this.Remarks,"接收的备注")
-    }else{
-      this.Remarks="备注信息"
+      //console.log(this.Remarks,"接收的备注")
     }
-    //图片
-    //const pList=this.$root.$mp
+    
   },
-  watch:{
+  watch:{  //图片
     '$store.state.pList':{
         handler:function(){
           const state=this.$store.state
@@ -106,6 +101,8 @@ export default {
     return {
         latitude: wx.getStorageSync("latitude"),
         longitude: wx.getStorageSync("longitude"),
+        Service:wx.getStorageSync("serItem"),
+        serTip:"请选择服务项目",
         timetip:"请选择服务时间",
         userId:"",
         token:"",
@@ -144,6 +141,33 @@ export default {
         title: "填写订单"
       });
     },
+    getSerItem(){  //转换服务项目
+        if(this.Service){
+          //console.log(this.Service,"11111")
+          const SerItembox=[]
+          const SerTipbox=[]
+          for(let i=0;i<this.Service.length;i++){
+            SerItembox.push(this.Service[i].Id)
+            SerTipbox.push(this.Service[i].Name)
+          }
+          this.serTip=SerTipbox.join(" ")
+          this.ServiceItem=SerItembox.join(" ")
+        }else{
+          this.serTip="请选择服务项目"
+        }
+    },
+    changeTime(){ //转换时间格式
+      const d=new Date()
+      const year=d.getFullYear()
+      const tt=this.$root.$mp.query.tt
+      const mm=this.$root.$mp.query.mm
+      if(tt&&mm){
+        this.timetip=tt+"  "+mm
+        //开始时间结束时间
+        this.AppointmentStartTime=year+"-"+tt +"  "+ mm.split("-")[0]
+        this.AppointmentEndTime=year+"-"+tt +"  "+ mm.split("-")[1]
+      }
+    },
     chosePlace(){
         wx.navigateTo({ url: "/pages/locationorder/main" });
     },
@@ -180,10 +204,20 @@ export default {
     },
     async toPay(){
       console.log("支付啦")
+      
       //验证手机号
       if(this.personName&&this.personPhone&&this.CarInfoId&&this.ServiceItem&&this.PicList&&this.Remarks&&this.timetip){
       let res=await post("/Order/SubmitDoorOrders",{
-          UserId:this.UserId
+         UserId: this.userId,
+         Token:this.token,
+         CarInfoId:this.CarInfoId,
+         Remarks:this.Remarks,
+         ServiceItem:this.ServiceItem,
+         ContactName:this.personName,
+         Tel:this.personPhone,
+         pList:JSON.stringify(this.pList),
+         AppointmentStartTime:this.AppointmentStartTime,//开始时间
+         AppointmentEndTime:this.AppointmentEndTime
       }) 
       //如果有订单编号跳转支付页面
         //wx.navigateTo({ url: "/pages/orderpay/main" });
