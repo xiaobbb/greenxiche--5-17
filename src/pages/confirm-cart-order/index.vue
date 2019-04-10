@@ -68,7 +68,7 @@
           <div class="btnconfir" @click="goPay">提交订单</div>
       </div>
       <!--遮罩层-->
-      <div class="mask-modal" v-if="isshow"></div>
+      <div class="mask-modal" v-if="isshow" @click="closeMask"></div>
         <!--确认付款-->
       <div v-if="showpay" class="paymask white">
           <div class="paytile">
@@ -112,19 +112,16 @@
                <text>选择优惠券</text>
           </div>
           <div>
-            <radio-group class="radio-group" @change="selectCoupon">
-              <label class="flex-container couponItem" v-for="(item,index) in couponList" :key="index">
-                    {{item.name}}
-                    <input type="radio" name="coupon" :value="index" :checked="item.status">
+              <label for="" class="flex-container couponItem">
+                    优惠券 -50
+                    <input type="radio" :checked="a==4" @click="change($event)">
               </label>
-              
               <label class="flex-container couponItem"> 
                   不使用优惠券
-                  <input type="radio" name="coupon" value="不使用优惠券">
+                  <input type="radio" :checked="a==5" @click="change($event)">
               </label> 
-    </radio-group>
           </div>
-          <div class="paybtn btnbottom" @click="closeMask">完成</div>
+          <div class="paybtn btnbottom">完成</div>
       </div>
   </div>
 </template>
@@ -344,6 +341,7 @@ export default {
       this.showpay=true,
       this.showway=false
     },
+
     // 跳转选择收货地址
     goSelectAddress(){
       this.$store.commit('setSelectAddress',{
@@ -356,21 +354,6 @@ export default {
     onShowCoupon (){
       this.showCoupon = true;
       this.isshow=true
-    },
-    selectCoupon(e){
-      console.log(e.mp.detail.value)
-      const index = e.mp.detail.value
-      if(index === '不使用优惠券'){
-        return false;
-      }
-      // const couponList = this.couponList
-      // this.couponList[index].status = true;
-      // for(let i=0;i<couponList.length;i+=1){
-      //   if(i!==index){
-      //     this.couponList[i].status = false;
-      //   }
-      // console.log(this.couponList[i])
-      // }
     },
     // 跳转选择优惠券
     goSelectCoupon(){
@@ -409,6 +392,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "./style";
+  @import "../confirmorder/style";
   @import "../../css/common.css";
 </style>
