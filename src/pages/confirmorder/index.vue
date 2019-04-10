@@ -19,13 +19,13 @@
           <div class="protitle white pad">{{product.shopName}}</div>
           <div class="proinfo flex-container pad">
               <div>
-                <img :src="skuImg||product.img" class="orderimg">
+                <img :src="product.img" class="orderimg">
               </div>
               <div class="inforight">
                   <div class="infotitle">{{product.title}}</div>
                   <div class="infospec">{{sku}}</div>
                   <div class="infoprice flex-container">
-                      <p>￥{{price}}</p>
+                      <p>￥{{product.price}}</p>
                       <p>x{{buyNum}}</p>
                   </div>
               </div>
@@ -60,7 +60,7 @@
               <div>买家留言</div>
               <input type="text" v-model="message" placeholder="填写内容已和卖家协商确认" class="inputmes">
           </div>
-          <div class="infoslide slideprice white pad">共计1件商品  合计：<span>￥{{total}}</span></div>
+          <div class="infoslide slideprice white pad">共计{{buyNum}}件商品  合计：<span>￥{{total}}</span></div>
       </div>
       <!--底部按钮-->
       <div class="botbtn">
@@ -107,42 +107,27 @@
           </div>
       </div>
       <!--选择优惠券-->
-      <div v-if="showCoupon" class="paymask white">
-          <div class="paytile">
-               <text>选择优惠券</text>
-          </div>
-          <div>
-            <radio-group class="radio-group" @change="selectCoupon">
-              <label class="flex-container couponItem" v-for="(item,index) in couponList" :key="index">
-                    {{item.name}}
-                    <input type="radio" name="coupon" :value="index" :checked="item.status">
-              </label>
-              
-              <label class="flex-container couponItem"> 
-                  不使用优惠券
-                  <input type="radio" name="coupon" value="不使用优惠券">
-              </label> 
-    </radio-group>
-          </div>
-          <div class="paybtn btnbottom" @click="closeMask">完成</div>
-      </div>
+        <Coupon :showCoupon.sync="showCoupon"></Coupon>
   </div>
 </template>
 
 <script>
 import {post} from "@/utils/index"
+import Coupon from '@/components/coupon.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.getData();
-    this.getAddress();
+    this.getData()
+    // Promise.all(
+    // [this.getData(),this.getAddress()]).then((res)=> {
+    //   console.log('getFreight')
+    //   this.getFreight()
+    // })
   },
   data () {
     return {
-      userId: wx.getStorageSync("userId"),
-      token: wx.getStorageSync("token"),
       isshow:false,
       showpay:false,
       showway:false,
@@ -153,6 +138,7 @@ export default {
       skuId:'',
       sbumitValue:'',
       skuPrice:0,
+      freight:0,
       message:'',
       address:{
         id:'',
@@ -163,41 +149,27 @@ export default {
       // 优惠券价格
       couponPrice:0.00,
       showCoupon:false,
-      couponList:[
-        {
-        name:'店铺优惠，满200-50',
-        status:false},
-        {
-        name:'店铺优惠，满300-100',
-        status:false},
-        {
-        name:'店铺优惠，满100-20',
-        status:false},
-        ]
     }
   },
  
   components: {
-    
+      Coupon
   },
   computed:{
     total(){
       let totals = 0;
-      if(this.skuPrice){
-        console.log('存在sku')
-      totals =  this.skuPrice*this.buyNum - this.couponPrice -this.product.freight
-      }else if(this.product.price){
-        console.log('不存在sku')
-        totals = this.product.price * this.buyNum - this.couponPrice
-      }
-      return  totals.toFixed(2)
+      console.log(this.product.price,this.buyNum ,this.couponPrice,this.freight)
+      totals =  this.product.price*this.buyNum - this.couponPrice -this.freight
+     return  totals.toFixed(2)
     },
-    price(){
-      return (this.product.price*this.buyNum).toFixed(2)
-    }
   },
   watch:{
-
+    // 更新id时更新地址
+    '$store.state.confirmOrder.addressId'(){
+      if(this.$store.state.confirmOrder.addressId){
+        this.getAddress();
+      }
+    }
   },
   methods: {
     setBarTitle() {
@@ -207,54 +179,53 @@ export default {
     },
     
     async getData() {
+
       const that = this;
       // 获取页面传参,在store里获取
       const store = this.$store.state
+      console.log('store',store)
       const id = store.confirmOrder.productId;
-      const skuId = store.confirmOrder.skuId;
+      const sku = store.confirmOrder.sku;
       this.buyNum = store.confirmOrder.buyNum||1;
       this.couponPrice = this.$store.state.couponPrice.toFixed(2)
-      const res = await post("Goods/ProductInfo", { proId: id * 1 })
-      console.log('store',store)
-
+      const res = await post("Goods/BuyNowInfo", { 
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token'),
+        proId: id,
+        proSpecText:sku
+       })
       const datas = res.data;
       that.product = {
           shopName:datas.ShopName,
-          img: datas.ProductImgList[0].PicUrl||'',
-          sku: [],
+          img: datas.ProductImage,
           title: datas.ProductName,
           id: datas.ProductId,
           shopId: datas.ShopId,
-          price: datas.ProductPrice,
+          price: datas.Price,
           // 积分
           score: datas.Score,
           //   库存
           stock: datas.Stock,
-          detail: datas.ContentDetail,
           // 邮费
-          freight: datas.freight,
+          freight: datas.Freight,
         };
-        // sku
-        for (let i = 0; i < datas.ProductSpecList.length; i += 1) {
-          const sku = datas.ProductSpecList[i];
-          that.product.sku.push({
-            productId: sku.ProId,
-            num: sku.ProStock,
-            price: sku.PunitPrice,
-            img: sku.SpecImage,
-            text: sku.SpecText,
-            value: sku.SpecText.replace(/_/g, " "),
-            sbumitValue:sku.SpecText
-          });
-          that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
-          // 购买的sku
-          if(sku.Id === skuId){
-            this.sku = sku.SpecText.replace(/_/g, " ");
-            this.skuPrice = sku.PunitPrice;
-            this.skuImg = sku.SpecImage;
-            this.sbumitValue = sku.SpecText
-          }
-         }
+        
+            this.sku = sku.replace(/_/g, " ");
+            this.sbumitValue = sku
+      this.getAddress()
+    },
+    // 获取运费
+    async getFreight(){
+      const params ={
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token'),
+        proId: this.product.id,
+        SpecText:this.sku,
+        Number:this.buyNum,
+        AddressId:this.address.id
+      }
+       const res = await post("Order/BuyNowToFreight",params)
+       this.freight = res.data
     },
     // 获取收货地址
     async getAddress(){
@@ -271,20 +242,20 @@ export default {
         url:'',
         status:false
       })
-
+      
       let res={}
       const confirmOrder = this.$store.state.confirmOrder
       // 还没选中地址，拿默认地址
       if(!confirmOrder.addressId){
       res = await post('Address/defaultaddress_New',{
-        UserId:this.userId,
-        Token:this.token
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token')
       })
       }else{
         // 选择地址获取选择的信息
         res = await post('Address/GetInfo',{
-          UserId:this.userId,
-          Token:this.token,
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token'),
           Id:confirmOrder.addressId
         })
       }
@@ -295,6 +266,7 @@ export default {
         phone:_res.tel,
         address:_res.addressinfo,
       }
+      this.getFreight()
     },
     // addNum(){
     //   let num = this.buyNum*1
@@ -315,8 +287,8 @@ export default {
       // this.isshow=true,
       // this.showpay=true
       const res = await post('Order/BuyNowSubmitOrder',{
-        UserId:this.userId,
-        Token:this.token,
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token'),
         ProId:this.product.id,
         Number:this.buyNum,
         AddressId:this.address.id,
@@ -352,10 +324,12 @@ export default {
       })
       wx.navigateTo({url:'/pages/sitemanage/main'})
     },
+    getCouponData(){
+
+    },
     // 选择优惠券
     onShowCoupon (){
       this.showCoupon = true;
-      this.isshow=true
     },
     selectCoupon(e){
       console.log(e.mp.detail.value)

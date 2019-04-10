@@ -476,8 +476,9 @@ export default {
     this.$store.commit('setConfirmOrder',{
       addressId:'',
       productId:this.product.id,
-      skuId:this.activeSkuId,
-      buyNum:this.selectSkuNum,
+      sku:this.selectSkuValueSubmit,
+      // buyNum:this.selectSkuNum,
+      buyNum:this.payNum,
       couponId:''
     })
       wx.navigateTo({ url: `/pages/confirmorder/main` });
@@ -488,7 +489,8 @@ export default {
       this.activeSkuId = this.product.sku[index].id;
       this.selectSkuPrice = this.product.sku[index].price;
       this.activeImg = this.product.sku[index].img;
-      this.selectSkuNum = this.payNum;
+      // this.selectSkuNum = this.payNum;
+      this.selectSkuNum = this.product.sku[index].stock;
       this.selectSkuValue = this.product.sku[index].value;
       this.selectSkuValueSubmit = this.product.sku[index].sbumitValue;
     },

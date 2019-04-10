@@ -15,7 +15,7 @@ const store = new Vuex.Store({
     confirmOrder:{
       addressId:'',
       productId:'',
-      skuId:'',
+      sku:'',
       buyNum:1,
       couponId:'',
     },
