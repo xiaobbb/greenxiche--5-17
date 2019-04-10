@@ -127,10 +127,11 @@ export default {
     '$store.state':{
       handler:function() {   
         const state = this.$store.state;
-        //console.log('state',state.longitude,state.latitude)
         this.longitude = state.longitude;
         this.latitude = state.latitude;
-        this.getCityinfo();
+        if(this.longitude||this.latitude){
+          this.getCityinfo();
+        }
         },
         deep: true 
     }
@@ -214,13 +215,15 @@ export default {
               "content-type": "application/x-www-form-urlencoded"
             },
             success:(res)=>{
-                //console.log(res,"地理转码")
+                console.log(res,"地理转码")
+                if(res.data.result){
                 this.update({
-                  cityName:res.data.result.addressComponent.city,
-                  nowPlace:res.data.result.formatted_address
-              })
+                    cityName:res.data.result.addressComponent.city,
+                    nowPlace:res.data.result.formatted_address
+                })
+                wx.setStorageSync("cityName",this.cityName)
+                }
               //console.log(this.cityName,this.nowPlace)
-            wx.setStorageSync("cityName",this.cityName)
           }
         })
         

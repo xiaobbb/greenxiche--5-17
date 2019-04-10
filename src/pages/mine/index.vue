@@ -82,7 +82,7 @@ export default {
   onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
-    this.initData();
+   // this.initData();
     this.setBarTitle();
     this.getMemberInfo();
     console.log("userId:"+this.userId);
