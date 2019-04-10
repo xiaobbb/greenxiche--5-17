@@ -1,23 +1,23 @@
 <template>
   <div class="flex-container bigcontainer">
     <!--左菜单-->
-    <div class="ser-menu">
-        <div v-for="(item,index) in menulist" :key="index" :class="{active:active==item.TypeName}" @click="change(item.TypeName)" class="nemeitem">
+    <div class="ser-menu" style="position:fixed;width:32%;">
+        <div style="padding:30rpx 0" v-for="(item,index) in menulist" :key="index" :class="{active:active==index}" @click="change(index)" class="nemeitem">
           <text class="title">{{item.TypeName}}</text>
         </div>
     </div>
     <!--右列表-->
-    <div class="list">
-        <div class="flex-container intitem" v-for="(item,pindex) in servicelist" :key="item.id">
-            <div class="flex-container">
-              <img src="/static/images/caritem.png" class="carpic">
-              <div class="flex-container clomn iteminfo">
-                  <p class="itemtitle">{{item.title}}</p>
+    <div class="list" style="margin-left:32%;margin-bottom:100rpx;">
+        <div class="flex-container intitem" v-for="(item,pindex) in servicelist" :key="item.Id">
+            <div class="flex-container" style="width:85%;">
+              <img :src="item.PicNo" class="carpic">
+              <div class="flex-container clomn iteminfo" style="width:70%">
+                  <p class="itemtitle">{{item.Name}}</p>
                   <p class="progress">
-                    <text>深度清洁</text><text>增加亮度</text>
+                    <text style="margin-top:10rpx" v-for="(itemtip,tindex) in item.KeywordName" :key="tindex">{{itemtip}}</text>
                   </p>
-                  <p class="sales">销量{{item.sales}}</p>
-                  <p class="price">￥{{item.price}}</p>
+                  <p class="sales">销量: {{item.SalesVolume}}</p>
+                  <p class="price">￥{{item.Price}}</p>
               </div>
             </div>
             <div>
@@ -31,7 +31,7 @@
             <input type="checkbox" class="checkbox-cart" @click="selectProduct()" :checked="isSelectAll"/>
             <text>全选</text>
           </div>
-          <div class="btn-confirm">确定</div>
+          <div class="btn-confirm" @click="submit">确定</div>
         </div>
 
     </div>
@@ -44,23 +44,26 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
    onLoad(){
+    this.latitude=this.$store.state.latitude
+    this.longitude=this.$store.state.longitude
+    this.servicelist=[]
     this.setBarTitle();
-    this.parmas=this.$root.$mp.query.url
-    console.log(this.parmas)
     this.getMenulist();
   },
   data () {
     return {
-      parmas:"",
+      latitude:"",
+      longitude:"",
+      Page:1,//当前页码
+      PageSize:5,//数量
+      pageCount:"",//商品总数
+      allPage:"",//总页码
+      isLoad:false,//是否加载更多数据
       menulist:[],
-      servicelist:[
-        {id:1,title:"外观简单清洗",sale:"198",price:"30.00",isSelect:true},
-        {id:2,title:"精细清洗漆面上光打蜡",sale:"98",price:"198.00",isSelect:false},
-        {id:3,title:"普通清洗漆面去污",sale:"88",price:"60.00",isSelect:false},
-        {id:4,title:"蒸汽深度清洗",sale:"38",price:"80.00",isSelect:false}
-      ],
-      active:"洗车",
-      isSelectAll:'true'
+      TypeId:"", //获取列表种类
+      servicelist:[],
+      active:"0",
+      isSelectAll:false
     }
   },
 
@@ -77,17 +80,51 @@ export default {
       });
     },
     async getMenulist(){
-       var result=await post("/Server/GetServerType")
+       var result=await post("/Server/GetCarWash",{
+          BrandList:21
+       })
+       //console.log(result)
        if(result.code==0){
-         if(this.parmas=="location"){
-            this.menulist=result.data
-         }
-         
+          this.menulist=result.data
+          this.TypeId=this.menulist[this.active].Id
+          this.getProlist()
        }
         
     },
-    change(e){
+    //获取产品列表
+    async getProlist(){
+       let res=await post("/Server/ChooseServiceProducts",{
+          Page:this.Page,
+          PageSize:this.PageSize,
+          TypeId:this.TypeId,
+          Lat:"1.000000",
+          Lng:"2.000000"
+          // Lat:this.latitude,
+          // Lng:this.longitude
+      })
+      //console.log(res,"商品列表")
+      if(res.code==0){
+          this.pageCount=res.count;
+          if(parseInt(this.pageCount) % this.PageSize === 0){
+            this.allPage=this.pageCount / this.PageSize
+          }else{
+            this.allPage = parseInt(this.pageCount / this.PageSize) + 1;
+          }
+          this.servicelist = this.servicelist.concat(res.data)
+         // console.log("当前的页数",this.Page)
+          //console.log("总页数："+this.allPage);
+          if(this.allPage>=this.Page){
+            this.isLoad=true
+          }else{
+            this.isLoad=false
+          }
+      }
+    },
+    change(e){  //点击菜单获取产品列表
       this.active=e
+      this.TypeId=this.menulist[e].Id
+      this.servicelist=[]
+      this.getProlist()
     },
     selectProduct:function(){
         //遍历servicelist，全部取反
@@ -107,12 +144,57 @@ export default {
             }
         }
         this.isSelectAll=true
+    },
+    submit(){
+      //console.log(this.servicelist)
+      const serItem=[]
+      for(var i=0;i<this.servicelist.length;i++){
+          if(this.servicelist[i].isSelect){
+            serItem.push(this.servicelist[i])
+          }
+      }
+      console.log(serItem)
+      wx.setStorageSync("serItem",serItem)
+      if(serItem.length>0){
+        wx.navigateTo({ url: "/pages/location/main" })
+      }else{
+        wx.showToast({
+          title: "请选择要服务项目",
+          icon: "none",
+          duration: 2000
+        });
+        return false
+      }
+      // const tip=JSON.stringify(serItem)
+      // if(serItem.length>0){
+      //   wx.navigateTo({ url: "/pages/location/main?serItem="+tip })
+      // }else{
+      //   wx.showToast({
+      //     title: "请选择要服务项目",
+      //     icon: "none",
+      //     duration: 2000
+      //   });
+      //   return false
+      // }
+         
     }
     
   },
 
   created () {
     // let app = getApp()
+  },
+  onReachBottom(){
+    if(this.isLoad){
+      this.Page++;
+      this.getProlist();
+    }else{
+      wx.showToast({
+          title: "没有更多商品啦。。。",
+          icon: "none",
+          duration: 2000
+        });
+    }
   }
 }
 </script>
