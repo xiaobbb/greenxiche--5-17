@@ -25,6 +25,8 @@ export default {
   onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
+    this.isHasInfo = false;
+    this.memberInfo= {};
     this.setBarTitle();
     this.getMemberInfo();
   },

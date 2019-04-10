@@ -97,6 +97,8 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onShow(){
+    // this.isshow = true;
+    this.carinfolist = [];
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync("token");
     this.setBarTitle();
@@ -256,6 +258,13 @@ export default {
       }
     },
     async editCarInfo(){
+      let type = 0;
+      //this.isshow=true
+      if(this.isDefault){
+        type=1;
+      }else{
+        type=0;
+      }
       let res = await post("User/EditCarInfo",{
         UserId:this.userId,
         Token:this.token,
@@ -264,7 +273,8 @@ export default {
           CarMumber:this.city+this.num+this.carNum,
           CarBrand:this.carBrand,
           CarType:this.carSize,
-          CarColor:this.carColor
+          CarColor:this.carColor,
+          IsDefault:type
         }
       });
       let _this = this;
@@ -289,7 +299,7 @@ export default {
       this.carBrand = this.carinfolist[index].CarBrand;//车系
       this.carSize= this.carinfolist[index].CarType;//车型
       this.carColor=this.carinfolist[index].CarColor;
-      if(this.carinfolist[index].isDefault===1){
+      if(this.carinfolist[index].IsDefault===1){
         this.isDefault = true;
       }else{
         this.isDefault = false;
@@ -335,7 +345,13 @@ export default {
       }
     },
     async saveCar(){
-        //this.isshow=true
+      let type = 0;
+      //this.isshow=true
+      if(this.isDefault){
+        type=1;
+      }else{
+        type=0;
+      }
       const params = {
         UserId:this.userId,
         Token: this.token,
@@ -343,7 +359,8 @@ export default {
           CarMumber:this.city+this.num+this.carNum,
           CarBrand:this.carBrand,
           CarType:this.carSize,
-          CarColor:this.carColor
+          CarColor:this.carColor,
+          IsDefault:type
         }
       }
       let res=await post("/User/AddCarInfo",params);

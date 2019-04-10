@@ -41,6 +41,7 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onShow() {
+    this.list = [];
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
     this.setBarTitle();
@@ -61,7 +62,8 @@ export default {
       payPrice:0,
       isChecked:true,
       WxOpenid:"",
-      rechargeId:""
+      rechargeId:"",
+      WxCode:""
     };
   },
 
@@ -120,7 +122,9 @@ export default {
           signType: payData.signType,
           paySign: payData.paySign,
           success(res) { 
-             
+             wx.navigateTo({
+              url:"/pages/wallet/main"
+             });
           },
           fail(res) {
 
