@@ -45,7 +45,14 @@
           <div class="flex-container infoslide white pad" @click="goSelectCoupon">
               <div>优惠券</div>
               <div>
-                  -{{couponPrice}}
+                  {{couponPrice*-1}}
+                  <img src="/static/images/back.png" class="right">
+              </div>
+          </div>
+          <div class="flex-container infoslide white pad">
+              <div>邮费</div>
+              <div>
+                  {{freight}}
                   <img src="/static/images/back.png" class="right">
               </div>
           </div>
