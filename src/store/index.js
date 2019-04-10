@@ -10,6 +10,8 @@ const store = new Vuex.Store({
     nowPlace:"正在定位中...",
     latitude:"",
     longitude:"",
+    pList:[],//上门洗车添加图片
+    ///
     confirmOrder:{
       addressId:'',
       productId:'',

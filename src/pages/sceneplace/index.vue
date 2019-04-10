@@ -7,12 +7,12 @@
     </div>
     <!--图片列表-->
     <div class="flex" style="justify-content:flex-start">
-        <div class="flexitem" style="margin-right:10rpx;" v-for="(img,index) in imgBase" :key="index">
-            <img :src="img.PicUrl" class="pic">
+        <div class="flexitem" style="margin-right:10rpx;" v-for="(img,index) in imgPathArr" :key="index">
+            <img :src="img" class="pic">
             <img src="/static/images/close5.png" class="close"  @click="deleteImg(index)">
         </div>
         <div>
-            <img src="/static/images/bg1.png" class="pic" v-show="!(imgBase.length >3)" @click="chosseImg">
+            <img src="/static/images/bg1.png" class="pic"  v-show="isShowBtnUpload" @click="chosseImg">
         </div>
     </div>
     <div class="paybtn" @click="submit">确定</div>
@@ -28,6 +28,9 @@ export default {
   },
   data () {
     return {
+      isShowBtnUpload:true,
+      imgLenght:4,
+      imgPathArr:[],
       imgBase:[],
       userid: wx.getStorageSync("userId"),
       token: wx.getStorageSync("token"),
@@ -46,34 +49,44 @@ export default {
     // 修改图片
     chosseImg() {
       const that = this;
-      wx.chooseImage({
-        success: res => {
-          wx.getFileSystemManager().readFile({
-            filePath: res.tempFilePaths[0], //选择图片返回的相对路径
-            encoding: "base64", //编码格式
-            success: ress => {
-              //成功的回调
-              that.imgBase.push({
-                PicUrl:'data:image/png;base64,'+ress.data.toString()
-              });
+      let num = 0;
+      if(that.imgPathArr.length<this.imgLenght){
+        num=this.imgLenght-that.imgPathArr.length;
+         wx.chooseImage({
+           count:num,
+           sizeType:["compressed"],
+           sourceType: ["album", "camera"],
+            success: res => {
+               that.imgPathArr = that.imgPathArr.concat(res.tempFilePaths);
+               if(that.imgPathArr.length==8){
+                 that.isShowBtnUpload=false
+               }
+                for(let i=0;i<that.imgPathArr.length;i++){
+                    wx.getFileSystemManager().readFile({
+                    filePath: that.imgPathArr[i], //选择图片返回的相对路径
+                    encoding: 'base64', //编码格式
+                    success: res => { //成功的回调
+                      that.imgBase.push({
+                        PicUrl: "data:image/png;base64," + res.data.toString()
+                      });
+                    }
+                  })
+                }
             }
-          });
-          
-          //以下两行注释的是同步方法 转化后的base路径
-          // that.imgBase = wx .getFileSystemManager().readFileSync(res.tempFilePaths[0], "base64");
-          // console.log("that.imgBase" + that.imgBase);
-          // this.updateimg();
-        }
-      });
+        });
+      }
+     
     },
     deleteImg(i){
         this.imgBase.splice(i,1)
-        this.deleteImgIndex=''
-        console.log(this.deleteImgIndex)
+        this.imgPathArr.splice(i,1);
+        if(this.imgPathArr.length<8){
+          this.isShowBtnUpload = true;
+        }
     },
     submit(){
-      let pList= JSON.stringify(this.imgBase)
-      // wx.navigateTo({ url: "/pages/locationcomplete/main?picList="+pList});
+      this.$store.commit("update",{"pList":this.imgBase})
+      wx.navigateTo({ url: "/pages/location/main"});
     },
     
     

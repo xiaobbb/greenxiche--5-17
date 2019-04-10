@@ -127,7 +127,7 @@ export default {
     '$store.state':{
       handler:function() {   
         const state = this.$store.state;
-        console.log('state',state.longitude,state.latitude)
+        //console.log('state',state.longitude,state.latitude)
         this.longitude = state.longitude;
         this.latitude = state.latitude;
         this.getCityinfo();
