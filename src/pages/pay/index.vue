@@ -8,7 +8,7 @@
       <div class="weui-cells payMethod">
         <div class="weui-cell">
           <div class="weui-cell__bd">
-            <img src class="iconImg" alt>
+            <img src="/static/images/wx.png" class="iconImg" alt>
             <span class="title">微信支付</span>
           </div>
           <div class="weui-cell__ft">
@@ -17,7 +17,7 @@
         </div>
         <div class="weui-cell">
           <div class="weui-cell__bd">
-            <img src class="iconImg" alt>
+            <img src="/static/images/rmbbg.png" class="iconImg" alt>
             <span class="title">余额支付</span>
           </div>
           <div class="weui-cell__ft">
