@@ -65,16 +65,6 @@
         <div class="white">
             <!-- <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar.Wallet}}</span>元</div> -->
             <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar}}</span>元</div>
-            <!-- <div>
-              <div class="flex-container payitem commonpad">
-                  <img src="/static/images/wx.png" class="payimg">
-                  <input type="radio" :checked="a==4" @click="change(4)">
-              </div>
-              <div class="flex-container payitem commonpad"> 
-                  <img src="/static/images/rmbbg.png" class="payimg">
-                  <input type="radio" :checked="a==5" @click="change(5)">
-              </div>
-          </div> -->
           <radio-group class="radio-group" @change="radioChange">
             <label class="radio" v-for="item in payitems" :key="item.id">
               <div class="flex-container payitem commonpad">

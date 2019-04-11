@@ -129,9 +129,9 @@ export default {
         const state = this.$store.state;
         this.longitude = state.longitude;
         this.latitude = state.latitude;
-        if(this.longitude||this.latitude){
-          this.getCityinfo();
-        }
+        // if(this.longitude||this.latitude){
+        //   this.getCityinfo();
+        // }
         },
         deep: true 
     }
@@ -204,7 +204,7 @@ export default {
       });
     },
     getCityinfo(){
-       console.log(this.latitude,this.longitude,"首页")
+       //console.log(this.latitude,this.longitude,"首页")
       // KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG
          wx.setStorageSync("latitude",this.latitude)
          wx.setStorageSync("longitude",this.longitude)
@@ -215,7 +215,7 @@ export default {
               "content-type": "application/x-www-form-urlencoded"
             },
             success:(res)=>{
-                console.log(res,"地理转码")
+                //console.log(res,"地理转码")
                 if(res.data.result){
                 this.update({
                     cityName:res.data.result.addressComponent.city,
@@ -223,7 +223,7 @@ export default {
                 })
                 wx.setStorageSync("cityName",this.cityName)
                 }
-              //console.log(this.cityName,this.nowPlace)
+              console.log(this.cityName,this.nowPlace)
           }
         })
         
@@ -253,7 +253,7 @@ export default {
           arr.push(marker)
         }
         this.markers=arr
-        console.log(this.markers,"markers数组")
+        //console.log(this.markers,"markers数组")
       }
     },
     
@@ -284,7 +284,7 @@ export default {
           UserId: this.userId,
           Token:this.token
       })
-      console.log(res,"判断是否是新人")
+      //console.log(res,"判断是否是新人")
       if(res.data.IsNewUser==0){
         //   wx.showToast({
         //     title: '您已经不是新用户啦。。。',
@@ -319,7 +319,7 @@ export default {
             UserId: this.userId,
             Token:this.token
         })
-        console.log(res,"领取新人礼券")
+       // console.log(res,"领取新人礼券")
         if(res.code==0){
           wx.showToast({
             title: '领取成功',
@@ -336,7 +336,7 @@ export default {
             UserId: this.userId,
             Token:this.token
         })
-        console.log(res,"领取vip  ")
+        //console.log(res,"领取vip  ")
         if(res.code==0){
           if(res.data.IsVip==1){
             //不是vip弹出领取vip点击开通vip
