@@ -6,8 +6,7 @@
         <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:560rpx;"></map>
         <cover-view>
             <cover-image src="/static/images/cart.png" class="cart-img"/>
-        </cover-view> 
-        
+        </cover-view>
     </div>
     <!--列表-->
     <div class="list">
@@ -31,13 +30,13 @@
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">请添加车辆</span>
+            <span class="location-self">{{cartip}}</span>
             <img src="/static/images/back.png" class="back" @click="choseCar">
         </div>
         <p class="hr"></p>
         <div class="item">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">价格 : 30.00</span>
+            <span class="location-self">价格 : {{serePrice}}</span>
             <p class="taginfo">
               <img src="/static/images/tag.png" class="tag">
               <span class="goods">充值有优惠</span>
@@ -84,6 +83,14 @@ export default {
       this.Remarks=textinfo
       //console.log(this.Remarks,"接收的备注")
     }
+    //获取车辆信息
+    this.cartip="请选择车辆"
+    this.getCar()
+    //获取上门服务的地址
+    this.address=this.$store.state.nowPlace
+  },
+  onShow(){
+    
     
   },
   watch:{  //图片
@@ -101,9 +108,11 @@ export default {
     return {
         latitude: wx.getStorageSync("latitude"),
         longitude: wx.getStorageSync("longitude"),
-        Service:wx.getStorageSync("serItem"),
+        address:"",
         serTip:"请选择服务项目",
         timetip:"请选择服务时间",
+        cartip:" ",
+        serePrice:"",
         userId:"",
         token:"",
         personName:"",//姓名
@@ -113,7 +122,7 @@ export default {
         AppointmentStartTime:"",//预约开始时间
         AppointmentEndTime:"",//预约结束时间
         PicList:"",//图片合集; JsonString格式(多图)
-        Remarks:"备注信息",//备注
+        Remarks:"",//备注
         controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',
@@ -141,15 +150,26 @@ export default {
         title: "填写订单"
       });
     },
-    getSerItem(){  //转换服务项目
-        if(this.Service){
+    getCar(){ //获取车辆
+      const car= wx.getStorageSync("CarInfo")
+      this.cartip=car.CarBrand+" "+car.CarType+" "+car.CarColor+" "+car.CarMumber
+      this.CarInfoId=car.Id
+      //console.log(this.cartip)
+    },
+    getSerItem(){  //转换服务项目、
+        const Service=wx.getStorageSync("serItem")
+        if(Service){
           //console.log(this.Service,"11111")
           const SerItembox=[]
           const SerTipbox=[]
-          for(let i=0;i<this.Service.length;i++){
-            SerItembox.push(this.Service[i].Id)
-            SerTipbox.push(this.Service[i].Name)
+          let Serpricebox=0
+          for(let i=0;i<Service.length;i++){
+            SerItembox.push(Service[i].Id)
+            SerTipbox.push(Service[i].Name)
+            //console.log(typeof(this.Service[i].Price ))
+            Serpricebox+=Service[i].Price * 1 || 0
           }
+          this.serePrice=Serpricebox.toFixed(2)
           this.serTip=SerTipbox.join(" ")
           this.ServiceItem=SerItembox.join(" ")
         }else{
@@ -164,8 +184,8 @@ export default {
       if(tt&&mm){
         this.timetip=tt+"  "+mm
         //开始时间结束时间
-        this.AppointmentStartTime=year+"-"+tt +"  "+ mm.split("-")[0]
-        this.AppointmentEndTime=year+"-"+tt +"  "+ mm.split("-")[1]
+        this.AppointmentStartTime=year+"-"+tt +" "+ mm.split("-")[0]
+        this.AppointmentEndTime=year+"-"+tt +" "+ mm.split("-")[1]
       }
     },
     chosePlace(){
@@ -203,24 +223,29 @@ export default {
       } 
     },
     async toPay(){
-      console.log("支付啦")
-      
-      //验证手机号
-      if(this.personName&&this.personPhone&&this.CarInfoId&&this.ServiceItem&&this.PicList&&this.Remarks&&this.timetip){
-      let res=await post("/Order/SubmitDoorOrders",{
-         UserId: this.userId,
+      //const _picList=JSON.stringify(this.PicList)
+      console.log(this.AppointmentStartTime,"信息")
+      const params={
+        UserId: this.userId,
          Token:this.token,
+         Lat:this.latitude,
+         Lng:this.longitude,
+         Addr:this.address,
          CarInfoId:this.CarInfoId,
          Remarks:this.Remarks,
          ServiceItem:this.ServiceItem,
          ContactName:this.personName,
          Tel:this.personPhone,
-         pList:JSON.stringify(this.pList),
+         pList:_picList,
          AppointmentStartTime:this.AppointmentStartTime,//开始时间
          AppointmentEndTime:this.AppointmentEndTime
-      }) 
+      }
+      let res=await post("/Order/SubmitDoorOrders",params) 
+      console.log(res)
       //如果有订单编号跳转支付页面
-        //wx.navigateTo({ url: "/pages/orderpay/main" });
+      if(res.code==0){
+        const orderNo=res.data //订单编号
+        wx.navigateTo({ url: "/pages/orderpay/main?orderNo="+orderNo+"&price="+this.serePrice });
       }
     }
   },

@@ -64,8 +64,10 @@ export default {
       active:'0',
       hourses:[],
       minutes:[],
-      datetip:"",//日期
+      datetip:"",//选中的日期
       time:[],//时间
+      nowhour:"",//当前的时间
+      nowminute:"",
       controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',
@@ -99,10 +101,13 @@ export default {
       this.datetip=this.datelist[this.active]
     },
     choosedate(){
-      var d=new Date()
+      var ddd=new Date()
       //console.log(date)
-      var month=d.getMonth()+1
-      var date=d.getDate()
+      var month=ddd.getMonth()+1
+      var date=ddd.getDate()
+      this.nowhour=ddd.getHours()
+      this.nowminute=ddd.getMinutes()
+      console.log()
       for(var n=0;n<5;n++){
         var i=`${month}`+'月'+`${date}`+'日'
         this.datelist.push(i)
@@ -136,14 +141,12 @@ export default {
           // 滚动时再动态 通过年和月获取 这个月下对应有多少天
     },
     choseTime(){
-      let mon=this.datetip.slice(0,1)
-      let dd=this.datetip.slice(2,3)
-      if(mon.length<2){
-        mon="0"+mon
-      }
-       if(dd.length<2){
-        dd="0"+dd
-      }
+      //console.log(this.datetip)
+      const _datetip=this.datetip.split("月")
+      let mon = _datetip[0]
+      let dd = _datetip[1].split("日")[0]
+      mon.length<2 ? mon="0"+mon : mon
+      dd.length<2 ? dd="0"+dd :dd
       let tt=mon+"-"+dd  //日期
       const time1=[]
       for (let i of this.time){
@@ -154,7 +157,37 @@ export default {
       }
       
        const timeValue=time1[0]+":"+time1[1]+"-"+time1[2]+":"+time1[3] //时间
-       if(this.time[0]>this.time[2]){
+       if(this.time[0] >23 || this.time[0] < 7 ){
+         wx.showToast({
+            title: '您选择的时间不在营业范围内',
+            icon: 'none',
+            duration: 2000,
+            complete: function (){
+              
+            }
+        });
+        return false
+       }else if(this.time[2] - this.time[0] > 2 ){
+         wx.showToast({
+            title: '服务时间不超过两个小时哦。。。',
+            icon: 'none',
+            duration: 2000,
+            complete: function (){
+              
+            }
+        });
+        return false
+       }else if(this.time[0]<this.nowhour && this.time[1] <this.nowminute){
+          wx.showToast({
+            title: '您选择的时间已过...',
+            icon: 'none',
+            duration: 2000,
+            complete: function (){
+              
+            }
+        });
+        return false
+       }else if(this.time[0]>this.time[2]){
          wx.showToast({
             title: '开始时间不能大于结束时间',
             icon: 'none',
