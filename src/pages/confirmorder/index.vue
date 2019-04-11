@@ -52,7 +52,7 @@
           <div class="flex-container infoslide white pad">
               <div>邮费</div>
               <div>
-                  {{product.freight||"免运费"}}
+                  {{product.freight*1?product.freight:"免运费"}}
                   <img src="/static/images/back.png" class="right">
               </div>
           </div>
@@ -67,53 +67,23 @@
           <div class="price white">合计: <span>￥{{total}}</span></div>
           <div class="btnconfir" @click="goPay">提交订单</div>
       </div>
-      <!--遮罩层-->
-      <div class="mask-modal" v-if="isshow"></div>
-        <!--确认付款-->
-      <div v-if="showpay" class="paymask white">
-          <div class="paytile">
-              <img src="/static/images/close.png" class="close" @click="closeMask">
-              <text>确认付款</text>
-          </div>
-          <div class="maskprice">￥{{total}}</div>
-          <div class="flex-container maskitem">
-              <div class="fontclolr">帐号</div>
-              <div>150******08</div>
-          </div>
-          <div class="flex-container maskitem">
-              <div class="fontclolr">付款方式</div>
-              <div  @click="goWay">
-                  <text class="wx">微信</text>
-                  <img src="/static/images/back.png" class="right">
-              </div>
-          </div>
-          <div class="paybtn btnbottom">确认付款</div>
-      </div>
-      <!--选择付款方式-->
-      <div v-if="showway" class="paymask white">
-          <div class="paytile">
-              <img src="/static/images/leftarrow.png" class="leftarrow leftposi" @click="backPage">
-              <text>选择支付方式</text>
-          </div>
-          <div>
-              <div class="flex-container payitem">
-                  <img src="/static/images/wx.png" class="payimg">
-                  <input type="radio" :checked="a==4" @click="change($event)">
-              </div>
-              <div class="flex-container payitem"> 
-                  <img src="/static/images/rmbbg.png" class="payimg">
-                  <input type="radio" :checked="a==5" @click="change($event)">
-              </div>
-          </div>
-      </div>
       <!--选择优惠券-->
-        <Coupon :showCoupon.sync="showCoupon"></Coupon>
+        <Coupon :showCoupon.sync="showCoupon" 
+        :productNumber="buyNum" :productId="productId"
+        :productAttr='sbumitValue' :couponId.sync = 'couponId'
+        :couponPrice.sync="couponPrice"
+        ></Coupon>
+        <!-- 支付 -->
+        <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
+         :total="total" :navigateUrl="'/pages/myorder/main'"
+        ></Pay>
   </div>
 </template>
 
 <script>
 import {post} from "@/utils/index"
 import Coupon from '@/components/coupon.vue'
+import Pay from '@/components/pay.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -126,14 +96,17 @@ export default {
     //   this.getFreight()
     // })
   },
+  components: {
+      Coupon,Pay
+  },
   data () {
     return {
-      isshow:false,
-      showpay:false,
+      showPay:false,
       showway:false,
       a:4,
       product:{},
       buyNum:1,
+      productId:'',
       sku:'',
       skuId:'',
       sbumitValue:'',
@@ -149,12 +122,13 @@ export default {
       // 优惠券价格
       couponPrice:0.00,
       showCoupon:false,
+      // 使用的优惠券id，0--不使用
+      couponId:0,
+      // 订单编号
+      orderNumber:''
     }
   },
  
-  components: {
-      Coupon
-  },
   computed:{
     total(){
       let totals = 0;
@@ -185,9 +159,13 @@ export default {
       const store = this.$store.state
       console.log('store',store)
       const id = store.confirmOrder.productId;
+      this.productId = store.confirmOrder.productId;
       const sku = store.confirmOrder.sku;
+      
+      this.sku = sku.replace(/_/g, " ");
+      this.sbumitValue = sku
       this.buyNum = store.confirmOrder.buyNum||1;
-      this.couponPrice = this.$store.state.couponPrice.toFixed(2)
+      // this.couponPrice = this.$store.state.couponPrice.toFixed(2)
       const res = await post("Goods/BuyNowInfo", { 
         UserId:wx.getStorageSync('userId'),
         Token: wx.getStorageSync('token'),
@@ -210,8 +188,6 @@ export default {
           freight: datas.Freight,
         };
         
-            this.sku = sku.replace(/_/g, " ");
-            this.sbumitValue = sku
       this.getAddress()
     },
     // 获取运费
@@ -278,14 +254,8 @@ export default {
     //     this.buyNum -=1;
     //   }
     // },
-    change(e){
-      //console.log(e.target)
-      this.a=e.target.dataset.eventid
-    },
     // 提交订单
     async goPay(){
-      // this.isshow=true,
-      // this.showpay=true
       const res = await post('Order/BuyNowSubmitOrder',{
         UserId:wx.getStorageSync('userId'),
         Token: wx.getStorageSync('token'),
@@ -299,22 +269,27 @@ export default {
         InvoiceEmail:'',
         // InvoiceType:2,
         // 优惠券id
-        MemberCouponId:0,
+        MemberCouponId:this.couponId*1,
+        // MemberCouponId:0,
         // 备注
-        Remark:'',
+        Remark:this.message,
         // 服务卡券
         MemberCardId:0
       })
-    },
-    goWay(){
-      this.isshow=true,
-      this.showpay=false,
-      this.showway=true
-    },
-    backPage(){
-      this.isshow=true,
-      this.showpay=true,
-      this.showway=false
+      wx.showToast({title:'提交成功！'})
+      this.orderNumber = res.data
+      // 查询订单价格
+      const order = await post('Order/OrderDetails',{
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token'),
+        OrderNo:res.data
+      })
+      console.log('前台计算订单价格',this.total)
+      console.log('后台计算订单价格',order.data.TotalPrice)
+      // 1.5秒后弹出支付窗口
+      setTimeout(()=> {
+      this.showPay=true
+      },500)
     },
     // 跳转选择收货地址
     goSelectAddress(){
@@ -369,11 +344,10 @@ export default {
       wx.navigateTo({url:'/pages/coupons/main'})
     },
     closeMask(){
-      this.isshow=false,
-      this.showpay=false,
+      this.showPay=false,
       this.showway=false,
       this.showCoupon=false
-    }
+    },
   },
 
   created () {
@@ -385,4 +359,7 @@ export default {
 <style lang="scss" scoped>
   @import "./style";
   @import "../../css/common.css";
+  .infoslide img{
+    margin-left:10rpx;
+  }
 </style>
