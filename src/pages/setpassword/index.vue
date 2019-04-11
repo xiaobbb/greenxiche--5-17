@@ -99,9 +99,9 @@ export default {
         });
       } else {
         const code = await post("User/GetUpdatePswCode", {
-          Token: this.token,
+          Token: wx.getStorageSync("token"),
           Mobile: this.phoneNumber,
-          UserId: this.userid
+          UserId: wx.getStorageSync("userId")
         });
         wx.showToast({
           title: "短信已发送",

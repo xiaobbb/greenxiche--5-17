@@ -49,6 +49,8 @@ export default {
   onLoad(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
+    this.setBarTitle();
+    this.getData()
   },
   data () {
     return {
@@ -62,10 +64,6 @@ export default {
  
   components: {
     
-  },
-  mounted(){
-    this.setBarTitle();
-    this.getData()
   },
   methods: {
     setBarTitle() {

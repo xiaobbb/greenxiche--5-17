@@ -101,7 +101,7 @@ export default {
     //     deep: true
     // }
   },
-  mounted() {
+  onLoad() {
     this.setBarTitle();
     // 分类列表
     this.getClassify();
@@ -132,7 +132,7 @@ export default {
       const that = this;
       that.activeId = id;
       that.productlist = [];
-      post("/Goods/GoodsList", { page: 1, pageSize: 10, TypeId: id }).then(
+      post("/Goods/GoodsList", { page: 1, pageSize: 30, TypeId: id }).then(
         res => {
           for (let i = 0; i < res.data.length; i += 1) {
             const datas = res.data[i];

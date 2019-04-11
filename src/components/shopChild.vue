@@ -17,7 +17,7 @@
                 <text class="numb">({{detailinfo[0].TransactionNumber}}条订单)</text>
                 </div>
             </div>
-            <div class="flex-container range alig">
+            <div class="flex-container range alig" style="width:40%;">
               <p class="location">
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/phone.png" class="small">
@@ -33,7 +33,7 @@
                   <p class="sercomplain">{{detailinfo[0].Address}}</p>
                 </div>
             </div>
-            <div class="flex-container range lineleft ">
+            <div class="flex-container range lineleft " style="width:40%;">
               <p class="location">
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/to.png" class="small">

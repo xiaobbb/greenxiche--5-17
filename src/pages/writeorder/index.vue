@@ -51,6 +51,7 @@ import "../../css/global.css";
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
+    this.datelist=[]
     this.setBarTitle();
     this.choosedate();
     this.gethous();

@@ -3,9 +3,6 @@
     <!--支付-->
     <div class="glo-relative">
         <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:610rpx;"></map>
-        <cover-view>
-            <cover-image src="/static/images/cart.png" class="cart-img"/>
-        </cover-view>
     </div>
     <!--item-->
     <div class="paymenu">
@@ -13,7 +10,7 @@
             <p>确认支付信息</p>
             <img src="/static/images/close.png" class="close">
         </div>
-        <p class="menu">￥{{price || 30.00}}</p>
+        <p class="menu">￥{{price || 1.00}}</p>
         <radio-group class="radio-group" @change="radioChange">
             <label class="radio" v-for="item in payitems" :key="item.id">
               <div class="flex-container payitem commonpad">
@@ -99,8 +96,27 @@ export default {
           //OrderNo:this.orderNo
         })
         console.log(res,"微信支付")
+        if(res.code==0){
+            let payData=JSON.parse(res.data.JsParam);
+            wx.requestPayment({
+            timeStamp: payData.timeStamp,
+            nonceStr: payData.nonceStr,
+            package: payData.package,
+            signType: payData.signType,
+            paySign: payData.paySign,
+            success(res) { 
+              wx.navigateTo({
+                url:"/pages/location/main"
+              });
+            },
+            fail(res) {
+
+            }
+          })
+        }
     },
     async otherPay(){
+      console.log(this.password,"支付密码")
       var res=await post("/Order/PaymentOrder",{
           UserId:this.userId,
           Token:this.token,
@@ -109,6 +125,12 @@ export default {
           //OrderNo:this.orderNo
         })
         console.log(res,"余额支付")
+        if(res.code==0){
+          //余额支付成功
+
+
+          
+        }
     },
     radioChange:function(e){
       for(const x in this.payitems){
