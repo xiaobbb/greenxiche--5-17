@@ -33,7 +33,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 48,
+			"current": 25,
 			"list": [
 				{
 					"id": 0,
@@ -211,10 +211,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 25,
 					"name": "发表评论",
 					"pathName": "pages/addcomment/main",
-					"query": "",
+					"query": "orderNo=201904111016183668853&appraiseType=0&appraiseId=1120",
 					"scene": null
 				},
 				{
