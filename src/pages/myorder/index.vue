@@ -43,10 +43,16 @@
                 共{{item.allNum}}件商品(含配送费<span v-if="item.isExpress">￥{{item.ExpressPrice}}</span>)
                 <span>合计￥{{item.TotalPrice}}</span>
               </div>
-              <div class="menubtn flex-container flexEnd">
+
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
                 <text class="btn">取消订单</text>
                 <text class="btn active">付款</text>
               </div>
+              <!-- 待使用 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===1">
+                <text class="btn">退款</text>
+              </div>
+              
             </div>
           </div>
           <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="hasData">暂无数据</p>
