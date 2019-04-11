@@ -103,6 +103,7 @@ export default {
         var openid = wx.getStorageSync("openId");
         var token = wx.getStorageSync("token");
         var unionid = wx.getStorageSync("unionid");
+        wx.setStorageSync("password",this.password);
         wx.request({
           url: "https://carapi.wtvxin.com/api/Login/BindOrRegister", //仅为示例，并非真实的接口地址
           method: "POST",
