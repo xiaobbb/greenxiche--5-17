@@ -13,7 +13,7 @@
             <p>确认支付信息</p>
             <img src="/static/images/close.png" class="close">
         </div>
-        <p class="menu">￥{{price || 0}}</p>
+        <p class="menu">￥{{price || 30.00}}</p>
         <radio-group class="radio-group" @change="radioChange">
             <label class="radio" v-for="item in payitems" :key="item.id">
               <div class="flex-container payitem commonpad">
@@ -26,26 +26,33 @@
               </div>
             </label>
           </radio-group>
-        <div class="paybtn" style="margin-top:50rpx;">立即支付</div>
+        <div class="paybtn" style="margin-top:50rpx;" @click="payMoney">立即支付</div>
     </div>
   </div>
 </template>
 
 <script>
+import { get, myget, mypost, post, toLogin } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
+    this.password=wx.getStorageSync('password');
     this.setBarTitle();
     this.orderNo=this.$root.$mp.query.orderNo
-    this.price=this.$root.$mp.query.orderNo
+    this.price=this.$root.$mp.query.price
   },
   data () {
     return {
       latitude: wx.getStorageSync("latitude"),
       longitude: wx.getStorageSync("longitude"),
-      orderNo:"",
+      orderNo:"",//订单编号
       price:"",
+      userId:"",
+      token:"",
+      password:"", //会员支付密码
       controls: [{  //控件不随着地图移动
           id: 1,
           iconPath: '/static/images/location.png',
@@ -72,8 +79,45 @@ export default {
         title: "支付订单"
       });
     },
-    change:function(e){
-      this.active=e
+    payMoney(){
+        //判断哪种支付方法
+        for(let i=0;i<this.payitems.length;i++){
+          if(this.payitems[i].checked){
+            if(i==0){
+              this.wxPay()
+            }else{
+              this.otherPay()
+            }
+          }
+        }
+    },
+    async wxPay(){
+      var res=await post("/Order/ConfirmWeiXinSmallPay",{
+          UserId:this.userId,
+          Token:this.token,
+          OrderNo:"201904111028561742883"
+          //OrderNo:this.orderNo
+        })
+        console.log(res,"微信支付")
+    },
+    async otherPay(){
+      var res=await post("/Order/PaymentOrder",{
+          UserId:this.userId,
+          Token:this.token,
+          OrderNo:"201904111028561742883",
+          Password:this.password //会员支付密码
+          //OrderNo:this.orderNo
+        })
+        console.log(res,"余额支付")
+    },
+    radioChange:function(e){
+      for(const x in this.payitems){
+        if(this.payitems[x].id==e.target.value){
+          this.payitems[x].checked=true
+        }else{
+          this.payitems[x].checked=false
+        }
+      }
     },
   },
 

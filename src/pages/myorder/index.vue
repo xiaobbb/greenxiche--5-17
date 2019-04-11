@@ -43,23 +43,34 @@
                 共{{item.allNum}}件商品(含配送费<span v-if="item.isExpress">￥{{item.ExpressPrice}}</span>)
                 <span>合计￥{{item.TotalPrice}}</span>
               </div>
-              <div class="menubtn flex-container flexEnd">
+
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
                 <text class="btn">取消订单</text>
                 <text class="btn active">付款</text>
               </div>
+              <!-- 待使用 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===1">
+                <text class="btn">退款</text>
+              </div>
+              
             </div>
           </div>
+          <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="hasData">暂无数据</p>
+          <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
         </div>
       </div>
       <!--预约订单-->
       <div v-if="orderBigType===1">
         <div class="menuhead flex-container white visit">
-          <p
+          <div class="item flex1 center" v-for="item in visitlist"
+            :key="item.id"
+            @click="change(item.id)"><p class="inline-block" :class="{active:serviceMode==item.id}">{{item.name}}</p></div>
+          <!-- <p
             v-for="item in visitlist"
             :key="item.id"
             :class="{active:active==item.id}"
             @click="change(item.id)"
-          >{{item.name}}</p>
+          >{{item.name}}</p> -->
         </div>
         <div class="shoplist">
           <div class="shopitem white" v-for="(item,index) in bookList" :key="index" @click="toOrderDetail(2)">
@@ -87,8 +98,11 @@
               <text class="btn active">付款</text>
             </div>
           </div>
+          <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="hasData">暂无数据</p>
+          <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
         </div>
       </div>
+      
     </div>
   </div>
 </template>
@@ -127,7 +141,7 @@ export default {
       menulist: [
         { id: 0, name: "全部" },
         { id: 1, name: "待付款" },
-        { id: 2, name: "代付款" },
+        { id: 2, name: "待使用" },
         { id: 4, name: "待评价" },
         { id: 5, name: "已完成" }
       ],
@@ -158,7 +172,7 @@ export default {
     },
     change(e) {
       //console.log(e)
-      this.active = e;
+      this.serviceMode = e;
     },
     toOrderDetail(e) {
       if (e == 1) {
@@ -181,6 +195,12 @@ export default {
     getOrderList(e){
       
     },
+    shiftStatus(status){
+      this.status = status;
+      this.active = status;
+      this.initData();
+      this.getOrderList();
+    },
     async getOrderList() {
       //商城订单
       let result = await post("Order/OrderList", {
@@ -190,6 +210,9 @@ export default {
         Page: this.page,
         pageSize: this.pageSize
       });
+      if(result.data=="" && this.page===1){
+        this.hasData = true;
+      }
       if (result.data.length > 0) {
         this.count = result.count;
         if (parseInt(this.count) % this.pageSize === 0) {
@@ -227,6 +250,9 @@ export default {
         pageSize:this.pageSize,
         ServiceMode:this.serviceMode
       });
+      if(result.data=="" && this.page===1){
+        this.hasData = true;
+      }
       if(result.data.length>0){
         this.bookList = this.bookList.concat(result.data);
       }
@@ -240,12 +266,11 @@ export default {
     if(this.isLoad){
       this.page++;
       if(this.orderBigType===0){  //商城订单
-         this.getOrderList();
+        this.getOrderList();
       }
       if(this.orderBigType===1){  //预约订单
-
+         this.getReserveOrderList();
       }
-      
     }else{
       if (this.page > 1) {
         this.isOved = true;
