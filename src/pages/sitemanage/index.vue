@@ -156,12 +156,13 @@ export default {
       this.$store.commit('setConfirmOrder',{
         addressId:id,
       productId:confirmOrder.productId,
-      skuId:confirmOrder.skuId,
+      sku:confirmOrder.sku,
       buyNum:confirmOrder.buyNum,
       couponId:confirmOrder.couponId
       })
-
-      wx.redirectTo({ url: selectAddress.url});
+      // 跳转到上一页
+      // wx.redirectTo({ url: selectAddress.url});
+      wx.navigateBack()
       // 重置选择地址
       this.$store.commit('setSelectAddress',{
         url:'',

@@ -86,7 +86,6 @@ export default function logins() {
             });
           } else {
             wx.hideLoading();
-            console.log("获取用户登录态失败：" + res.errMsg);
             wx.showToast({
               title: "获取授权信息失败",
               icon: "none",
@@ -96,6 +95,8 @@ export default function logins() {
           }
         },
         fail() {
+          console.log("未授权",this);
+          // backUrl: 0--不跳转,1--后退一页，2--后退2页
           //   未授权，跳转授权   
           wx.navigateTo({
             url: '/pages/login/main'

@@ -36,7 +36,7 @@
           合计:
           <span>￥{{total}}</span>
         </div>
-        <div class="btnconfir" @click="goPay">结算</div>
+        <div class="btnconfir" @click="submit">结算</div>
       </div>
       <div class="delete botbtn" v-else>
         <div class="price"></div>
@@ -288,6 +288,12 @@ export default {
       this.showMask = false;
       this.showDelete = false;
       this.isShow = true;
+    },
+    submit(){
+      console.log('a')
+      wx.navigateTo({
+        url:'/pages/confirm-cart-order/main'
+      })
     }
   },
 

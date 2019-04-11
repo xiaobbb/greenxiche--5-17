@@ -59,10 +59,10 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.userId = wx.getStorageSync('userId');
-    this.token = wx.getStorageSync("token");
   },
   onShow(){
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync("token");
     this.carinfolist = [];
     this.getAllcar(); 
   },
