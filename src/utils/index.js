@@ -59,7 +59,7 @@ function request(url, method, data, header = {}) {
                     default:
                         reject(false)
                         wx.showToast({
-                            title: res.data.msg + '，请刷新页面重试!',
+                            title: res.data.msg + '!',
                             icon: 'none'
                         })
                 }

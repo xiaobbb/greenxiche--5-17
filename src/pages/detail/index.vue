@@ -291,7 +291,7 @@ export default {
     detailChild,
     detailChildpic
   },
-  mounted() {
+  onLoad() {
     this.id = this.$root.$mp.query.id;
     this.setBarTitle();
     this.getData();
@@ -520,10 +520,10 @@ export default {
         title: "领取成功!",
         icon: "success"
       });
-      setTimeout(() => {
-        this.isshow = false;
-        this.showDiscount = false;
-      }, 1500);
+      // setTimeout(() => {
+      //   this.isshow = false;
+      //   this.showDiscount = false;
+      // }, 1500);
     },
     cancleMask() {
       this.isshow = false;
