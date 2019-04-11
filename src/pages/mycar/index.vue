@@ -5,7 +5,7 @@
         <!--车辆列表-->
         <div class="carlist" v-if="carinfolist.length>0">
             <radio-group class="radio-group" @change="changeIsDefault($event)">
-               <div class="radio"  v-for="(item,index) in carinfolist" :key="index">
+               <div class="radio"  v-for="(item,index) in carinfolist" :key="index" @click="choseCar(index)">
                     <div class="caritem">
                     <div class="flex-container infostyle">
                       <div class="carlogo">
@@ -143,6 +143,13 @@ export default {
     btnEaditCar(carNumber){
       wx.navigateTo({ url: "/pages/addCar/main?carNumber="+carNumber });
     },
+    choseCar(e){
+      //console.log(e)
+      console.log(this.carinfolist[e])
+      let CarInfo=this.carinfolist[e]
+      wx.setStorageSync("CarInfo",CarInfo)
+      wx.navigateTo({ url: "/pages/location/main"});
+    }
   },
 
   created () {
