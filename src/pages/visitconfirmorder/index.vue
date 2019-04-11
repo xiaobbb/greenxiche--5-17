@@ -94,7 +94,7 @@ export default {
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
-    this.UserId=wx.getStorageSync('userid');
+    this.UserId=wx.getStorageSync('userId');
     this.Password=wx.getStorageSync('password');
     this.getOrderInfo()
     console.log(this.proid,this.Token,this.UserId)
@@ -102,7 +102,7 @@ export default {
   },
   data () {
     return {
-      isshow:false,
+      isshow:true,
       proid:"", //产品id
       CarInfoId:"",//车辆id
       CouponId:"",//优惠券id
@@ -132,7 +132,7 @@ export default {
         title: "确认订单"
       });
     },
-    async getOrderInfo(){
+    async getOrderInfo(){ //获取订单信息
       var result=await post("/Order/ServiceProductsFirmOrder",{
         UserId:this.UserId,
         Token:this.Token,
@@ -140,7 +140,7 @@ export default {
       })
       if(result.code==0){
         this.orderinfo=result.data
-        //console.log(result.data)
+        console.log(result.data)
         this.CouponId=result.data.CouponData.CouponId
         this.CardTicketId=result.data.CardTicketData.CardTicketId  //优惠券卡券只能选择一个
         this.CarInfoId= result.data.CarInfoData.Id
@@ -164,7 +164,7 @@ export default {
         }
       }
     },
-    async goPay(){
+    async goPay(){  //提交支付
       //this.isshow=false
       var result=await post("/Order/ServiceProductsPlaceOrder",{
           UserId:this.UserId,

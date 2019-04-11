@@ -36,7 +36,7 @@
         <p class="hr"></p>
         <div class="item"  @click="choseMoney">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">价格 : {{serePrice}}</span>
+            <span class="location-self">价格 : {{serePrice || 0 }}</span>
             <p class="taginfo">
               <img src="/static/images/tag.png" class="tag">
               <span class="goods">充值有优惠</span>
@@ -235,10 +235,12 @@ export default {
       } 
     },
     async toPay(){
+      wx.setStorageSync("serItem"," ");
+      wx.setStorageSync("CarInfo"," ");
      const _picList=JSON.stringify(this.PicList)
-    //   console.log(this.AppointmentStartTime,"开始时间信息")
+    //console.log(this.AppointmentStartTime,"开始时间信息")
     //   console.log(this.AppointmentEndTime,"结束时间信息")
-    //  console.log(this.latitude,this.address,"经度信息")
+      console.log(this.latitude,this.address,"经度信息")
     //  console.log(this.userId,"用户id")
     //  console.log(this.ServiceItem,"服务id")
     //  console.log(this.CarInfoId,"车辆信息")

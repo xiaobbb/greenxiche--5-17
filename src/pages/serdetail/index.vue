@@ -8,7 +8,7 @@
           <div class="title">{{detailinfo.Name}}</div>
           <div class="complain">{{detailinfo.Synopsis}}</div>
           <div class="flex-container iteminfo">
-              <p>已售652件</p>
+              <p>已售{{detailinfo.SalesVolume || 0}}件</p>
               <p>今日仅剩<span>{{detailinfo.Stock}}</span>件</p>
           </div>
       </div>
@@ -29,13 +29,13 @@
                   </p>
               </div>
           </div>
-          <div class="price">￥{{detailinfo.Price}}</div>
+          <div class="price">￥{{detailinfo.Price || 0}}</div>
       </div>
       <div class="hr"></div>
       <!--位置-->
       <div class="flex-container item">
           <div>
-              <p class="sertitle">{{detailinfo.ShopData[0].ShopNick}}</p>
+              <p class="sertitle">{{detailinfo.Name}}</p>
               <p class="sercomplain">{{detailinfo.ShopData[0].Address}}</p>
           </div>
           <div class="flex-container range">
@@ -54,7 +54,7 @@
               <text>评分</text><text>4.0</text>
             </p>
             <p>
-              <text>{{detailinfo.CommentData.length}}条评论</text>
+              <text>{{detailinfo.CommentData.length || 0 }}条评论</text>
               <img src="/static/images/back.png" class="arrowback">
             </p>
         </div>
@@ -85,7 +85,7 @@
       </div>
       <!--支付-->
       <div class="btn"> 
-          <div class="btnmoney">￥{{detailinfo.Price}}</div>
+          <div class="btnmoney">￥{{detailinfo.Price || 0}}</div>
           <div class="btncharge" @click="toPay(detailinfo.Id)">去结算</div>
       </div>
 
@@ -104,7 +104,7 @@ export default {
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
-    this.UserId=wx.getStorageSync('userid');
+    this.UserId=wx.getStorageSync('userId');
     this.getSerdetail()
   },
   data () {
@@ -135,9 +135,10 @@ export default {
             Lat:this.lat,
             Lng:this.lng
         })
-        //console.log(result)
+        console.log(result)
         if(result.code==0){
             this.detailinfo=result.data[0]
+            this.$set(result.data[0].ShopData[0],"Distance",parseFloat(result.data[0].ShopData[0].Distance).toFixed(2))
             //console.log(this.detailinfo)
         }
     },

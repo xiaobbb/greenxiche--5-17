@@ -362,7 +362,9 @@ export default {
       if(name=="到店"){
         //console.log(666)
         this.isXiche=false,
-        this.isGoshop=true
+        this.isGoshop=true,
+        //获取最近的商家显示
+        this.getNearShopInfo()
       }else if(name=="上门"){
         this.isXiche=true,
         this.isGoshop=false
@@ -371,18 +373,21 @@ export default {
     washCar(){
        wx.navigateTo({ url: "/pages/location/main" });
     },
-    // goTo(e){
-    //     var id=e
-    //     if(id==1){
-    //         wx.navigateTo({ url: "/pages/city/main" });
-    //     }
-    //     if(id==2){
-    //         wx.navigateTo({ url: "/pages/shoplist/main" });
-    //     }
-    //     if(id==3){
-    //         wx.navigateTo({ url: "/pages/shopdetail/main" });
-    //     }
-    // }
+    getNearShopInfo(){
+
+    },
+    goTo(e){
+        var id=e
+        if(id==1){
+            wx.navigateTo({ url: "/pages/city/main" });
+        }
+        if(id==2){
+            wx.navigateTo({ url: "/pages/shoplist/main" });
+        }
+        if(id==3){
+            wx.navigateTo({ url: "/pages/shopdetail/main" });
+        }
+    }
   },
 
   created () {
