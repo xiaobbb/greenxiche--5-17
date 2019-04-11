@@ -244,8 +244,8 @@ export default {
       console.log(res)
       //如果有订单编号跳转支付页面
       if(res.code==0){
-        const orderNo=res.data
-        wx.navigateTo({ url: "/pages/orderpay/main?orderNo="+orderNo });
+        const orderNo=res.data //订单编号
+        wx.navigateTo({ url: "/pages/orderpay/main?orderNo="+orderNo+"&price="+this.serePrice });
       }
     }
   },
