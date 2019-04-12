@@ -45,14 +45,17 @@
               </div>
 
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
-                <text class="btn">取消订单</text>
+                <text class="btn" @click="showReasonMak(index,item.OrderNumber)">取消订单</text>
                 <text class="btn active">付款</text>
               </div>
               <!-- 待使用 -->
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===1">
                 <text class="btn">退款</text>
               </div>
-              
+              <!-- 已经取消订单删除 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===14">
+                <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
+              </div>
             </div>
           </div>
           <p style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;" v-if="hasData">暂无数据</p>
@@ -106,13 +109,15 @@
           <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
         </div>
       </div>
-      
     </div>
+    <!-- 取消订单选择原因 -->
+    <reasonMask :title="title" :button="button" v-if="reasonList.length>0" :show="reasonShow" :data="reasonList" @closeReason="closeReason" @selectReason="selectReason"></reasonMask>  
   </div>
 </template>
 
 <script>
-import { post } from "../../utils";
+import { post,get } from "../../utils";
+import reasonMask from '@/components/reasonMask';
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -127,6 +132,7 @@ export default {
     this.token = wx.getStorageSync("token");
     this.orderList = [];
     this.bookList = [];
+    this.reasonList = [];
     if(this.$root.$mp.query.orderBigType){  //是商城订单还是预约订单;1:商城订单；2：预约订单
       this.orderBigType = this.$root.$mp.query.orderBigType;
     }else{
@@ -177,12 +183,17 @@ export default {
       ],
       visitlist: [{ id: 1, name: "上门服务" }, { id: 2, name: "到店服务" }],
       orderList: [],
-      bookList:[]
+      bookList:[],
+      title:"取消订单原因",
+      button:'确定',
+      reasonList:[],
+      orderNo:"",
+      reasonShow:false
     };
   },
 
   components: {
-
+    reasonMask
   },
   methods: {
     setBarTitle() {
@@ -223,6 +234,9 @@ export default {
       this.hasData=false;
       this.orderList = [];
       this.bookList = [];
+      this.reasonList = [];
+      this.orderNo="";
+      this.reasonShow = false;
     },
     shiftStatus(status){
       this.status = status;
@@ -285,7 +299,79 @@ export default {
         this.bookList = this.bookList.concat(result.data);
       }
     },
-
+    showReasonMak(index,orderNo){
+      this.orderNo = orderNo;
+      this.reasonShow = true;
+      this.getCancelReason();
+    },
+    closeReason(){
+     this.reasonShow = false;
+    },
+    selectReason(code,codeTxt){
+       this.cancelOrders(codeTxt);
+    },
+    async getCancelReason(){  //获取取消订单原因
+      let result = await get("Order/CancelReason");
+      if(result.data.length>0){
+        this.reasonList = result.data;
+      }
+    },
+    async cancelOrders(reasonMark){
+      let result = await post("Order/CancelOrders",{
+        UserId:this.userId,
+        Token:this.token,
+        OrderNo:this.orderNo,
+        ReMarks:reasonMark
+      })
+      if(result.code===0){
+        let _this = this;
+        wx.showToast({
+          title: '取消订单成功!',
+          icon: 'none',
+          duration: 1500,
+          success:function(){
+            setTimeout(() => {
+              _this.reasonShow= false;
+              _this.orderNo = "";
+              //还没有做改变订单状态
+            }, 1500);
+          }
+        })
+      }
+    },
+    btnDel(index,orderNo){
+      let _this = this;
+      wx.showModal({
+        content: '您确定要删除该订单么？',
+        success(res) {
+          if (res.confirm) {
+            _this.DeleteOrders(index,orderNo);
+          } else if (res.cancel) {
+            
+          }
+        }
+      })
+    },
+    async DeleteOrders(index,orderNo){
+      let result = await post("Order/DeleteOrders",{
+        UserId:this.userId,
+        Token:this.token,
+        OrderNo:orderNo
+      })
+      if(result.code===0){
+        let _this = this;
+        wx.showToast({
+          title: '删除订单成功!',
+          icon: 'none',
+          duration: 1500,
+          success:function(){
+            setTimeout(() => {
+              _this.orderList.splice(index,1);
+            }, 1500);
+          }
+        })
+      }
+    }
   },
 
   created() {
