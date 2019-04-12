@@ -1,5 +1,5 @@
 <template>
-  <div class="bggray" style="height:100vh">
+  <div class="bggray">
     <div style="height:200rpx;">
         <!--顶部输入框-->
         <div class="white" >
@@ -329,6 +329,7 @@ export default {
     // let app = getApp()
   },
    onReachBottom(){
+     console.log("正在加载中国个古古怪怪")
     if(this.isLoad){
       this.Page++;
       this.getShopList();

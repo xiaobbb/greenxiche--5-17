@@ -1,5 +1,5 @@
 <template>
-  <div class="cerbg">
+  <div class="cerbg" style="background:#f4f7fc">
     <!--导航栏-->
     <div class="title">
       <div
@@ -10,14 +10,15 @@
         @click="change(item.id)"
       >{{item.name}}</div>
     </div>
-    <div class="slide"></div>
+    <!-- <div class="slide"></div> -->
     <!--没有优惠券-->
       <div class="nodata"  v-if="couptlist.length<=0">
         <img src="/static/images/nodata.png" class="couppics">
         <p>暂无服务卡券</p>
     </div>
     <!--排行list-->
-    <div class="certlist">
+    <scroll-view scroll-y @scrolltolower="loadMore" class="certlistBox">
+      <div class="certlist">
       <!--未使用-->
       <!-- <div> -->
         <div class="ceritem" v-for="(item,index) in couptlist" :key="index">
@@ -70,8 +71,10 @@
           </div>
         </div>
       </div> -->
-    </div>
-    <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
+      </div>
+      <p class="ovedMsg" v-if="isOved" style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;">我也是有底线的</p> 
+    </scroll-view>
+    
   </div>
 </template>
 
@@ -179,6 +182,19 @@ export default {
       wx.switchTab({
         url:"/pages/shopcenter/main?serverCouponId="+id
       })
+    },
+    loadMore(){
+      console.log(this.isLoad);
+      if(this.isLoad){
+        this.page++;
+        this.getCouponList();
+      }else{
+        if (this.page > 1) {
+          this.isOved = true;
+        } else {
+          this.isOved = false;
+        }
+      }
     }
   },
 
@@ -186,17 +202,7 @@ export default {
     // let app = getApp()
   },
   onReachBottom(){
-    console.log(this.isLoad);
-    if(this.isLoad){
-      this.page++;
-      this.getCouponList();
-    }else{
-      if (this.page > 1) {
-        this.isOved = true;
-      } else {
-        this.isOved = false;
-      }
-    }
+    
   }
 }
 </script>
@@ -204,4 +210,16 @@ export default {
 <style lang="scss" scoped>
 @import "./style";
 @import "../../css/common.css";
+.cerbg{
+  height: 100vh;
+}
+.certlistBox{
+  height: calc(100vh - 86rpx);
+  overflow: hidden;
+  overflow-y:auto;
+  
+}
+.certlist{
+  padding-top:20rpx;
+}
 </style>
