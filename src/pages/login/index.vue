@@ -42,7 +42,7 @@ export default {
   components: {},
   methods: {
     doBind(){
-        logins();
+        logins(true);
     },
     // 没作用上的函数
     setOpenId(session_id) {
