@@ -48,7 +48,7 @@ export default {
           type:String,
           default:''
         },
-        carIds:{
+        cartIds:{
           type:Array,
           default:function(){
             return []
@@ -95,6 +95,9 @@ export default {
   },
     // 获取可使用的优惠券
     async getCouponList(){
+      
+      const _carIds = JSON.stringify(this.cartIds);
+      const __carIds = _carIds.substring(1, _carIds.length - 1);
       let result = await post("Order/GetCouponList",{
         UserId:wx.getStorageSync('userId'),
         Token:wx.getStorageSync('token'),
@@ -102,7 +105,7 @@ export default {
         ProductId:this.productId,
         ProductNumber:this.productNumber,
         ProductSpec:this.productAttr,
-        CartIds:JSON.stringify(this.carIds)
+        CartIds:__carIds
       });
       console.log('获取优惠券列表',result)
         this.couponList=[]
