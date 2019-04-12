@@ -23,7 +23,6 @@ export default {
     
   },
   created() {},
-  mounted() {},
   data() {
     return {
       phonecode: "获取验证码",

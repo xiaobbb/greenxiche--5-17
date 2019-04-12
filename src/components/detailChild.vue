@@ -40,7 +40,7 @@ export default {
 
         }
     },
-    mounted(){
+    onLoad(){
         console.log(this.data)
     }
 

@@ -109,7 +109,7 @@ export default {
       // provArray: ["A", "B", "C"]
     };
   },
-  mounted(){
+  onLoad(){
     this.setBarTitle();
     const id = this.$root.$mp.query.id
     if(id){
