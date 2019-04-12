@@ -134,5 +134,5 @@ export default {
 .noactive{
   background:#aaa!important;
 
-}
+} 
 </style>

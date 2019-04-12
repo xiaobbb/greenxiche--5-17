@@ -67,7 +67,7 @@ export default {
   },
 
   components: {},
-  mounted() {
+  onLoad() {
     wx.setNavigationBarTitle({
       title: "地址管理"
     });
