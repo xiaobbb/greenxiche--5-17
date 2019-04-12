@@ -16,11 +16,11 @@
       <div class="flex-container maskitem" @click="showPayType = false">
         <div class="fontclolr">付款方式</div>
         <div>
-          <text class="wx">{{payType?'余额':'微信'}}</text>
+          <text class="wx">{{payType*1?'余额':'微信'}}</text>
           <img src="/static/images/back.png" class="right">
         </div>
       </div>
-      <div class="flex-container maskitem" v-if="payType">
+      <div class="flex-container maskitem" v-if="payType*1">
         <div class="fontclolr">支付密码</div>
         <input type="password" class="payPassword" max="6" placeholder="请输入支付密码" v-model="payPassword">
       </div>
@@ -140,16 +140,16 @@ export default {
             }, 1500);
           },
           fail(err) {
-            wx.showToast({
-              title: "支付失败",
-              icon: "none"
-            });
+            // wx.showToast({
+            //   title: "支付失败",
+            //   icon: "none"
+            // });
 
-            setTimeout(() => {
-              wx.redirectTo({
-                url: "/pages/myorder/main"
-              });
-            }, 1500);
+            // setTimeout(() => {
+            //   wx.redirectTo({
+            //     url: "/pages/myorder/main"
+            //   });
+            // }, 1500);
           }
         });
       } else {
@@ -164,28 +164,31 @@ export default {
     async balance() {
       const paswd = this.payPassword.toString();
       if (paswd.length !== 6) {
+        this.payPassword=''
         wx.showToast({
           title: "请输入正确的6位支付密码！",
           icon:'none'
         });
         return false;
       }
+      try{
       let res = await post("Order/PaymentOrder", {
         UserId: wx.getStorageSync("userId"),
         Token: wx.getStorageSync("token"),
         Password: this.payPassword,
         OrderNo: this.orderNumber
       });
-      if (res.code == 0) {
         wx.showToast({
           title: "支付成功"
         });
-      }
       setTimeout(() => {
         wx.redirectTo({
           url: "/pages/myorder/main"
         });
       }, 1500);
+      }catch{
+        this.payPassword=''
+      }
     },
     changes(e) {
       this.payType = e.mp.detail.value;

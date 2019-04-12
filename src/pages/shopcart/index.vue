@@ -65,10 +65,6 @@ import specChild from "@/components/specChild";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad() {
-    this.setBarTitle();
-    this.getCarData();
-  },
   data() {
     return {
       userId: wx.getStorageSync("userId"),
@@ -136,6 +132,12 @@ export default {
       return total.toFixed(2)
     }
   },
+  onLoad() {
+    this.setBarTitle();
+    this.getCarData();
+    // 初始化全选
+    this.isSelectAll = false;
+  },
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
@@ -171,7 +173,6 @@ export default {
     selectProduct: function() {
       //遍历list，全部取反
       this.isSelectAll = !this.isSelectAll;
-      //console.log(this.isSelectAll)
       for (var i = 0, len = this.carData.length; i < len; i++) {
         this.carData[i].isSelect = this.isSelectAll;
         console.log(this.carData[i].isSelect);
@@ -290,7 +291,14 @@ export default {
       this.isShow = true;
     },
     submit(){
-      console.log('a')
+      const cartIds =[]
+      this.carData.map((data)=>{
+        if(data.isSelect){
+        cartIds.push(data.id)
+        }
+      })
+      console.log('a',cartIds)
+      this.$store.commit('update',{'cartIds':cartIds})
       wx.navigateTo({
         url:'/pages/confirm-cart-order/main'
       })
