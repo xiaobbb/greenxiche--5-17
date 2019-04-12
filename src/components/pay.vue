@@ -22,7 +22,13 @@
       </div>
       <div class="flex-container maskitem" v-if="payType*1">
         <div class="fontclolr">支付密码</div>
-        <input type="password" class="payPassword" max="6" placeholder="请输入支付密码" v-model="payPassword">
+        <input
+          type="password"
+          class="payPassword"
+          max="6"
+          placeholder="请输入支付密码"
+          v-model="payPassword"
+        >
       </div>
       <div class="paybtn btnbottom" @click="pay">确认付款</div>
     </div>
@@ -94,16 +100,16 @@ export default {
       payPassword: Number
     };
   },
-  watch:{
-      payPassword(){
-          if(this.payPassword.length>6){
-              this.payPassword = this.payPassword.substring(0,6)
-                wx.showToast({
-                title: "请输入正确的6位支付密码！",
-                icon:'none'
-                });
-          }
+  watch: {
+    payPassword() {
+      if (this.payPassword.length > 6) {
+        this.payPassword = this.payPassword.substring(0, 6);
+        wx.showToast({
+          title: "请输入正确的6位支付密码！",
+          icon: "none"
+        });
       }
+    }
   },
   methods: {
     pay() {
@@ -144,7 +150,6 @@ export default {
             //   title: "支付失败",
             //   icon: "none"
             // });
-
             // setTimeout(() => {
             //   wx.redirectTo({
             //     url: "/pages/myorder/main"
@@ -164,30 +169,30 @@ export default {
     async balance() {
       const paswd = this.payPassword.toString();
       if (paswd.length !== 6) {
-        this.payPassword=''
+        this.payPassword = "";
         wx.showToast({
           title: "请输入正确的6位支付密码！",
-          icon:'none'
+          icon: "none"
         });
         return false;
       }
-      try{
-      let res = await post("Order/PaymentOrder", {
-        UserId: wx.getStorageSync("userId"),
-        Token: wx.getStorageSync("token"),
-        Password: this.payPassword,
-        OrderNo: this.orderNumber
-      });
+      try {
+        let res = await post("Order/PaymentOrder", {
+          UserId: wx.getStorageSync("userId"),
+          Token: wx.getStorageSync("token"),
+          Password: this.payPassword,
+          OrderNo: this.orderNumber
+        });
         wx.showToast({
           title: "支付成功"
         });
-      setTimeout(() => {
-        wx.redirectTo({
-          url: "/pages/myorder/main"
-        });
-      }, 1500);
-      }catch{
-        this.payPassword=''
+        setTimeout(() => {
+          wx.redirectTo({
+            url: "/pages/myorder/main"
+          });
+        }, 1500);
+      } catch (err) {
+        this.payPassword = "";
       }
     },
     changes(e) {
