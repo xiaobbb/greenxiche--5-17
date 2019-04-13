@@ -52,15 +52,15 @@ export default function logins(check) {
                     duration: 2000,
                     complete: function () {
                       //登陆成功之后,延时2秒跳转到会员中心,或者返回上一层
-                      console.log(check,'check')
-                      if(check){
+                      // console.log(check,'check')
+                      // if(check){
                         setTimeout(function () {
                           // wx.switchTab({
                           //     url: "/pages/mine/main",
                           // })
                           wx.navigateBack()
                         }, 1500);
-                      }
+                      // }
                     }
                   });
                 } else if (res.data.meta.code === 2) {

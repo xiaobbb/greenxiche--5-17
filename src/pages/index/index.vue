@@ -126,6 +126,9 @@ export default {
     }
   
     
+    this.getCityName()
+    this.getCoupon()//是否新用户
+    this.isNewVip() //是否vip
   },
   watch:{
     '$store.state':{
@@ -160,6 +163,7 @@ export default {
       isXiche:false,  //我要洗车
       isGoshop:false,//到店洗车最近的一家商铺
       isnew:false,   //是否是新人
+      dddd:false
     }
   },
   computed:{
@@ -185,6 +189,7 @@ export default {
           this.$store.commit('update',{ latitude:data.latitude,
                         longitude:data.longitude
                         });
+                        console.log(data.latitude,data.longitude);
           this.getCityinfo()
         },
         fail:(info)=>{
@@ -246,7 +251,7 @@ export default {
             width:48,
             height:55
           };
-          arr.push(marker)
+          // arr.push(marker)
         }
         this.markers=arr
         console.log(this.markers,"markers数组")

@@ -55,17 +55,21 @@
                 <span v-if="item.isExpress">￥{{item.ExpressPrice}}</span>)
                 <span>合计￥{{item.TotalPrice}}</span>
               </div>
-
+              <!-- 待付款 -->
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
                 <text class="btn" @click="showReasonMak(index,item.OrderNumber)">取消订单</text>
-                <text class="btn active">付款</text>
+                <text class="btn active" @click="toPay(index,item.OrderNumber)">付款</text>
               </div>
               <!-- 待使用 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===1">
-                <text class="btn">退款</text>
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===19">
+                <text class="btn active">申请退款</text>
               </div>
-              <!-- 已经取消订单删除 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===14">
+              <!-- 已使用 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
+                <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
+              </div>
+              <!-- 已完成 、已经取消订单删除 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===13 || item.StatusId===14 || item.StatusId===4">
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
             </div>
@@ -104,14 +108,14 @@
             class="shopitem white"
             v-for="(item,index) in bookList"
             :key="index"
-            @click="toOrderDetail(2)"
+            
           >
             <div class="flex-container commonpad">
               <p class="number">订单编号：{{item.OrderNumber}}</p>
               <p class="tips">{{item.StatusName}}</p>
             </div>
             <!--切换上门服务-->
-            <div class="seritem">
+            <div class="seritem" @click="toOrderDetail(2)">
               <p>项目：{{item.ProductName}}</p>
               <p>地址：{{item.ServiceAddr}}</p>
               <p>
@@ -126,9 +130,18 @@
               <p>时间：2019-03-18 14:00-16:00</p>
               <p>手机号：13682293390</p>
             </div>
-            <div class="menubtn flex-container flexEnd">
-              <text class="btn">取消订单</text>
-              <text class="btn active">支付</text>
+            <!-- 未付款的 -->
+            <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
+              <text class="btn" @click="showReasonMak(index,item.OrderNumber)">取消订单</text>
+              <text class="btn active" @click="toPay(index,item.OrderNumber)">支付</text>
+            </div>
+            <!-- 已使用 -->
+            <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3 || item.StatusId===20">
+              <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
+            </div>
+            <!-- 已经取消订单、已完成订单删除 -->
+            <div class="menubtn flex-container flexEnd" v-if="item.StatusId===4 || item.StatusId===13 || item.StatusId===14">
+              <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
             </div>
             <!--切换到店服务-->
             <!-- <div class="seritem" v-if="active==2">
@@ -164,12 +177,17 @@
       @closeReason="closeReason"
       @selectReason="selectReason"
     ></reasonMask>
+    <!-- 支付 -->
+    <Pay :showPay="showPay" v-if="showPay" :orderNumber="orderNo" 
+      :total="totalPrice" :navigateUrl="'/pages/myorder/main'"
+    ></Pay>
   </div>
 </template>
 
 <script>
 import { post, get } from "../../utils";
 import reasonMask from "@/components/reasonMask";
+import Pay from '@/components/pay.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -180,11 +198,18 @@ export default {
     //
   },
   onShow() {
+    //支付的时候初始原来的值
+    this.orderNo = "";
+    this.cancleIndex="";
+    this.reasonShow= false;
+    this.showPay =false;  //支付弹窗
+    this.totalPrice ="";  //需要支付的价格
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
     this.orderList = [];
     this.bookList = [];
     this.reasonList = [];
+  
     if (this.$root.$mp.query.orderBigType) {
       //是商城订单还是预约订单;1:商城订单；2：预约订单
       this.orderBigType = this.$root.$mp.query.orderBigType;
@@ -231,8 +256,8 @@ export default {
         { id: 0, name: "全部" },
         { id: 1, name: "待付款" },
         { id: 2, name: "待使用" },
-        { id: 4, name: "待评价" },
-        { id: 5, name: "已完成" }
+        { id: 3, name: "待评价" },
+        { id: 4, name: "已完成" }
       ],
       visitlist: [{ id: 1, name: "上门服务" }, { id: 2, name: "到店服务" }],
       orderList: [],
@@ -241,12 +266,16 @@ export default {
       button: "确定",
       reasonList: [],
       orderNo: "",
-      reasonShow: false
+      cancleIndex:"",
+      reasonShow: false,
+      showPay:false,  //支付弹窗
+      totalPrice:""  //需要支付的价格
     };
   },
 
   components: {
-    reasonMask
+    reasonMask,
+    Pay
   },
   methods: {
     setBarTitle() {
@@ -289,7 +318,9 @@ export default {
       this.bookList = [];
       this.reasonList = [];
       this.orderNo = "";
+      this.cancleIndex = "";
       this.reasonShow = false;
+      this.totalPrice = "";
     },
     shiftStatus(status) {
       this.status = status;
@@ -354,6 +385,7 @@ export default {
     },
     showReasonMak(index, orderNo) {
       this.orderNo = orderNo;
+      this.cancleIndex = index;
       this.reasonShow = true;
       this.getCancelReason();
     },
@@ -386,8 +418,18 @@ export default {
           success: function() {
             setTimeout(() => {
               _this.reasonShow = false;
+              
+              //做改变订单状态
+              if(_this.orderBigType===1){  //商城订单
+                _this.$set(_this.orderList[_this.cancleIndex],"StatusId",14);
+                _this.$set(_this.orderList[_this.cancleIndex],"StatusName","交易关闭");
+              }
+              if(_this.orderBigType===2){  //预约订单
+                _this.$set(_this.bookList[_this.cancleIndex],"StatusId",14);
+                _this.$set(_this.bookList[_this.cancleIndex],"StatusName","交易关闭");
+              }
               _this.orderNo = "";
-              //还没有做改变订单状态
+              _this.cancleIndex = "";
             }, 1500);
           }
         });
@@ -419,11 +461,46 @@ export default {
           duration: 1500,
           success: function() {
             setTimeout(() => {
-              _this.orderList.splice(index, 1);
+              if(_this.orderBigType===1){
+                _this.orderList.splice(index, 1);
+              }
+              if(_this.orderBigType===2){
+                _this.bookList.splice(index, 1);
+              }
             }, 1500);
           }
         });
       }
+    },
+    gotoAddComent(index,orderNo){
+      if(this.orderBigType===1){  //商城订单
+        if(this.orderList[index].orderDetails.length>1){  //跳到评价列表页面
+           
+        }else{  //跳到评价页面
+           wx.navigateTo({
+             url:"/pages/addcomment/main?appraiseType=0&orderNo="+orderNo
+           })
+        }
+      }
+      if(this.orderBigType===2){  //预约订单
+        if(this.bookList[index].orderDetails.length>1){  //跳到评价列表页面
+           
+        }else{  //跳到评价页面
+           wx.navigateTo({
+             url:"/pages/addcomment/main?appraiseType="+this.serviceMode+"+&orderNo="+orderNo
+           })
+        }
+      }
+    },
+    toPay(index,orderNo){
+      if(this.orderBigType===1){
+        this.totalPrice =this.orderList[index].TotalPrice;
+      }
+      if(this.orderBigType===2){
+        this.totalPrice =this.bookList[index].TotalPrice;
+      }
+      this.orderNo = orderNo;
+      this.showPay = true;
     },
     loadMoreOrder(e) {
       console.log("ffffffffff");

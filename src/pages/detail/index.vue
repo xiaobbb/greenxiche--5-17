@@ -241,16 +241,6 @@
         <div class="cancleshare" @click="cancleShare">取消分享</div>
       </div>
     </div>
-    <!--全部评价-->
-    <div v-else>
-      <detailChild></detailChild>
-      <detailChildpic></detailChildpic>
-      <detailChild></detailChild>
-      <div>
-        <detailChild></detailChild>
-        <div class="callback">[商家回复]：感谢您的评价，我们的价格可以说是龙华最 低、性价比最高、服务最好的洗车店了</div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -263,8 +253,8 @@ import "../../css/global.css";
 export default {
   data() {
     return {
-      userId: wx.getStorageSync("userId"),
-      token: wx.getStorageSync("token"),
+      userId: '',
+      token: '',
       id: "",
       isshow: false,
       showDiscount: false,
@@ -291,7 +281,9 @@ export default {
     detailChild,
     detailChildpic
   },
-  onLoad() {
+  onShow() {
+      this.userId= wx.getStorageSync("userId")
+      this.token= wx.getStorageSync("token")
     this.id = this.$root.$mp.query.id;
     this.setBarTitle();
     this.getData();
@@ -309,7 +301,7 @@ export default {
 
         const datas = res.data;
         // 获取优惠券信息
-        that.getCoupon(datas.ShopId);
+        that.getCoupon();
         that.product = {
           img: datas.ProductImgList[0].PicUrl||'',
           imgs: [],
@@ -358,7 +350,9 @@ export default {
             content: comments.ContentText,
             time: comments.AddTime,
             rank: comments.Rank,
-            img: comments.EvaluateImgList
+            img: comments.EvaluateImgList.split(','),
+            // 回复
+            reply:datas.Reply
           });
         }
         // sku
@@ -381,10 +375,10 @@ export default {
           });
           that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
          }
-        
+        console.log('comment',this.product.comment)
     },
     // 获取优惠券列表
-    async getCoupon(shopId) {
+    async getCoupon() {
       if (wx.getStorageSync("token") && wx.getStorageSync("userId")) {
         const params = {
           UserId: wx.getStorageSync("userId"),
@@ -393,6 +387,7 @@ export default {
           page: 1
         };
         const res = await post("Coupon/CouponCenter", params);
+        this.coupon=[]
         for (let i = 0; i < res.data.length; i += 1) {
           const _res = res.data[i];
           this.coupon.push({
@@ -548,11 +543,17 @@ export default {
     },
     commentList() {
       wx.navigateTo({
-        url:'/pages/comment-list/main'
+        url:`/pages/comment-list/main?productId=${this.product.id}&shopId=${this.product.shopId}`
       })
     }
   },
 
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.getData();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
+  },
   created() {
     // let app = getApp()
   }
