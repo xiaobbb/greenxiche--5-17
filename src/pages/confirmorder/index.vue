@@ -294,10 +294,10 @@ export default {
       });
       console.log("前台计算订单价格", this.total);
       console.log("后台计算订单价格", order.data.TotalPrice);
-      // 1.5秒后弹出支付窗口
-      setTimeout(() => {
+      // 0.5秒后弹出支付窗口
+      // setTimeout(() => {
         this.showPay = true;
-      }, 500);
+      // }, 500);
     },
     // 跳转选择收货地址
     goSelectAddress() {

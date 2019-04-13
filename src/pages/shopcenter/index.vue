@@ -151,7 +151,7 @@ export default {
               sale: datas.SalesVolume,
               num: 0,
               tab:datas.KeywordName?JSON.parse(datas.KeywordName):[],
-              isAttr:datas.SpecificationValue
+              isAttr:datas.SpecificationValue&&datas.BrandId===21
             });
           }
         that.getCarData()
