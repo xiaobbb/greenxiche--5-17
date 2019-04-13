@@ -77,13 +77,12 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
-    
+    this.setBarTitle();
   },
   onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
    // this.initData();
-    this.setBarTitle();
     this.getMemberInfo();
     console.log("userId:"+this.userId);
     console.log("userId:"+this.token);
