@@ -215,6 +215,7 @@ export default {
       if (Object.keys(result.data).length > 0) {
         this.hasData = true;
         this.info = result.data;
+        // this.appraiseId = 
       }
     },
     async orderComment() {
