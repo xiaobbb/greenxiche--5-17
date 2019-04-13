@@ -47,6 +47,7 @@ export default {
   onShow(){
     // Enables:0:不可以使用；1：可使用；2：已使用；3：为已过期
     this.couptlist = [];
+    this.pramas=this.$root.$mp.query.url
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.setBarTitle();
@@ -54,6 +55,7 @@ export default {
   },
   data () {
     return {
+      pramas:"",
       active:"2",
       userId:"",
       token:"",
@@ -80,6 +82,9 @@ export default {
       wx.setNavigationBarTitle({
         title: "优惠券"
       });
+    },
+    choseCoupon(){
+
     },
     async getCouponList(){
       let result = await post("User/CouponList",{

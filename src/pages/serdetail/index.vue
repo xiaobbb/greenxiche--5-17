@@ -142,11 +142,12 @@ export default {
             //console.log(this.detailinfo)
         }
     },
-    toPay(e){
-      wx.navigateTo({ url: "/pages/visitconfirmorder/main?proid="+e });
+    toPay(e){//跳转到确认订单页面
+      this.$store.commit("setVisitConfirmOrder",{
+          ProductId:e
+      })
+      wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
     }
-    
-    
   },
 
   created () {

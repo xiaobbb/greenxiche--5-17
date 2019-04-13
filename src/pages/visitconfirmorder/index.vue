@@ -4,8 +4,8 @@
       <!---->
       <div class="flex-container clomn  ordershophead white">
           <div class="orderserve">服务商家</div>
-          <div class="flex-container ordermain">
-              <img :src="orderinfo[0].ShopData[0].Logo" class="ordershopimg">
+          <div class="flex-container ordermain" v-if="orderinfo.length>0">
+              <img :src="orderinfo[0].ShopData[0].Logo" class="ordershopimg" >
               <div class="flex-container clomn orderplace">
                   <p class="placename">{{orderinfo[0].ShopData[0].ShopNick}}</p>
                   <p>{{orderinfo[0].ShopData[0].Address}}</p>
@@ -27,44 +27,53 @@
           <div class="flex-container infoslide white pad" @click="choseItem(1)">
               <div>服务车辆</div>
               <div>
-                  <img src="/static/images/back.png" class="right">
+                  <span v-if="CarInfo">{{CarInfo}}</span>
+                  <img src="/static/images/back.png" class="right" v-else>
               </div>
           </div>
           <div class="flex-container infoslide white pad" @click="choseItem(3)">
               <div>优惠券</div>
               <div>
-                  <img src="/static/images/back.png" class="right">
+                  <span v-if="couponPrice*1">-{{couponPrice}}</span>
+                  <img src="/static/images/back.png" class="right" v-else>
               </div>
+              <!-- <div>
+                  <img src="/static/images/back.png" class="right">
+              </div> -->
           </div>
           <div class="flex-container infoslide white pad" @click="choseItem(5)">
               <div>服务卡券</div>
               <div>
-                  <img src="/static/images/back.png" class="right">
+                  <span v-if="CardTicketName">-{{CardTicketName}}</span>
+                  <img src="/static/images/back.png" class="right" v-else>
               </div>
           </div>
-          <div class="infoslide inputbor flex-container white pad" @click="choseItem(4)">
+          <div class="infoslide inputbor flex-container white pad">
               <div>买家留言</div>
-              <input type="text" placeholder="填写内容已和卖家协商确认" class="inputmes">
+              <input type="text" placeholder="填写内容已和卖家协商确认" class="inputmes" v-model="Remarks">
           </div>
-          <div class="infoslide slideprice white pad">合计：<span>￥{{orderinfo[0].Price}}</span></div>
+          <div class="infoslide slideprice white pad">合计：<span>￥{{totalPrice}}</span></div>
       </div>
       <!--底部按钮-->
       <div class="botbtn">
-          <div class="price white">合计: <span>￥{{orderinfo[0].Price}}</span></div>
+          <div class="price white">合计: <span>￥{{totalPrice}}</span></div>
           <div class="btnconfir" @click="goPay">提交订单</div>
       </div>
+      <!--遮罩层-->
+    <orderCount :showCoupon.sync="showCoupon" :couponId.sync = "CouponId" :couponList="couponList" :couponPrice.sync="couponPrice" ></orderCount>
+    <orderCard :showCoupon.sync="showCardTicket" :CardTicketId.sync="CardTicketId" :couponList="couponList" :CardTicketPrice.sync="CardTicketPrice"></orderCard>
     </div>
-    <div v-else>
+    <div v-else>  
         <div class="lasttime white">剩余支付时间  <span>{{minute}}</span> : <span>{{second}}</span></div>
         <div class="flex-container white commonpad">
             <p class="strong">应付金额</p>
             <!-- <p class="shouldpay">￥{{orderParmar.Total}}</p> -->
-            <p class="shouldpay">￥{{orderParmar}}</p>
+            <p class="shouldpay">￥{{totalPrice}}</p>
         </div>
         <div class="slide"></div>
         <div class="white">
             <!-- <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar.Wallet}}</span>元</div> -->
-            <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar}}</span>元</div>
+            <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{totalPrice}}</span>元</div>
           <radio-group class="radio-group" @change="radioChange">
             <label class="radio" v-for="item in payitems" :key="item.id">
               <div class="flex-container payitem commonpad">
@@ -85,46 +94,70 @@
 
 <script>
 import { get, myget, mypost, post, toLogin } from "../../utils";
+import orderCount from '@/components/orderCount.vue'
+import orderCard from '@/components/orderCard.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.proid=this.$root.$mp.query.proid;
+    //获取vuex商品信息
+    this.proid=this.$store.state.visitconfirmorder.ProductId
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
     this.Password=wx.getStorageSync('password');
+    const carInfo=wx.getStorageSync('CarInfo');
+    this.CarInfoId=carInfo.Id
+    this.CarInfo=carInfo.CarBrand+carInfo.CarType+carInfo.CarColor
     this.getOrderInfo()
-    console.log(this.proid,this.Token,this.UserId)
+    console.log(this.proid,this.Token,this.UserId,this.CarInfoId)
     this.changeTime()
+    if(this.CarInfoId){
+        this.getTotal()//获取订单总金额
+    }
+    
   },
   data () {
     return {
+      couponList:[],//子组件展示信息
+      CardTicketData:[],//卡券列表
+      CouponData:[],//优惠券列表
       isshow:true,
       proid:"", //产品id
       CarInfoId:"",//车辆id
-      CouponId:"",//优惠券id
-      CardTicketId:"",//服务卡券id
+      CarInfo:"",
+      CouponId:"0",//优惠券id
+      CardTicketId:"0",//服务卡券id
+      couponPrice:"0.00",
+      CardTicketPrice:"0.00",
       Token:"",
       UserId:"",
-      OrderNo:"",
+      OrderNo:"",//订单编号
       Password:"",
+      Remarks:"",
       orderinfo:[],
-      orderParmar:"",
+      orderParmar:"", ////////////
       minute:10,
       second:'00',
       timer:"",
       a:4,
       payitems:[
         {id:1,value:"微信支付",checked:'true'},{id:2,value:"余额支付"}
-      ]
+      ],
+      showCoupon:false,//组件
+      showCardTicket:false,
+      total:""//总价格
     }
   },
- 
+  computed:{ //计算之后的总价格
+    totalPrice(){
+      return this.total-this.couponPrice-(this.total*this.CardTicketPrice)
+    }    
+  },
   components: {
-    
+    orderCount,orderCard
   },
   methods: {
     setBarTitle() {
@@ -140,20 +173,24 @@ export default {
       })
       if(result.code==0){
         this.orderinfo=result.data
-        console.log(result.data)
-        this.CouponId=result.data.CouponData.CouponId
-        this.CardTicketId=result.data.CardTicketData.CardTicketId  //优惠券卡券只能选择一个
-        this.CarInfoId= result.data.CarInfoData.Id
+        this.CouponData=result.data[0].CouponData
+        this.CardTicketData=result.data[0].CardTicketData
+        console.log(result.data,"确认页面详情")
       }
     },
     choseItem(e){
       if(e==1){   //我的车辆
-           wx.navigateTo({ url: "/pages/mycar/main?url=visitconfirmorder/main"});
+           wx.navigateTo({ url: "/pages/mycar/main?url=visitconfirmorder"});
       }else if(e==3){ //优惠券
-           wx.navigateTo({ url: "/pages/coupons/main?url=visitconfirmorder/main"});
+          this.showCoupon=true
+          this.title="请选择优惠券"
+          this.couponList=this.CouponData
       }else{   //服务卡券
-           wx.navigateTo({ url: "/pages/certical/main?url=visitconfirmorder/main"});
+          this.showCardTicket=true
+          this.title="请选择服务卡券"
+          this.couponList=this.CardTicketData
       }
+      console.log(this.couponList)
     },
     radioChange(e){
       for(const x in this.payitems){
@@ -164,8 +201,27 @@ export default {
         }
       }
     },
+    //获取订单总金额
+    async getTotal(){
+        wx.setStorageSync('CarInfo',"");
+        var result=await post("/Order/ServiceProductsPlaceOrderVerifyAmount",{
+          UserId:this.UserId,
+          Token:this.Token,
+          ProductId:this.proid,
+          CarInfoId:this.CarInfoId,
+          CouponId:this.CouponId,
+          CardTicketId:this.CardTicketId,
+          Remarks:this.Remarks
+      })
+      console.log(result,"获取订单总金额")
+      if(result.code==0){
+        this.total=result.data.allPayMoney
+      }
+    },
     async goPay(){  //提交支付
-      //this.isshow=false
+      this.isshow=false
+      console.log(this.UserId,this.proid,this.CarInfoId,this.CouponId,this.CardTicketId,"提交信息")
+      
       var result=await post("/Order/ServiceProductsPlaceOrder",{
           UserId:this.UserId,
           Token:this.Token,
@@ -173,27 +229,80 @@ export default {
           CarInfoId:this.CarInfoId,
           CouponId:this.CouponId,
           CardTicketId:this.CardTicketId,
+          Remarks:this.Remarks
       })
       console.log(result,"发起支付请求")
       if(result.code==0){
           this.OrderNo=result.data
-          this.getOrderParam()
+          //this.getOrderParam()
       }
     },
-    async getOrderParam(){  //获取订单支付金额及支付剩余时间
-        if(this.OrderNo){
-            var result=await post("/Order/GetOrderParam",{
-              UserId:this.UserId,
-              Token:this.Token,
-              OrderNo:this.OrderNo
-            })
-            console.log(result,"获取订单金额 剩余支付时间")
-            if(result.code==0){
-              this.orderParmar=result.data
-              this.minute=result.data.ExpireTime
+    payMoney(){
+        //判断哪种支付方法
+        for(let i=0;i<this.payitems.length;i++){
+          if(this.payitems[i].checked){
+            console.log(i)
+            if(i==0){
+              this.wxPay()
+            }else{
+              this.otherPay()
+            }
           }
         }
     },
+    async wxPay(){
+      var res=await post("/Order/ConfirmWeiXinSmallPay",{
+           UserId:this.UserId,
+           Token:this.Token,
+          OrderNo:this.OrderNo
+        })
+        if(res.code==0){
+            let payData=JSON.parse(res.data.JsParam);
+            wx.requestPayment({
+            timeStamp: payData.timeStamp,
+            nonceStr: payData.nonceStr,
+            package: payData.package,
+            signType: payData.signType,
+            paySign: payData.paySign,
+            success(res) { 
+              wx.navigateTo({
+                url:"/pages/visitconfirmorder/main"
+              });
+            },
+            fail(res) {
+
+            }
+          })
+       }
+    },
+    async otherPay(){
+      console.log(this.password,"支付密码")
+      var res=await post("/Order/PaymentOrder",{
+           UserId:this.UserId,
+          Token:this.Token,
+          Password:this.password, //会员支付密码
+          OrderNo:this.OrderNo
+        })
+        console.log(res,"余额支付")
+        if(res.code==0){
+          //余额支付成功
+          
+        }
+    },
+    // async getOrderParam(){  //获取订单支付金额及支付剩余时间
+    //     if(this.OrderNo){
+    //         var result=await post("/Order/GetOrderParam",{
+    //           UserId:this.UserId,
+    //           Token:this.Token,
+    //           OrderNo:this.OrderNo
+    //         })
+    //         console.log(result,"获取订单金额 剩余支付时间")
+    //         if(result.code==0){
+    //           this.orderParmar=result.data
+    //           this.minute=result.data.ExpireTime
+    //       }
+    //     }
+    // },
     //定时器支付时间变化
     changeTime(){
       this.timer=setInterval(
@@ -212,40 +321,8 @@ export default {
         if(this.minute==="00"){
           clearInterval(this.timer)
         }
-      },1000)
+      },2000)
     },
-    async payMoney(){
-       for(const x in this.payitems){
-         if(this.payitems[x].checked){
-           if(x==0){
-             var result=await post("") //微信支付接口
-           }
-           if(x==1){
-             var result=await post("/Order/PaymentOrder",{
-                UserId:this.UserId,
-                Token:this.Token,
-                OrderNo:this.OrderNo,
-                Password:this.Password
-             })
-             console.log(result,"这是余额支付的结果")
-             if(result.code==0){
-               wx.wx.showToast({
-                 title: result.data,
-                 icon: 'none',
-                 duration: 1500,
-                 mask: false,
-                 success: (result)=>{
-
-                 },
-                 fail: ()=>{},
-                 complete: ()=>{}
-               });
-             }
-           }
-         }
-          
-      }
-    }
   },
 
   created () {

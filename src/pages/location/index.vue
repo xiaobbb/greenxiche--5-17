@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div  class="height:100%">
     <!--填写订单-->
     <div class="glo-relative bg-cart">
         <!-- <img src="/static/images/cartbg5.png" class="shopbg"> -->
-        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:560rpx;"></map>
+        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:480rpx;"></map>
         <cover-view>
             <cover-image src="/static/images/cart.png" class="cart-img"/>
         </cover-view>
@@ -74,6 +74,9 @@ export default {
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.setBarTitle();
+    this.cartip="请选择车辆"
+    this.timetip="请选择服务时间"
+    this.serTip="请选择服务项目"
     //转换时间
     this.changeTime();
     //服务项目
@@ -85,15 +88,16 @@ export default {
       //console.log(this.Remarks,"接收的备注")
     }
     //获取车辆信息
-    this.cartip="请选择车辆"
     this.getCar()
     //获取上门服务的地址
     this.address=this.$store.state.nowPlace
+    console.log(this.latitude)
   },
   onShow(){
      
     
   },
+
   watch:{  //图片
     '$store.state.pList':{
         handler:function(){
@@ -115,12 +119,10 @@ export default {
  
   data () {
     return {
-        latitude: wx.getStorageSync("latitude"),
-        longitude: wx.getStorageSync("longitude"),
         address:"",
-        serTip:"请选择服务项目",
-        timetip:"请选择服务时间",
-        cartip:"请选择车辆",
+        serTip:"",
+        timetip:"",
+        cartip:"",
         serePrice:"",
         userId:"",
         token:"",
@@ -146,7 +148,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["cityName","nowPlace"])
+    ...mapState(["cityName","nowPlace","longitude","latitude"])
   },
   components: {
     
@@ -184,21 +186,38 @@ export default {
           this.serePrice=Serpricebox.toFixed(2)
           this.serTip=SerTipbox.join(" ")
           this.ServiceItem=SerItembox.join(",")
-        }else{
-          this.serTip="请选择服务项目"
         }
     },
     changeTime(){ //转换时间格式
       const d=new Date()
       const year=d.getFullYear()
-      const tt=this.$root.$mp.query.tt
-      const mm=this.$root.$mp.query.mm
+      const _time= wx.getStorageSync("timearr")    //时间
+      const _date= wx.getStorageSync("datearr")   //日期
+      console.log(_time,_date,"页面接收")
+      if(_time&&_date){
+        let _mon=_date.split("月")[0]  //月份
+        let _dd=_date.split("月")[1].split("日")[0]  //日期
+        _mon.length<2 ? _mon="0"+_mon : _mon
+        _dd.length<2 ? _dd="0"+_dd : _dd
+        const tt=_mon+"-"+_dd
+        const time1=[]
+      for (let i of _time){
+        if(i.toString().length<2){
+            i="0"+i
+        }
+        time1.push(i)
+      }
+      
+       let mm=time1[0]+":"+time1[1]+"-"+time1[2]+":"+time1[3] //时间
       if(tt&&mm){
         this.timetip=tt+"  "+mm
         //开始时间结束时间
         this.AppointmentStartTime=year+"-"+tt +" "+ mm.split("-")[0]
         this.AppointmentEndTime=year+"-"+tt +" "+ mm.split("-")[1]
       }
+      console.log(this.timetip)
+      }
+      
     },
     chosePlace(){
         wx.navigateTo({ url: "/pages/locationorder/main" });
@@ -213,7 +232,7 @@ export default {
         wx.navigateTo({ url: "/pages/writeorder/main" }) //时间
     },
     choseCar(){
-        wx.navigateTo({ url: "/pages/mycar/main" }); //我的车辆
+        wx.navigateTo({ url: "/pages/mycar/main?url=location" }); //我的车辆
     },
     addpics() {
       wx.navigateTo({ url: "/pages/sceneplace/main" }); //添加图片
@@ -237,6 +256,8 @@ export default {
     async toPay(){
       wx.setStorageSync("serItem"," ");
       wx.setStorageSync("CarInfo"," ");
+      wx.setStorageSync("timearr"," ");
+       wx.setStorageSync("datearr"," ");
      const _picList=JSON.stringify(this.PicList)
     //console.log(this.AppointmentStartTime,"开始时间信息")
     //   console.log(this.AppointmentEndTime,"结束时间信息")

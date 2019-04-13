@@ -3,9 +3,9 @@
       <div>
         <!--顶部导航栏-->
         <div class="head white">
-          <div>
+          <div @click="goTo(1)">
             <span class="province">{{cityName}}</span>
-            <img src="/static/images/bottom.png" class="img-bottom" @click="goTo(1)">
+            <img src="/static/images/bottom.png" class="img-bottom">
           </div>
           <div v-for="item in titlelist" :key="item.name" :class="{active:active==item.name}" @click="change(item.name)">{{item.name}}</div>
           <div class="list-img"  @click="goTo(2)">
@@ -15,17 +15,13 @@
         </div>
         <div class="location glo-relative">
           <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
-          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="14" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
-          <!-- <img src="/static/images/location.png" class="location-logo"> -->
-          <!-- <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
-          <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
-          <img src="/static/images/cart.png" class="car-small" v-if="!isshow"> -->
+          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="8" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
         <div id="cont"></div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
         <!--领取会员弹框-->
-        <cover-view v-if="showmember" >
+        <cover-view v-if="showmember" class="my-dongdong">
             <cover-view class="mask">
                 <cover-image src="/static/images/modal.png" class="mask-img"/>
                 <cover-image src="/static/images/close3.png" class="close"  @click="closeModal"/>
@@ -138,26 +134,16 @@ export default {
   },
   data () {
     return {
-      // latitude:"",
-      // longitude:"",
+      //latitude:"",
+      //longitude:"",
       userId:"",
       token:"",
       markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       markers: [], //不显示
-      controls: [{  //控件不随着地图移动
-        id: 1,
-        iconPath: '/static/images/location.png',
-        position: {
-          left: 0,
-          top: 200,
-          width: 40,
-          height: 40
-        },
-        clickable: true
-      }],
+      controls: [],
       titlelist:[
-        {name:"全部"}, {name:"上门"}, {name:"到店"},
+       {name:"上门"}, {name:"到店"},
       ],
       active:'上门',
       isshow:true,
@@ -243,41 +229,42 @@ export default {
           let longitude =res.data[i].Lng;
           let marker= {
             iconPath: "/static/images/cart.png",
-            id:i || 0,
-            name:res.data[i].ShopNick || '',
+            id:i,
+            // name:res.data[i].ShopNick || '',
             latitude: latitude,
             longitude: longitude,
-            width:48,
-            height: 55
+            width:24,
+            height:27.5
           };
           arr.push(marker)
         }
         this.markers=arr
-        //console.log(this.markers,"markers数组")
+        console.log(this.markers,"markers数组")
       }
     },
-    
-    makertap(e){  //点击标记点
+    markertap(e){  //点击标记点
         console.log(e)
-        let { markerId } = e;
-        let { markers } = this.data;
-        let marker = markers[markerId];
-        this.showMarkerInfo(marker);//展示标记的信息
+        let markerId  = e.mp.markerId;
+        console.log(markerId)
+        // let { markers } = this.markers;
+        //let marker = markers[markerId];
+        // //this.showMarkerInfo(marker);//展示标记的信息
         this.changeMarkerColor(markerId); //更改样式
     },
     changeMarkerColor(markerId) { //更改用户选中的标记样式
-      let { markers } = this.data;
-      markers.forEach((item, index) => {
+      this.markers.forEach((item, index) => {
         item.iconPath = "/static/images/cart.png";
         if (index == markerId){
           item.iconPath = "/static/images/bigcar.png";
           item.width=80;
           item.height=95
-        } 
+        }else{
+          item.iconPath = "/static/images/cart.png";
+          item.width=24;
+          item.height=27.5
+        }
       })
-      //this.setData({ markers, markerId });
-      this.markers=markers
-      this.markerId=markerId
+      
     },
     async getCoupon(){ //判断是否是新人  三天内
       const res=await post("/Coupon/IsNewUser",{ 

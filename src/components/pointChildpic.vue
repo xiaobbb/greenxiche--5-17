@@ -19,12 +19,13 @@
             <div class="carname">{{iteminfo.ProductSpecText}}</div>
         </div>
         <div>{{iteminfo.ContentText}}</div>
-        <div class="flex-container picslist">
+        <!--评论图片列表-->
+        <!-- <div class="flex-container picslist">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
             <img src="/static/images/download9.png" class="pointpics">
-        </div>
+        </div> -->
         <div class="usertime">{{iteminfo.AddTime}}</div>
         <div class="callback" v-if="iteminfo.Reply.length>0">
             {{iteminfo.Reply}}

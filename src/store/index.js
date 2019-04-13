@@ -11,7 +11,10 @@ const store = new Vuex.Store({
     latitude:"",
     longitude:"",
     pList:[],//上门洗车添加图片
-    ///
+    visitconfirmorder:{  //到店确认订单
+      ProductId:''
+    },
+    //商城确认订单
     confirmOrder:{
       addressId:'',
       productId:'',
@@ -58,7 +61,11 @@ const store = new Vuex.Store({
         state[item] = config[item]
       })
     },
-    // 设置提交订单数据
+    // 设置提交订单到店数据
+    setVisitConfirmOrder(state,params){
+      state.visitconfirmorder = params;
+    },
+    // 设置提交订单商城数据
     setConfirmOrder(state,params){
       state.confirmOrder = params;
     },

@@ -92,8 +92,8 @@ export default {
       var res=await post("/Order/ConfirmWeiXinSmallPay",{
           UserId:this.userId,
           Token:this.token,
-          OrderNo:"201904111028561742883"
-          //OrderNo:this.orderNo
+          //OrderNo:"201904111028561742883"
+          OrderNo:this.orderNo
         })
         console.log(res,"微信支付")
         if(res.code==0){
@@ -120,9 +120,9 @@ export default {
       var res=await post("/Order/PaymentOrder",{
           UserId:this.userId,
           Token:this.token,
-          OrderNo:"201904111028561742883",
-          Password:this.password //会员支付密码
-          //OrderNo:this.orderNo
+          //OrderNo:"201904111028561742883",
+          Password:this.password, //会员支付密码
+          OrderNo:this.orderNo
         })
         console.log(res,"余额支付")
         if(res.code==0){
