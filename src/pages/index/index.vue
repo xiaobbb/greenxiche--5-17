@@ -15,7 +15,9 @@
         </div>
         <div class="location glo-relative">
           <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
-          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="14" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+          <!-- <div v-if="dddd"> -->
+            <map id="map" :longitude="114.06031" :latitude="22.72174"  scale="5" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+          <!-- </div> -->
           <!-- <img src="/static/images/location.png" class="location-logo"> -->
           <!-- <img src="/static/images/person.png" class="mine-pic" v-if="isXiche">
           <img src="/static/images/bigcar.png" class="mine-pic" v-if="isGoshop">
@@ -144,7 +146,26 @@ export default {
       token:"",
       markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
-      markers: [], //不显示
+      markers: [
+        {
+          height:55,
+          width:48,
+          iconPath:"http://www.sc-mall.net/static/f2.png",
+          id:0,
+          latitude:"21.642603",
+          longitude:"113.031730",
+          name:"家味康旗舰店"
+        },
+        {
+          height:55,
+          width:48,
+          iconPath:"http://www.sc-mall.net/static/f2.png",
+          id:1,
+          latitude:"22.650543",
+          longitude:"113.031730",
+          name:"家味康旗舰店"
+        }
+      ], //不显示
       controls: [{  //控件不随着地图移动
         id: 1,
         iconPath: '/static/images/location.png',
@@ -166,6 +187,7 @@ export default {
       isXiche:false,  //我要洗车
       isGoshop:false,//到店洗车最近的一家商铺
       isnew:false,   //是否是新人
+      dddd:false
     }
   },
   computed:{
@@ -191,6 +213,7 @@ export default {
           this.$store.commit('update',{ latitude:data.latitude,
                         longitude:data.longitude
                         });
+                        console.log(data.latitude,data.longitude);
           this.getCityinfo()
         },
         fail:(info)=>{
@@ -234,7 +257,8 @@ export default {
           Lat:this.latitude,
           Lng:this.longitude
       })
-      //console.log(res)
+      console.log("bbbbbbbbbbbbbb");
+      console.log(res)
       if(res.code==0){
         let arr=[]
         for (let i=0;i<res.data.length;i++){
@@ -250,9 +274,23 @@ export default {
             width:48,
             height: 55
           };
-          arr.push(marker)
+          // arr.push(marker)
         }
-        this.markers=arr
+        // this.markers=arr;
+        // let bb = {
+        //   height:55,
+        //   width:48,
+        //   iconPath:"/static/images/cart.png",
+        //   id:0,
+        //   latitude:"21.642603",
+        //   longitude:"113.031730",
+        //   name:"家味康旗舰店"
+        // }
+        // this.markers.push(bb);
+        this.dddd = true;
+
+        console.log("markers");
+        console.log(this.markers);
         //console.log(this.markers,"markers数组")
       }
     },
