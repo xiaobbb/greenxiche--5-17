@@ -112,10 +112,11 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
+  },
+  onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.getCityName()
-    
     this.getCoupon()//是否新用户
     this.isNewVip() //是否vip
   },

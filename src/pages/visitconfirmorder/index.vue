@@ -115,9 +115,8 @@ export default {
     console.log(this.proid,this.Token,this.UserId,this.CarInfoId)
     this.changeTime()
     if(this.CarInfoId){
-        this.getTotal()//获取订单总金额
+      this.getTotal()//获取订单总金额
     }
-    
   },
   data () {
     return {
