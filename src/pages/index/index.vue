@@ -14,17 +14,15 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
-            <map id="map"  :longitude="longitude" :latitude="latitude"  scale="8" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="13" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
-        <div id="cont"></div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
         <!--领取会员弹框-->
-        <cover-view v-if="showmember" class="my-dongdong">
-            <cover-view class="mask">
+        <cover-view v-if="showmember" class="mask">
+            <cover-view >
                 <cover-image src="/static/images/modal.png" class="mask-img"/>
-                <cover-image src="/static/images/close3.png" class="close"  @click="closeModal"/>
+                <cover-image src="/static/images/close3.png" class="close" style="border:1px solid blue"  @click="closeModal"/>
                 <cover-view class="text text1">
                   <cover-view>优惠洗车</cover-view>
                   <cover-view>到店洗车减免20%</cover-view>
@@ -73,31 +71,31 @@
           <cover-view class="wash" @click="washCar">我要洗车</cover-view>
         </cover-view>
         <!--到店-->
-        <div class="modal-goshop" v-if="isGoshop" @click="goTo(3)">
-          <div>
-            <img src="/static/images/shop-img.png" class="showimg">
-          </div>
-          <div class="shopinfoflex">
-            <p class="shopname">明新汽车服务</p>
-            <p class="addressflex">
-              <span>
-                <img src="/static/images/xing.png" class="xing">
-                <img src="/static/images/xing.png" class="xing">
-                <img src="/static/images/xing.png" class="xing">
-                <img src="/static/images/xing.png" class="xing">
-                <img src="/static/images/xing.png" class="xing">
-              </span>
-              <span class="start">5.0分</span>
-              <span class="time">9:00-18:00</span>
-            </p>
-            <p class="address">龙岗区坂田街道河背中心路...</p>
-          </div>
-          <div class="rights">
-            <img src="/static/images/rembg.png" class="big">
-            <img src="/static/images/wei.png" class="small">
-            <span>989m</span>
-          </div>
-        </div>
+        <cover-view class="modal-goshop" v-if="isGoshop" @click="goTo(3)">
+          <cover-view>
+            <img :src="shopInfo.Logo" class="showimg">
+          </cover-view>
+          <cover-view class="shopinfoflex">
+            <cover-view class="shopname">{{shopInfo.ShopNick}}</cover-view>
+            <cover-view class="addressflex">
+              <cover-view class="flex-container">
+                <cover-image src="/static/images/xing.png" class="xing"/>
+                <cover-image src="/static/images/xing.png" class="xing"/>
+                <cover-image src="/static/images/xing.png" class="xing"/>
+                <cover-image src="/static/images/xing.png" class="xing"/>
+                <cover-image src="/static/images/xing.png" class="xing"/>
+              </cover-view>
+              <cover-view class="start">5.0分</cover-view>
+              <cover-view class="time">{{shopInfo.BusinessHours}}</cover-view>
+            </cover-view>
+            <cover-view class="address">{{shopInfo.Address}}</cover-view>
+          </cover-view>
+          <cover-view class="rights">
+            <cover-image src="/static/images/rembg.png" class="big"/>
+            <cover-image src="/static/images/wei.png" class="small"/>
+            <cover-view class="span-info">{{shopInfo.Distance}}m</cover-view>
+          </cover-view>
+        </cover-view>
     </div>
     
   </div>
@@ -112,12 +110,25 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
+    
+   
+  },
+  onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
-    this.getCityName()
+    if(this.userId && this.token){
+      console.log("userId:"+this.userId+"token:"+this.token);
+        Promise.all([
+            this.getCityName(), this.isNewVip(),this.getCoupon()
+        ]).then(
+          this.isXiche=true
+         
+        )
+       
+    }else{
+      wx.navigateTo({ url :"/pages/login/main"})
+    }
     
-    this.getCoupon()//是否新用户
-    this.isNewVip() //是否vip
   },
   watch:{
     '$store.state':{
@@ -139,15 +150,16 @@ export default {
       markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       shopArr:[],//商铺信息集合
+      shopInfo:{}, //marker店铺信息
       markers: [], //不显示
       controls: [],
       titlelist:[
        {name:"上门"}, {name:"到店"},
       ],
       active:'上门',
-      isshow:true,
+      isshow:false,
       showShop:false, //提示不在服务范围
-      showmember:true,  //是否是vip
+      showmember:false,  //是否是vip
       isXiche:false,  //我要洗车
       isGoshop:false,//到店洗车最近的一家商铺
       isnew:false,   //是否是新人
@@ -221,8 +233,9 @@ export default {
       })
       console.log(res)
       if(res.code==0){
-        let arr=[]  //保存markers数组
         this.shopArr=res.data
+        this.getNearShop()
+        let arr=[]  //保存markers数组
         for (let i=0;i<res.data.length;i++){
           //console.log(res.data[i])
           let latitude =res.data[i].Lat; 
@@ -233,8 +246,8 @@ export default {
             // name:res.data[i].ShopNick || '',
             latitude: latitude,
             longitude: longitude,
-            width:24,
-            height:27.5
+            width:48,
+            height:55
           };
           arr.push(marker)
         }
@@ -242,23 +255,23 @@ export default {
         console.log(this.markers,"markers数组")
       }
     },
-    getNearShop(){
-
+    getNearShop(){  //获取markers标记时的商户信息
+        this.shopInfo=this.shopArr[this.markerId]
+        this.$set(this.shopInfo,'Distance',this.shopInfo.Distance.toFixed(2))
+        this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
+        console.log(this.shopInfo,"店铺详情")
     },
     markertap(e){  //点击标记点
         console.log(e)
-        let markerId  = e.mp.markerId;
-        console.log(markerId)
-        // let { markers } = this.markers;
-        //let marker = markers[markerId];
+        this.markerId  = e.mp.markerId;
         // //this.showMarkerInfo(marker);//展示标记的信息
-        this.changeMarkerColor(markerId); //更改样式
-        this.getNearShop(markerId) //获取最近的一家商铺信息
+        this.changeMarkerColor(); //更改样式
+        this.getNearShop()
     },
-    changeMarkerColor(markerId) { //更改用户选中的标记样式
+    changeMarkerColor() { //更改用户选中的标记样式
       this.markers.forEach((item, index) => {
         item.iconPath = "/static/images/cart.png";
-        if (index == markerId){
+        if (index == this.markerId){
           item.iconPath = "/static/images/bigcar.png";
           item.width=80;
           item.height=95
@@ -276,41 +289,17 @@ export default {
           Token:this.token
       })
       //console.log(res,"判断是否是新人")
-      if(res.data.IsNewUser==0){
-        //   wx.showToast({
-        //     title: '您已经不是新用户啦。。。',
-        //     icon: 'none',
-        //     duration: 2000,
-        //     complete: function (){
-              
-        //     }
-        // });
-        // 
-      }else{
-        //是新人 弹出领取新人礼券
-        this.isshow=true
-        this.isnew=true
-        if(res.data.IsNewCoupon==0){
-            wx.showToast({
-            title: '活动已经结束啦。。。',
-            icon: 'none',
-            duration: 2000,
-            complete: function (){
-            }
-          });
-        return false
-        }else{
-          this.getNewConpon()
-        }
+      if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
+         this.isshow=true
+         this.isnew=true
       }
-      
     },
     async getNewConpon(){  //领取新人礼券
         let res=await post("/Coupon/GetNewCoupon",{
             UserId: this.userId,
             Token:this.token
         })
-       // console.log(res,"领取新人礼券")
+        console.log(res,"领取新人礼券")
         if(res.code==0){
           wx.showToast({
             title: '领取成功',
@@ -327,7 +316,7 @@ export default {
             UserId: this.userId,
             Token:this.token
         })
-        //console.log(res,"领取vip  ")
+        console.log(res,"领取vip  ")
         if(res.code==0){
           if(res.data.IsVip==1){
             //不是vip弹出领取vip点击开通vip
@@ -358,7 +347,8 @@ export default {
         this.getShopinfo() //获取地图上的商铺标记信息
       }else if(name=="上门"){
         this.isXiche=true,
-        this.isGoshop=false
+        this.isGoshop=false,
+        this.markers=[]
       }
     },
     washCar(){

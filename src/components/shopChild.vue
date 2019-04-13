@@ -17,7 +17,7 @@
                 <text class="numb">({{detailinfo[0].TransactionNumber}}条订单)</text>
                 </div>
             </div>
-            <div class="flex-container range alig" style="width:40%;">
+            <div class="flex-container range" style="width:30%;" @click="makePhoneCall">
               <p class="location">
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/phone.png" class="small">
@@ -33,7 +33,7 @@
                   <p class="sercomplain">{{detailinfo[0].Address}}</p>
                 </div>
             </div>
-            <div class="flex-container range lineleft " style="width:40%;">
+            <div class="flex-container range" style="width:30%;">
               <p class="location">
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/to.png" class="small">
@@ -62,9 +62,12 @@ export default {
    onLoad(){
       console.log(this.detailinfo)
   },
+  onShow(){
+    this.phoneNum=this.detailinfo[0].Phone
+  },
   data () {
     return {
-     
+       phoneNum:"",
     }
   },
 
@@ -73,7 +76,11 @@ export default {
   },
 
   methods: {
-    
+    makePhoneCall(){
+      wx.makePhoneCall({
+        phoneNumber: this.phoneNum
+      })
+    }
     
   },
 
@@ -170,7 +177,6 @@ export default {
 .loactsty{
   align-items: flex-start;
   justify-content: flex-start;
-  width:70%;
 }
 .halfhr{
   width:670rpx;

@@ -25,7 +25,7 @@
                             </p>
                         </div>
                     </div>
-                    <div class="pay" @click="choseItem(2)">支付</div>
+                    <div class="pay" @click="choseItem(item.Id)">支付</div>
                 </div>
             </div>
         </div>
@@ -35,8 +35,8 @@
                 <img src="/static/images/meal.png" class="mealbg">
                 <div class="mealbg mealinfo">
                     <div class="flex-col">
-                        <div class="weight sizebig">极护 SN 5W-30 4L</div>
-                        <div class="explain">有效期720天，仅限本店使用本店拥有最终解释权</div>
+                        <div class="weight sizebig">{{item.Name}}</div>
+                        <div class="explain">{{item.Synopsis}}</div>
                     </div>
                     <div class="linehr"></div>
                     <div class="flex-container">
@@ -120,7 +120,7 @@ export default {
         Token:"",
         UserId:"",
         Page:"1",
-        PageSize:"15", //////////////////////////
+        PageSize:"5", //////////////////////////
         PageCount:"",
         allPage:"", //页数
         ProductId:"",
@@ -146,9 +146,31 @@ export default {
     pointChildpic
   },
   methods: {
-    showItem(){
+     async getShopDetail(){  //商户详情
+        var res=await post("Shop/GetMerchantDetail",{
+          ShopId:this.shopid,
+          Lat:this.lat,
+          Lng:this.lng
+        })
+        if(res.code==0){
+          this.$set(res.data[0],"Distance",parseFloat(res.data[0].Distance).toFixed(2));
+          //  res.data[0].Distance = parseFloat(res.data[0].Distance).toFixed(2);
+          this.detailinfo=res.data
+        }
+        //console.log(this.detailinfo,"商家详情")
+        
+    },
+    async getBarlist(){ //服务菜单
+      var res=await post("Server/GetServerType",{
+      })
+      if(res.code==0){
+        this.barlist=res.data
+        //console.log(this.barlist,"服务分类")
+      }
+    },
+    showItem(){   //服务列表
       wx.request({
-        url:"https://carapi.wtvxin.com/api/Server/ServiceProducts" ,//服务列表
+        url:"https://carapi.wtvxin.com/api/Server/ServiceProducts" ,
         method: "POST",
         data: {
            Page:this.Page,
@@ -187,7 +209,7 @@ export default {
             ShopId:this.shopid,
             CommentType:this.first
       })
-      console.log(res,"评价列表")
+      //console.log(res,"评价列表")
       if(res.code==0){
         this.PageCount=res.count
         if(parseInt(this.PageCount) % this.PageSize === 0){
@@ -203,29 +225,20 @@ export default {
         }
       }
     },
-    async getShopDetail(){
-        var res=await post("Shop/GetMerchantDetail",{
-          ShopId:this.shopid,
-          Lat:this.lat,
-          Lng:this.lng
-        })
-        if(res.code==0){
-          this.$set(res.data[0],"Distance",parseFloat(res.data[0].Distance).toFixed(2));
-          //  res.data[0].Distance = parseFloat(res.data[0].Distance).toFixed(2);
-          this.detailinfo=res.data
-        }
-        //console.log(this.detailinfo,"商家详情")
-        
+    async getServiceMeal(){ //获取商户套餐
+        var res=await post("/Server/ServiceMealProducts",{  //获取套餐
+            Page:this.Page,
+            PageSize:this.PageSize,
+            ShopId:this.shopid
+          })
+          if(res.code==0){
+            this.meallist=res.data
+            console.log(res.data,"套餐列表")
+          }
     },
-    async getBarlist(){
-        var res=await post("Server/GetServerType",{
-        })
-        if(res.code==0){
-          this.barlist=res.data
-          console.log(this.barlist,"服务分类")
-        }
-    },
-    async showItemServe(e){
+    
+   
+    async showItemServe(e){ //不同服务类型列表
         //console.log(e)
         this.servincelist=[]
         this.activecolor=e
@@ -251,14 +264,8 @@ export default {
           this.dishshow=true,
           this.sershow=false,
           this.pointshow=false
-          var res=await post("/Server/ServiceMealProducts",{  //获取套餐
-            Page:1,
-            ShopId:this.shopid
-          })
-          if(res.code==0){
-            this.meallist=res.data
-            //console.log(res.data,"套餐列表")
-          }
+
+          this.getServiceMeal()
       }else{
           this.pointshow=true,
           this.sershow=false,
@@ -279,9 +286,12 @@ export default {
         wx.navigateTo({ url: "/pages/serdetail/main?proid="+e});  //获取商户服务产品详情
     },
     choseItem(e){
-      if(e==2){
-         wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
-      }
+      console.log(e)
+       this.$store.commit("setVisitConfirmOrder",{
+          ProductId:e
+      })
+      wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
+      
     }
     
   },

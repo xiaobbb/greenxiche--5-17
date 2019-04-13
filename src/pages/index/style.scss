@@ -52,23 +52,24 @@
     top:150rpx;
     width:480rpx;
     height:628rpx;
+    border:1px solid red
 }
 .mask-img{
     width:480rpx;
     height:628rpx;
 }
-.vipbtn{
-    width:328rpx;
-    height:70rpx;
-    position:fixed;
-    top:830rpx;
-    left:210rpx;
-    z-index: 40;
-}
+// .vipbtn{
+//     width:328rpx;
+//     height:70rpx;
+//     position:fixed;
+//     top:830rpx;
+//     left:210rpx;
+//     z-index: 40;
+// }
 .close{
     width:44rpx;
     height:44rpx;
-    z-index: 40;
+    z-index:60;
     position: absolute;
     top:0rpx;
     right:0rpx;
@@ -139,14 +140,15 @@
     width:540rpx;
     height:664rpx;
 }
-.my-dongdong{
-    width:540rpx;
-    height:700rpx;
-    position:fixed;
-    z-index:20;
-    top:200rpx;
-    left:130rpx;
-}
+// .my-dongdong{
+//     width:540rpx;
+//     height:628rpx;
+//     position:fixed;
+//     z-index:20;
+//     top:200rpx;
+//     left:110rpx;
+//     border:1px solid red
+// }
 .newgroup{
     width:540rpx;
     height:664rpx;
@@ -189,6 +191,7 @@
     display:flex;
     padding:40rpx 20rpx;
     justify-content: space-between;
+    box-sizing: border-box
 }
 .showimg{
     width:120rpx;
@@ -210,11 +213,11 @@
     top:32rpx;
     left:48rpx;
 }
-.rights span{
+.rights .span-info{
     position:absolute;
     top:65rpx;
     left:38rpx;
-    font-size: 20rpx;
+    font-size: 18rpx;
     color:#fff;
 }
 .rights{

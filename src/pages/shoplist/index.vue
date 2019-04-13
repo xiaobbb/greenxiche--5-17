@@ -4,7 +4,7 @@
         <!--顶部输入框-->
         <div class="white" >
             <div class="topinput">
-                <input type="text" placeholder="搜索商户" v-model="seartext"  @input="searchShop">
+                <input type="text" placeholder="搜索商户" v-model="SearchKey"  @input="searchShop">
                 <img src="/static/images/search.png" class="searchpic absolu">
                 <img src="/static/images/cancle.png" class="canclepic absolu" @click="trimData">
             </div>
@@ -12,12 +12,29 @@
         <!--导航栏-->
         <div class="flex-container menu">
             <div class="menuitem">
+                <div @click="changeItem(1)">
+                      <text>全部服务</text>
+                      <img src="/static/images/top.png" class="bottom" v-if="aa==1">
+                      <img src="/static/images/bottom.png" class="bottom" v-else>
+                  </div>
+                  <div @click="changeItem(2)">
+                      <text>距离排序</text>
+                      <img src="/static/images/top.png" class="bottom" v-if="aa==2">
+                      <img src="/static/images/bottom.png" class="bottom" v-else>
+                  </div>
+                  <div @click="changeItem(3)">
+                      <text>全部区域</text>
+                      <img src="/static/images/top.png" class="bottom" v-if="aa==3">
+                      <img src="/static/images/bottom.png" class="bottom" v-else>
+                  </div>
+            </div>
+            <!-- <div class="menuitem">
                 <div @click="changeItem(item.id)" v-for="item in list" :key="item.name">
                       <text>{{item.name}}</text>
                       <img src="/static/images/top.png" class="bottom" v-if="aa==item.id">
                       <img src="/static/images/bottom.png" class="bottom" v-else>
                   </div>
-            </div>
+            </div> -->
             <!--排行榜-->
             <div @click="showBrand()"><img src="/static/images/gold.png" class="gold"></div>
         </div>
@@ -107,7 +124,6 @@ export default {
         SearchKey:"",//关键词
         Sort:"",//距离查询
         shoplist:[],
-        seartext:"",
         list:[
           {id:1,name:"全部服务"},{id:2,name:"距离排序"},{id:3,name:"全部区域"} //导航栏
         ],
@@ -150,22 +166,33 @@ export default {
         })
         console.log(result)
         if(result.code==0){
-          this.PageCount=result.count
-          if(parseInt(this.PageCount) % this.PageSize === 0){
-              this.allPage=this.PageCount / this.PageSize
+          if(result.data.length==0){
+              wx.showToast({
+                title: "没有满足条件的商品。。。",
+                icon: "none",
+                duration: 2000
+              });
+
           }else{
-            this.allPage=parseInt(this.PageCount / this.PageSize) +1
+              this.PageCount=result.count
+              if(parseInt(this.PageCount) % this.PageSize === 0){
+                  this.allPage=this.PageCount / this.PageSize
+              }else{
+                this.allPage=parseInt(this.PageCount / this.PageSize) +1
+              }
+            
+              if(this.allPage>this.Page){
+                  this.isLoad=true
+              }else{
+                this.isLoad=false
+              }
+              this.shoplist=this.shoplist.concat(result.data)
+              for(let i of result.data){
+                this.$set(i,"Distance",parseFloat(i.Distance).toFixed(2))
+              }
+              this.closeMask()
           }
-         
-          if(this.allPage>this.Page){
-              this.isLoad=true
-          }else{
-            this.isLoad=false
-          }
-          this.shoplist=this.shoplist.concat(result.data)
-          for(let i of result.data){
-            this.$set(i,"Distance",parseFloat(i.Distance).toFixed(2))
-          }
+          
         }
     },
     choseServe(e){   //选择服务列表
@@ -181,7 +208,7 @@ export default {
       }
       this.shoplist=[]
       this.getShopList()
-      this.closeMask()
+     // this.closeMask()
     },
     choseDistance(e){  //选择距离列表
       console.log(e)
@@ -189,7 +216,7 @@ export default {
       this.Sort=e
       this.shoplist=[]
       this.getShopList()
-      this.closeMask()
+      //this.closeMask()
      
     },
     chosePlace(e){   //选择区域列表
@@ -204,7 +231,7 @@ export default {
       }
       this.shoplist=[]
       this.getShopList()
-      this.closeMask()
+      //this.closeMask()
     },
     async getPlace(){ //获取所在地的区域信息
       var result=await post("/Server/GetArea",{
@@ -284,8 +311,8 @@ export default {
     },
     trimData(){
       //console.log(123)
-      this.seartext=this.seartext.slice(0,-1)
-      if(this.seartext=""){
+      this.SearchKey=this.SearchKey.slice(0,-1)
+      if(this.SearchKey==""){
           this.getShopList()
       }
     },
@@ -296,7 +323,7 @@ export default {
           this.showserve=false,
           this.showload=false,
           this.showplace=false
-         },2000)
+         },1000)
     },
     showShopDetail(e){ //商户详情
         //console.log(e)
@@ -317,27 +344,11 @@ export default {
             duration: 2000
           });
       }
+    },
+    searchShop(){
+      this.shoplist=[]
+      this.getShopList()
     }
-    // async searchShop(){
-    //   var reg= /^[\u4e00-\u9fa5]+$/
-    //   reg.test(this.seartext)
-    //   //console.log(reg.test(this.seartext))
-    //   if(reg.test(this.seartext)){
-    //       var result=await post("/Shop/SearchShopList",{
-    //           Page:1,
-    //           Lat:this.latitude,
-    //           Lng:this.longitude,
-    //           SearchKey:this.seartext
-    //       })
-    //       if(result.code==0){
-    //             this.shoplist=result.data
-    //             //console.log(result.data)
-    //             this.clearText()
-               
-    //       }
-    //   }
-      
-    // }
        
     
   },
