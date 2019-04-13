@@ -1,4 +1,4 @@
-import logins from './login'
+// import logins from './login'
 
 function formatNumber(n) {
     const str = n.toString()
@@ -53,7 +53,10 @@ function request(url, method, data, header = {}) {
                             title: '需要重新登录!',
                             icon: 'none'
                         })
-                        logins();
+                        // logins();
+                        setTimeout(()=>{
+                            wx.navigateTo({url:'/pages/login/main'})
+                        },1000)
                         reject(false)
                         break;
                     default:

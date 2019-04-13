@@ -102,6 +102,9 @@ export default {
     // }
   },
   onShow() {
+    this.cardlist=[]
+    this.combolist=[]
+    this.carData=[]
       this.userId=wx.getStorageSync('userId'),
       this.token=wx.getStorageSync('token'),
     this.setBarTitle();
@@ -118,6 +121,7 @@ export default {
     getClassify() {
       const that = this;
       post("Server/GetCarWash",{BrandList:0}).then(res => {
+        this.menulist=[]
         for (let i = 0; i < res.data.length; i += 1) {
           const datas = res.data[i];
           that.menulist.push({

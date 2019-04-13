@@ -5,7 +5,7 @@
       <text class="main">该小程序由网坛科技开发，请提供以下授权，即可继续操作</text>
       <text class="sub">· 获得你的公开信息（昵称、头像等）</text>
     </div>
-    <button class="login-btn" open-type="getUserInfo" lang="zh_CN" @getuserinfo="doBind">确认授权</button>
+    <button class="login-btn" open-type="getUserInfo" lang="zh_CN" @getuserinfo="doBind">授权登录</button>
   </div>
 </template>
 
