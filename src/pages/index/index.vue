@@ -151,6 +151,7 @@ export default {
       isXiche:false,  //我要洗车
       isGoshop:false,//到店洗车最近的一家商铺
       isnew:false,   //是否是新人
+      dddd:false
     }
   },
   computed:{
@@ -176,6 +177,7 @@ export default {
           this.$store.commit('update',{ latitude:data.latitude,
                         longitude:data.longitude
                         });
+                        console.log(data.latitude,data.longitude);
           this.getCityinfo()
         },
         fail:(info)=>{
@@ -236,7 +238,7 @@ export default {
             width:24,
             height:27.5
           };
-          arr.push(marker)
+          // arr.push(marker)
         }
         this.markers=arr
         console.log(this.markers,"markers数组")
