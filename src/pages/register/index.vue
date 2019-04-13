@@ -127,7 +127,7 @@ export default {
                   //绑定手机成功之后,延时2秒跳转到会员中心
                   setTimeout(function() {
                     // 登录
-                    logins()
+                    logins(true)
                     // wx.switchTab({
                     //   url: "/pages/mine/main"
                     // });

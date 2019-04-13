@@ -28,11 +28,10 @@ export default {
   onLoad(){
     this.setBarTitle();
     this.getAround()
+    console.log(this.latitude)
   },
   data () {
     return {
-      // latitude:wx.getStorageSync("latitude"),
-      // longitude:wx.getStorageSync("longitude"),
       locationlist:[ ],
       active:'0',
       markers:[],

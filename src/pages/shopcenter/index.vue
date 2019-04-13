@@ -80,8 +80,8 @@ export default {
       carData:[],
       carNum:0,
       carPrice:0,
-      userId: wx.getStorageSync('userId'),
-      token: wx.getStorageSync('token'),
+      userId: '',
+      token: ''
     };
   },
   watch: {
@@ -101,7 +101,9 @@ export default {
     //     deep: true
     // }
   },
-  onLoad() {
+  onShow() {
+      this.userId=wx.getStorageSync('userId'),
+      this.token=wx.getStorageSync('token'),
     this.setBarTitle();
     // 分类列表
     this.getClassify();

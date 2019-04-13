@@ -82,8 +82,8 @@
 
 <script>
 import {post} from "@/utils/index"
-import Coupon from '@/components/coupon.vue'
 import Pay from '@/components/pay.vue'
+import Coupon from '@/components/coupon.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {

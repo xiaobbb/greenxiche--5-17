@@ -23,7 +23,7 @@
         </div>
     </div>
     <!--商户列表-->
-    <div class="shoplist">
+    <scroll-view class="shoplist" scroll-y="true"   :scroll-into-view="scrollTopId" @scrolltolower="scrolltolower">
       <div class="shopitem flex-container white" @click="showShopDetail(index)" v-for="(item,index) in shoplist" :key="index">
           <img :src="item.Logo" class="mycar">
           <div class="shopinfo flex-container">
@@ -45,7 +45,7 @@
           </div>
       </div>
       
-    </div>
+    </scroll-view>
 
     <!--点击导航栏弹框-->
     <div class="bigmask" v-if="isServe"></div>
@@ -62,7 +62,7 @@
     </div>
     <div v-if="showplace" class="load">
         <!-- <div >全部区域</div> -->
-        <div class="ttborder">
+        <div>
             <span @click="chosePlace(199)" :class="{yellow:active}" class="ttborder">全部区域</span>
             <span class="dui ttborder" :class="{active1:active}">✔</span>
         </div>
@@ -79,6 +79,7 @@
 
 <script>
 import { get, myget, mypost, post, toLogin } from "../../utils";
+import Coupon from '@/components/coupon.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -125,14 +126,15 @@ export default {
         showserve:false,  //全部服务
         showload:false,   //距离
         showplace:false,  //区域
-        aa:""  //导航栏高亮显示
+        aa:"" , //导航栏高亮显示
+        
     }
   },
   computed:{
     
   },
   components: {
-    
+    Coupon
   },
   methods: {
     async getShopList(){  //获取商户列表
@@ -179,6 +181,7 @@ export default {
       }
       this.shoplist=[]
       this.getShopList()
+      this.closeMask()
     },
     choseDistance(e){  //选择距离列表
       console.log(e)
@@ -186,6 +189,7 @@ export default {
       this.Sort=e
       this.shoplist=[]
       this.getShopList()
+      this.closeMask()
      
     },
     chosePlace(e){   //选择区域列表
@@ -200,6 +204,7 @@ export default {
       }
       this.shoplist=[]
       this.getShopList()
+      this.closeMask()
     },
     async getPlace(){ //获取所在地的区域信息
       var result=await post("/Server/GetArea",{
@@ -301,6 +306,18 @@ export default {
     showBrand(){  //展示排行榜
       wx.navigateTo({ url: "/pages/shoprank/main" });
     },
+    scrolltolower(){
+      if(this.isLoad){
+        this.Page++;
+        this.getShopList();
+      }else{
+        wx.showToast({
+            title: "没有更多啦。。。",
+            icon: "none",
+            duration: 2000
+          });
+      }
+    }
     // async searchShop(){
     //   var reg= /^[\u4e00-\u9fa5]+$/
     //   reg.test(this.seartext)
@@ -328,19 +345,8 @@ export default {
   created () {
     // let app = getApp()
   },
-   onReachBottom(){
-     console.log("正在加载中国个古古怪怪")
-    if(this.isLoad){
-      this.Page++;
-      this.getShopList();
-    }else{
-      wx.showToast({
-          title: "没有更多啦。。。",
-          icon: "none",
-          duration: 2000
-        });
-    }
-  }
+   
+
 }
 </script>
 
@@ -349,7 +355,7 @@ export default {
   @import "../../css/common.css";
   .shoplist{
     height: calc(100vh - 200rpx);
-    overflow: hidden;
-    overflow-y:auto;
+    // overflow: hidden;
+    // overflow-y:auto;
   }
 </style>

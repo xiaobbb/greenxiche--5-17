@@ -20,17 +20,17 @@
             </div>
           </div>
           <div class="container">
-              
+              <scroll-view scroll-y="true" v-bind:style="{height: winHeight + 'px'}" :scroll-into-view="scrollTopId">
               <!--定位当前城市-->
-              <div class="item mylocal">定位当前城市</div>
+              <div class="item mylocal" id="currentcity">定位当前城市</div>
               <div class="itemlocat mylocal">
-                  <div class="name">{{cityname}}</div>
+                  <div class="name">{{cityName}}</div>
                   <!-- <div class="chose" @click="choseCIty">
                     <img src="/static/images/can.png" class="can">
                     <text>重新定位</text>
                   </div> -->
               </div>
-              <scroll-view scroll-y="true" v-bind:style="{height: winHeight + 'px'}" :scroll-into-view="scrollTopId">
+              
                 <div class="item">热门城市</div>
                 <div class="flex-container cityhot">
                     <div class="name" v-for="item in hotCity" :key="item.id" :data-city="item.name" @click="bindCity">{{item.name}}</div>
@@ -52,6 +52,7 @@
 <script>
 import "../../css/common.css";
 import "../../css/global.css";
+import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
@@ -63,7 +64,6 @@ export default {
         inputName:"",
         winHeight:"",
         searchLetter:['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z'],
-        cityname:"深圳",
         citylist:[],
         hotCity:[
           {id:1,name:"深圳"},{id:2,name:"上海"},{id:3,name:"杭州"},{id:4,name:"广州"},{id:5,name:"南京"},{id:6,name:"武汉"},{id:7,name:"成都"},{id:8,name:"北京"},
@@ -77,30 +77,34 @@ export default {
   components: {
     
   },
- 
+  computed:{
+    ...mapState(["cityName","nowPlace","longitude","latitude"])
+  },
   methods: {
+    ...mapMutations(["update"]),
      bindBlur(e) {
       this.inputName = '';
       
     },
-    bindKeyInput(e){
+    bindKeyInput(e){  //输入搜索
       console.log(e)
        this.inputName = e.mp.detail.value;
        // 空搜索框时 取消匹配显示
         if (this.inputName.length < 1) {
           this.cityList()
-        }
-        this.scrollTopId = 'citylist';
+        }    
         
     },
     clickLetter(e){
-        console.log(e)
+        //console.log(e)
         const showLetter=e.currentTarget.dataset.letter
         this.scrollTopId = showLetter;
     },
-    bindCity(e){
-      console.log(e)
-      this.cityname=e.currentTarget.dataset.city
+    bindCity(e){ //点击城市
+      //console.log(e)
+      this.update({ cityName: e.currentTarget.dataset.city });
+      this.scrollTopId=""  //清空
+      this.scrollTopId= 'currentcity'
     },
     setBarTitle() {
       wx.setNavigationBarTitle({
@@ -123,24 +127,12 @@ export default {
         }
      );
         //this.citylist=JSON.stringify(this.citylist)  不用转码
-        console.log(this.citylist);
+        //console.log(this.citylist);
     //   //return tempArr;
     
     
     },
-    choseCIty(){
-        wx.getLocation({
-        type: 'wgs84',
-        success:(res) =>{
-          console.log(res)
-          const latitude = res.latitude
-          const longitude = res.longitude
-          const speed = res.speed
-          const accuracy = res.accuracy
-        }
-      })
-    }
-   
+    
    
   },
 

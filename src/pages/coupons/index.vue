@@ -72,28 +72,29 @@ export default {
   onShow() {
     // Enables:0:不可以使用；1：可使用；2：已使用；3：为已过期
     this.couptlist = [];
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
+    this.pramas=this.$root.$mp.query.url
+    this.userId = wx.getStorageSync('userId');
+    this.token = wx.getStorageSync('token');
+
     this.setBarTitle();
     this.getCouponList();
   },
   data() {
     return {
-      active: "2",
-      userId: "",
-      token: "",
-      status: 2, //1--已过期,2--未使用,3--已使用
-      page: 1,
-      pageSize: 12,
-      couponType: 0,
-      count: 0,
-      allPage: 0,
-      isLoad: false,
-      isOved: false,
-      titlelist: [
-        { id: 2, name: "未使用" },
-        { id: 3, name: "已使用" },
-        { id: 1, name: "已过期" }
+      pramas:"",
+      active:"2",
+      userId:"",
+      token:"",
+      status:2,  //1--已过期,2--未使用,3--已使用
+      page:1,
+      pageSize:12,
+      couponType:0,
+      count:0,
+      allPage:0,
+      isLoad:false,
+      isOved:false,
+      titlelist:[
+        {id:2,name:"未使用"},{id:3,name:"已使用"},{id:1,name:"已过期"}
       ],
       couptlist: []
     };

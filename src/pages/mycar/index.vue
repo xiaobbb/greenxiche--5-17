@@ -58,6 +58,8 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
+    this.params=this.$root.$mp.query.url
+    console.log(this.params)
     this.setBarTitle();
   },
   onShow(){
@@ -71,7 +73,8 @@ export default {
         isDefault:false,
         userId: "",
         token: "",
-        carinfolist:[]
+        carinfolist:[],
+        params:""
     }
   },
   watch:{
@@ -148,7 +151,7 @@ export default {
       console.log(this.carinfolist[e])
       let CarInfo=this.carinfolist[e]
       wx.setStorageSync("CarInfo",CarInfo)
-      wx.navigateTo({ url: "/pages/location/main"});
+      wx.navigateTo({ url: "/pages/"+this.params+"/main"});
     }
   },
 

@@ -111,7 +111,7 @@ export default {
         lat:"",
         lng:"",
         detailinfo:[],
-        typeid:"",
+        typeid:"33",
         active:"服务",
         activecolor:"0",
         servincelist:"",
@@ -120,11 +120,12 @@ export default {
         Token:"",
         UserId:"",
         Page:"1",
-        PageSize:"1",
+        PageSize:"15", //////////////////////////
         PageCount:"",
         allPage:"", //页数
         ProductId:"",
         isLoad:false,
+        isLoadCom:false,
         barlist:[], //洗车分类
         menulist:[
           {id:1,name:'服务'},{id:2,name:'套餐'},{id:3,name:'评价'}
@@ -153,6 +154,7 @@ export default {
            Page:this.Page,
            PageSize:this.PageSize,
            TypeId:this.typeid,
+           //TypeId:33,
            ShopId:this.shopid,
         },
         header: {
@@ -195,9 +197,9 @@ export default {
         }
         this.commonlist=this.commonlist.concat(res.data)
         if(this.allPage>this.Page){
-            this.isLoad=true
+            this.isLoadCom=true
         }else{
-          this.isLoad=false
+          this.isLoadCom=false
         }
       }
     },
@@ -220,13 +222,15 @@ export default {
         })
         if(res.code==0){
           this.barlist=res.data
-          //console.log(this.barlist,"服务分类")
+          console.log(this.barlist,"服务分类")
         }
     },
     async showItemServe(e){
-      //console.log(e)
+        //console.log(e)
+        this.servincelist=[]
         this.activecolor=e
         this.typeid=this.barlist[e].Id
+        console.log(this.typeid)
         this.showItem()
     },
     setBarTitle() {
@@ -255,7 +259,6 @@ export default {
             this.meallist=res.data
             //console.log(res.data,"套餐列表")
           }
-
       }else{
           this.pointshow=true,
           this.sershow=false,
@@ -290,7 +293,9 @@ export default {
     if(this.isLoad){
       this.Page++;
       this.showItem();
-      this.showComment()
+    }else if(this.isLoadCom){
+        this.Page++;
+        this.showComment()
     }else{
       wx.showToast({
           title: "没有更多啦。。。",
