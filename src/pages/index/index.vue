@@ -3,19 +3,19 @@
       <div>
         <!--顶部导航栏-->
         <div class="head white">
-          <div @click="goTo(1)">
-            <span class="province">{{cityName}}</span>
-            <img src="/static/images/bottom.png" class="img-bottom">
-          </div>
-          <div v-for="item in titlelist" :key="item.name" :class="{active:active==item.name}" @click="change(item.name)">{{item.name}}</div>
-          <div class="list-img"  @click="goTo(2)">
-            <img src="/static/images/right.png" class="container-img">
-            <img src="/static/images/list.png" class="list">
-          </div>
+            <div @click="goTo(1)">
+              <span class="province">{{cityName}}</span>
+              <img src="/static/images/bottom.png" class="img-bottom">
+            </div>
+            <div v-for="item in titlelist" :key="item.name" :class="{active:active==item.name}" @click="change(item.name)">{{item.name}}</div>
+            <div class="list-img"  @click="goTo(2)">
+              <img src="/static/images/right.png" class="container-img">
+              <img src="/static/images/list.png" class="list">
+            </div>
         </div>
         <div class="location glo-relative">
-          <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
-          <map id="map"  :longitude="longitude" :latitude="latitude"  scale="8" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+            <!-- <img src="/static/images/tupian.png" class="dingwei"> -->
+            <map id="map"  :longitude="longitude" :latitude="latitude"  scale="8" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
         <div id="cont"></div>
         <!--弹框遮罩-->
@@ -115,7 +115,7 @@ export default {
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.getCityName()
-    this.getShopinfo()
+    
     this.getCoupon()//是否新用户
     this.isNewVip() //是否vip
   },
@@ -134,12 +134,11 @@ export default {
   },
   data () {
     return {
-      //latitude:"",
-      //longitude:"",
       userId:"",
       token:"",
       markerId: 0,
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
+      shopArr:[],//商铺信息集合
       markers: [], //不显示
       controls: [],
       titlelist:[
@@ -220,9 +219,10 @@ export default {
           Lat:this.latitude,
           Lng:this.longitude
       })
-      //console.log(res)
+      console.log(res)
       if(res.code==0){
-        let arr=[]
+        let arr=[]  //保存markers数组
+        this.shopArr=res.data
         for (let i=0;i<res.data.length;i++){
           //console.log(res.data[i])
           let latitude =res.data[i].Lat; 
@@ -242,6 +242,9 @@ export default {
         console.log(this.markers,"markers数组")
       }
     },
+    getNearShop(){
+
+    },
     markertap(e){  //点击标记点
         console.log(e)
         let markerId  = e.mp.markerId;
@@ -250,6 +253,7 @@ export default {
         //let marker = markers[markerId];
         // //this.showMarkerInfo(marker);//展示标记的信息
         this.changeMarkerColor(markerId); //更改样式
+        this.getNearShop(markerId) //获取最近的一家商铺信息
     },
     changeMarkerColor(markerId) { //更改用户选中的标记样式
       this.markers.forEach((item, index) => {
@@ -351,7 +355,7 @@ export default {
         this.isXiche=false,
         this.isGoshop=true,
         //获取最近的商家显示
-        this.getNearShopInfo()
+        this.getShopinfo() //获取地图上的商铺标记信息
       }else if(name=="上门"){
         this.isXiche=true,
         this.isGoshop=false
@@ -359,9 +363,6 @@ export default {
     },
     washCar(){
        wx.navigateTo({ url: "/pages/location/main" });
-    },
-    getNearShopInfo(){
-
     },
     goTo(e){
         var id=e
@@ -391,5 +392,9 @@ export default {
   .cover-text{
     position:absolute;
     color:#fff
+}
+.centermark{
+  width:80rpx;
+  height:92rpx;
 }
 </style>

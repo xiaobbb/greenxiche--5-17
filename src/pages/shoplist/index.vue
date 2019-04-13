@@ -345,23 +345,8 @@ export default {
   created () {
     // let app = getApp()
   },
-   onReachBottom(){
-<<<<<<< HEAD
-   }
-=======
-     console.log("正在加载中国个古古怪怪")
-    if(this.isLoad){
-      this.Page++;
-      this.getShopList();
-    }else{
-      wx.showToast({
-          title: "没有更多啦。。。",
-          icon: "none",
-          duration: 2000
-        });
-    }
-  }
->>>>>>> 9ab0905db14598973ce1bc5c4ebbc37158a595af
+   
+
 }
 </script>
 
