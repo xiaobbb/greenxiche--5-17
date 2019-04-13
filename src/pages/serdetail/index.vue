@@ -48,20 +48,18 @@
       </div>
       <div class="slide"></div>
       <!--评分-->
-      <div class="point" v-if="detailinfo.CommentData.length>0">
+      <div class="point">
         <div class="flex-container">
             <p class="left">
               <text>评分</text><text>4.0</text>
             </p>
-            <p>
-              <text>{{detailinfo.CommentData.length || 0 }}条评论</text>
+            <p @click="showAllComment">
+              <text>{{commentlist.length  || 0 }}条评论</text>
               <img src="/static/images/back.png" class="arrowback">
             </p>
         </div>
         <div class="pointsheet">
-              <div v-for="(item,lindex) in detailinfo.CommentData" :key="lindex">
-                  <pointChildpic :iteminfo="item"></pointChildpic>
-              </div>
+            <pointChildpic :commentlist="commentlist" v-if="commentlist.length>0" :showPic="false"></pointChildpic>
         </div>
       </div>
       <div class="slide"></div>
@@ -114,7 +112,8 @@ export default {
        lng:"",
        Token:"",
        UserId:"",
-       detailinfo:[]
+       detailinfo:[],
+       commentlist:[]
     }
   },
  
@@ -135,13 +134,19 @@ export default {
             Lat:this.lat,
             Lng:this.lng
         })
-        console.log(result)
+        //console.log(result)
         if(result.code==0){
-            this.detailinfo=result.data[0]
+            this.detailinfo=result.data[0];
+            this.commentlist=result.data[0].CommentData;
+           
             this.$set(result.data[0].ShopData[0],"Distance",parseFloat(result.data[0].ShopData[0].Distance).toFixed(2))
-            //console.log(this.detailinfo)
+            console.log(this.detailinfo,"服务详情");
+             console.log("数据长度："+this.commentlist.length);
         }
     },
+    showAllComment(){
+        wx.navigateTo({ url: "/pages/shopcommentlist/main?proid="+this.proid });
+    },//获取所有评价
     toPay(e){//跳转到确认订单页面
       this.$store.commit("setVisitConfirmOrder",{
           ProductId:e

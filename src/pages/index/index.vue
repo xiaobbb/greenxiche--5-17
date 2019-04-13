@@ -120,14 +120,11 @@ export default {
       console.log("userId:"+this.userId+"token:"+this.token);
         Promise.all([
             this.getCityName(), this.isNewVip(),this.getCoupon()
-        ]).then(
-          this.isXiche=true
-         
-        )
-       
+        ])
     }else{
       wx.navigateTo({ url :"/pages/login/main"})
     }
+  
     
   },
   watch:{
@@ -288,10 +285,11 @@ export default {
           UserId: this.userId,
           Token:this.token
       })
-      //console.log(res,"判断是否是新人")
+      console.log(res,"判断是否是新人")
       if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
          this.isshow=true
          this.isnew=true
+         this.showmember=false
       }
     },
     async getNewConpon(){  //领取新人礼券
@@ -318,10 +316,11 @@ export default {
         })
         console.log(res,"领取vip  ")
         if(res.code==0){
-          if(res.data.IsVip==1){
+          if(res.data.IsVip==0){
             //不是vip弹出领取vip点击开通vip
             this.isshow=true
             this.showmember=true
+            this.isnew=false
           }
         }
     },

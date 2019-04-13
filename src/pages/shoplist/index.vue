@@ -13,17 +13,17 @@
         <div class="flex-container menu">
             <div class="menuitem">
                 <div @click="changeItem(1)">
-                      <text>全部服务</text>
+                      <text>{{no1}}</text>
                       <img src="/static/images/top.png" class="bottom" v-if="aa==1">
                       <img src="/static/images/bottom.png" class="bottom" v-else>
                   </div>
                   <div @click="changeItem(2)">
-                      <text>距离排序</text>
+                      <text>{{no2}}</text>
                       <img src="/static/images/top.png" class="bottom" v-if="aa==2">
                       <img src="/static/images/bottom.png" class="bottom" v-else>
                   </div>
                   <div @click="changeItem(3)">
-                      <text>全部区域</text>
+                      <text>{{no3}}</text>
                       <img src="/static/images/top.png" class="bottom" v-if="aa==3">
                       <img src="/static/images/bottom.png" class="bottom" v-else>
                   </div>
@@ -111,6 +111,9 @@ export default {
   },
   data () {
     return {
+        no1:"全部服务",
+        no2:"距离排序",
+        no3:"全部区域",
         latitude:"",
         longitude:"",
         cityName:"",
@@ -124,11 +127,7 @@ export default {
         SearchKey:"",//关键词
         Sort:"",//距离查询
         shoplist:[],
-        list:[
-          {id:1,name:"全部服务"},{id:2,name:"距离排序"},{id:3,name:"全部区域"} //导航栏
-        ],
         serlist:[ ],
-       
         distancelist:[
             {id:1,name:"距离排序"},{id:2,name:"订单排序"}
         ],
@@ -203,8 +202,10 @@ export default {
         this.ServiceType=""
         this.defaultactive="全部服务"
         this.seractive=e
+        this.no1=this.defaultactive
       }else{
         this.ServiceType=this.serlist[e].Id
+        this.no1=this.serlist[e].TypeName
       }
       this.shoplist=[]
       this.getShopList()
@@ -214,6 +215,7 @@ export default {
       console.log(e)
       this.disactive=e
       this.Sort=e
+      this.no2=this.distancelist[e].name
       this.shoplist=[]
       this.getShopList()
       //this.closeMask()
@@ -226,8 +228,10 @@ export default {
       if(e==199){
         this.RegionId=""
         this.active="全部区域"
+        this.no3=this.active
       }else{
         this.RegionId=this.placelist[e].Id
+        this.no3=this.placelist[e].Name
       }
       this.shoplist=[]
       this.getShopList()
@@ -251,7 +255,7 @@ export default {
         var result=await post("/Server/GetServerType")
         if(result.code==0){
             this.serlist=result.data
-            //console.log(this.serlist)
+            console.log(this.serlist)
         }
     },
     changeItem(e){   //弹框展示
@@ -288,27 +292,27 @@ export default {
       
     },
  
-    async choseItem(e){  //选择服务类型展示列表
-      console.log(e)
-      this.seractive=e
-      this.disactive=e
-      this.active=e
-      //console.log(e)
-      if(e==99){
-          //console.log(666)
-          this.defaultactive=true
-          this.getShopList()
-          this.isServe=false
-      }else if(e==199){
-           this.defaultplace=true
-           this.getShopList()
-           this.isServe=false
-      }   
-      else{
-         this.defaultactive=false
-      }
+    // async choseItem(e){  //选择服务类型展示列表
+    //   console.log(e)
+    //   this.seractive=e
+    //   this.disactive=e
+    //   this.active=e
+    //   //console.log(e)
+    //   if(e==99){
+    //       //console.log(666)
+    //       this.defaultactive=true
+    //       this.getShopList()
+    //       this.isServe=false
+    //   }else if(e==199){
+    //        this.defaultplace=true
+    //        this.getShopList()
+    //        this.isServe=false
+    //   }   
+    //   else{
+    //      this.defaultactive=false
+    //   }
       
-    },
+    // },
     trimData(){
       //console.log(123)
       this.SearchKey=this.SearchKey.slice(0,-1)

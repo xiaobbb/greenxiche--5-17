@@ -36,7 +36,7 @@
         <p class="hr"></p>
         <div class="item"  @click="choseMoney">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">价格 : {{serePrice || 0 }}</span>
+            <span class="location-self">价格 : {{total || 0 }}</span>
             <p class="taginfo">
               <img src="/static/images/tag.png" class="tag">
               <span class="goods">充值有优惠</span>
@@ -60,83 +60,88 @@
         </div>
         <div class="chase" @click="toPay">立即下单</div>
     </div>
-
+     <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
+    :total="total" :successUrl="'/pages/myorder/main'" :closeUrl="'/pages/myorder/main'"
+    ></Pay>
   </div>
 </template>
 
 <script>
+import Pay from "@/components/pay.vue";
 import "../../css/common.css";
 import "../../css/global.css";
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
-   onLoad(){
-    this.userId = wx.getStorageSync('userId');
-    this.token = wx.getStorageSync('token');
+  onShow() {
+    this.showPay = false;
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
     this.setBarTitle();
-    this.cartip="请选择车辆"
-    this.timetip="请选择服务时间"
-    this.serTip="请选择服务项目"
+    this.cartip = "请选择车辆";
+    this.timetip = "请选择服务时间";
+    this.serTip = "请选择服务项目";
     //转换时间
     this.changeTime();
     //服务项目
-    this.getSerItem()
+    this.getSerItem();
     //备注
-    const textinfo=this.$root.$mp.query.textinfo
-    if(textinfo){
-      this.Remarks=textinfo
+    const textinfo = this.$root.$mp.query.textinfo;
+    if (textinfo) {
+      this.Remarks = textinfo;
       //console.log(this.Remarks,"接收的备注")
     }
     //获取车辆信息
-    this.getCar()
+    this.getCar();
     //获取上门服务的地址
-    this.address=this.$store.state.nowPlace
-    console.log(this.latitude)
-  },
-  onShow(){
-     
-    
+    this.address = this.$store.state.nowPlace;
+    //console.log(this.latitude);
   },
 
-  watch:{  //图片
-    '$store.state.pList':{
-        handler:function(){
-          const state=this.$store.state
-          this.PicList=state.pList
-          //console.log(this.PicList,"添加图片")
-        },
-        deep:true
+  watch: {
+    //图片
+    "$store.state.pList": {
+      handler: function() {
+        const state = this.$store.state;
+        this.PicList = state.pList;
+        //console.log(this.PicList,"添加图片")
+      },
+      deep: true
     },
-    '$store.state.nowPlace':{
-        handler:function(){
-          const state=this.$store.state
-          this.address=state.nowPlace
-          console.log(this.address,"地址")
-        },
-        deep:true
-    },
+    "$store.state.nowPlace": {
+      handler: function() {
+        const state = this.$store.state;
+        this.address = state.nowPlace;
+        //console.log(this.address, "地址");
+      },
+      deep: true
+    }
   },
- 
-  data () {
+
+  data() {
     return {
-        address:"",
-        serTip:"",
-        timetip:"",
-        cartip:"",
-        serePrice:"",
-        userId:"",
-        token:"",
-        personName:"",//姓名
-        personPhone:"",//手机
-        CarInfoId:"",//车子id
-        ServiceItem:"",//服务项目id
-        AppointmentStartTime:"",//预约开始时间
-        AppointmentEndTime:"",//预约结束时间
-        PicList:"",//图片合集; JsonString格式(多图)
-        Remarks:"",//备注
-        controls: [{  //控件不随着地图移动
+      showPay: false,
+      address: "",
+      serTip: "",
+      timetip: "",
+      cartip: "",
+      total: "",
+      userId: "",
+      token: "",
+      orderNumber: "", //订单编号
+      personName: "", //姓名
+      personPhone: "", //手机
+      CarInfoId: "", //车子id
+      ServiceItem: "", //服务项目id
+      AppointmentStartTime: "", //预约开始时间
+      AppointmentEndTime: "", //预约结束时间
+      PicList: "", //图片合集; JsonString格式(多图)
+      Remarks: "", //备注
+      controls: [
+        {
+          //控件不随着地图移动
           id: 1,
-          iconPath: '/static/images/location.png',
+          iconPath: "/static/images/location.png",
           position: {
             left: 0,
             top: 100,
@@ -144,14 +149,15 @@ export default {
             height: 30
           },
           clickable: true
-      }],
-    }
+        }
+      ]
+    };
   },
-  computed:{
-    ...mapState(["cityName","nowPlace","longitude","latitude"])
+  computed: {
+    ...mapState(["cityName", "nowPlace", "longitude", "latitude"])
   },
   components: {
-    
+    Pay
   },
 
   methods: {
@@ -161,146 +167,142 @@ export default {
         title: "填写订单"
       });
     },
-    getCar(){ //获取车辆
-      const car= wx.getStorageSync("CarInfo")
-      if(car){
-        this.cartip=car.CarBrand+" "+car.CarType+" "+car.CarColor+" "+car.CarMumber
-        this.CarInfoId=car.Id
+    getCar() {
+      //获取车辆
+      const car = wx.getStorageSync("CarInfo");
+      if (typeof car == "object") {
+        this.cartip = car.CarBrand +" " +car.CarType + " " +car.CarColor +" " +car.CarMumber;
+        this.CarInfoId = car.Id;
       }
-      
+
       //console.log(this.cartip)
     },
-    getSerItem(){  //转换服务项目、
-        const Service=wx.getStorageSync("serItem")
-        if(Service){
-          //console.log(this.Service,"11111")
-          const SerItembox=[]
-          const SerTipbox=[]
-          let Serpricebox=0
-          for(let i=0;i<Service.length;i++){
-            SerItembox.push(Service[i].Id)
-            SerTipbox.push(Service[i].Name)
-            //console.log(typeof(this.Service[i].Price ))
-            Serpricebox+=Service[i].Price * 1 || 0
+    getSerItem() {
+      //转换服务项目
+      const Service = wx.getStorageSync("serItem");
+      if (typeof Service == "object" && Service.length>0) {
+        const SerItembox = [];
+        const SerTipbox = [];
+        let Serpricebox = 0;
+        for (let i = 0; i < Service.length; i++) {
+          SerItembox.push(Service[i].Id);
+          SerTipbox.push(Service[i].Name);
+          //console.log(typeof(this.Service[i].Price ))
+          Serpricebox += Service[i].Price * 1 || 0;
+        }
+        this.total = Serpricebox.toFixed(2);
+        this.serTip = SerTipbox.join(" ");
+        this.ServiceItem = SerItembox.join(",");
+      }
+    },
+    changeTime() {
+      //转换时间格式
+      const d = new Date();
+      const year = d.getFullYear();
+      let _time = wx.getStorageSync("timearr"); //时间
+      let _date = wx.getStorageSync("datearr"); //日期
+      //console.log(typeof _time, typeof _date,_time, _date,"页面接收");
+
+      if (typeof _time === "object") {
+        if (_time.length > 0) {
+          let _mon = _date.split("月")[0]; //月份
+          let _dd = _date.split("月")[1].split("日")[0]; //日期
+          _mon.length < 2 ? (_mon = "0" + _mon) : _mon;
+          _dd.length < 2 ? (_dd = "0" + _dd) : _dd;
+          const tt = _mon + "-" + _dd;
+          const time1 = [];
+          for (let i of _time) {
+            if (i.toString().length < 2) {
+              i = "0" + i;
+            }
+            time1.push(i);
           }
-          this.serePrice=Serpricebox.toFixed(2)
-          this.serTip=SerTipbox.join(" ")
-          this.ServiceItem=SerItembox.join(",")
+
+          let mm = time1[0] + ":" + time1[1] + "-" + time1[2] + ":" + time1[3]; //时间
+          if (tt && mm) {
+            this.timetip = tt + "  " + mm;
+            //开始时间结束时间
+            this.AppointmentStartTime =year + "-" + tt + " " + mm.split("-")[0];
+            this.AppointmentEndTime = year + "-" + tt + " " + mm.split("-")[1];
+          }
+          //console.log(this.AppointmentStartTime);
         }
-    },
-    changeTime(){ //转换时间格式
-      const d=new Date()
-      const year=d.getFullYear()
-      const _time= wx.getStorageSync("timearr")    //时间
-      const _date= wx.getStorageSync("datearr")   //日期
-      console.log(_time,_date,"页面接收")
-      if(_time&&_date){
-        let _mon=_date.split("月")[0]  //月份
-        let _dd=_date.split("月")[1].split("日")[0]  //日期
-        _mon.length<2 ? _mon="0"+_mon : _mon
-        _dd.length<2 ? _dd="0"+_dd : _dd
-        const tt=_mon+"-"+_dd
-        const time1=[]
-      for (let i of _time){
-        if(i.toString().length<2){
-            i="0"+i
-        }
-        time1.push(i)
       }
-      
-       let mm=time1[0]+":"+time1[1]+"-"+time1[2]+":"+time1[3] //时间
-      if(tt&&mm){
-        this.timetip=tt+"  "+mm
-        //开始时间结束时间
-        this.AppointmentStartTime=year+"-"+tt +" "+ mm.split("-")[0]
-        this.AppointmentEndTime=year+"-"+tt +" "+ mm.split("-")[1]
-      }
-      console.log(this.timetip)
-      }
-      
     },
-    chosePlace(){
-        wx.navigateTo({ url: "/pages/locationorder/main" });
+    chosePlace() {
+      wx.navigateTo({ url: "/pages/locationorder/main" });
     },
-    choseItem(){  //选择服务项目
-        wx.navigateTo({ url: "/pages/servince/main?url=location"});
+    choseItem() {
+      //选择服务项目
+      wx.navigateTo({ url: "/pages/servince/main?url=location" });
     },
-    choseMoney(){
+    choseMoney() {
       wx.navigateTo({ url: "/pages/sum/main" }); //充值
     },
-    choseTime(){
-        wx.navigateTo({ url: "/pages/writeorder/main" }) //时间
+    choseTime() {
+      wx.navigateTo({ url: "/pages/writeorder/main" }); //时间
     },
-    choseCar(){
-        wx.navigateTo({ url: "/pages/mycar/main?url=location" }); //我的车辆
+    choseCar() {
+      wx.navigateTo({ url: "/pages/mycar/main?url=location" }); //我的车辆
     },
     addpics() {
       wx.navigateTo({ url: "/pages/sceneplace/main" }); //添加图片
     },
     addinfo() {
-      wx.navigateTo({ url: "/pages/signinfo/main" });//添加备注
+      wx.navigateTo({ url: "/pages/signinfo/main" }); //添加备注
     },
-    checkPhone(){ //验证手机号
+    checkPhone() {
+      //验证手机号
       const phoneNum = this.personPhone;
-      if (!(/^1[3|4|5|6|7|8][0-9]\d{4,8}$/.test(phoneNum))) {
+      if (!/^1[3|4|5|6|7|8][0-9]\d{4,8}$/.test(phoneNum)) {
         wx.showToast({
           title: "请输入正确的手机号码！",
           icon: "none",
           duration: 2000
         });
-        this.personPhone=""
-        return false
-        
-      } 
-    },
-    async toPay(){
-      wx.setStorageSync("serItem"," ");
-      wx.setStorageSync("CarInfo"," ");
-      wx.setStorageSync("timearr"," ");
-       wx.setStorageSync("datearr"," ");
-     const _picList=JSON.stringify(this.PicList)
-    //console.log(this.AppointmentStartTime,"开始时间信息")
-    //   console.log(this.AppointmentEndTime,"结束时间信息")
-      console.log(this.latitude,this.address,"经度信息")
-    //  console.log(this.userId,"用户id")
-    //  console.log(this.ServiceItem,"服务id")
-    //  console.log(this.CarInfoId,"车辆信息")
-    //  console.log(this.personPhone,"手机信息")
-    //  console.log(this.personName,"用户信息")
-    //  console.log(this.Remarks,"备注信息")
-    //  console.log(_picList,"图片信息")
-      const params={
-         UserId: this.userId,
-         Token:this.token,
-         Lat:this.latitude,
-         Lng:this.longitude,
-         Addr:this.address,
-         CarInfoId:this.CarInfoId,
-         Remarks:this.Remarks,
-         ServiceItem:this.ServiceItem,
-         ContactName:this.personName,
-         Tel:this.personPhone,
-         //pList:_picList,
-         AppointmentStartTime:this.AppointmentStartTime,//开始时间
-         AppointmentEndTime:this.AppointmentEndTime
+        this.personPhone = "";
+        return false;
       }
-      var res=await post("/Order/SubmitDoorOrders",params) 
-       console.log(res)
+    },
+    async toPay() {
+      wx.setStorageSync("serItem", " ");
+      wx.setStorageSync("CarInfo", " ");
+      wx.setStorageSync("timearr", " ");
+      wx.setStorageSync("datearr", " ");
+      const _picList = JSON.stringify(this.PicList);
+      //console.log(this.latitude, this.address, "经度信息");
+      const params = {
+        UserId: this.userId,
+        Token: this.token,
+        Lat: this.latitude,
+        Lng: this.longitude,
+        Addr: this.address,
+        CarInfoId: this.CarInfoId,
+        Remarks: this.Remarks,
+        ServiceItem: this.ServiceItem,
+        ContactName: this.personName,
+        Tel: this.personPhone,
+        //pList:_picList,
+        AppointmentStartTime: this.AppointmentStartTime, //开始时间
+        AppointmentEndTime: this.AppointmentEndTime
+      };
+      var res = await post("/Order/SubmitDoorOrders", params);
+     // console.log(res);
       //如果有订单编号跳转支付页面
-      if(res.code==0){
-        let orderNo=res.data //订单编号
-        wx.navigateTo({ url: "/pages/orderpay/main?orderNo="+orderNo+"&price="+this.serePrice });
+      if (res.code == 0) {
+        this.orderNumber = res.data;
+        this.showPay = true;
       }
     }
   },
 
-  created () {
+  created() {
     // let app = getApp()
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-  @import "./style";
-
+@import "./style";
+@import "../../css/common.css";
 </style>

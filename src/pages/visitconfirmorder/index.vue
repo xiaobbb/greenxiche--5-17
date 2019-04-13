@@ -1,6 +1,6 @@
 <template>
   <div class="backgray">
-    <div v-if="isshow">
+    <div>
       <!---->
       <div class="flex-container clomn  ordershophead white">
           <div class="orderserve">服务商家</div>
@@ -52,27 +52,28 @@
               <div>买家留言</div>
               <input type="text" placeholder="填写内容已和卖家协商确认" class="inputmes" v-model="Remarks">
           </div>
-          <div class="infoslide slideprice white pad">合计：<span>￥{{totalPrice}}</span></div>
+          <div class="infoslide slideprice white pad">合计：<span>￥{{total}}</span></div>
       </div>
       <!--底部按钮-->
       <div class="botbtn">
-          <div class="price white">合计: <span>￥{{totalPrice}}</span></div>
+          <div class="price white">合计: <span>￥{{total}}</span></div>
           <div class="btnconfir" @click="goPay">提交订单</div>
       </div>
       <!--遮罩层-->
     <orderCount :showCoupon.sync="showCoupon" :couponId.sync = "CouponId" :couponList="couponList" :couponPrice.sync="couponPrice" ></orderCount>
     <orderCard :showCoupon.sync="showCardTicket" :CardTicketId.sync="CardTicketId" :couponList="couponList" :CardTicketPrice.sync="CardTicketPrice"></orderCard>
     </div>
-    <div v-else>  
+    <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
+    :total="total" :successUrl="'/pages/myorder/main'" :closeUrl="'/pages/myorder/main'"
+    ></Pay>
+    <!-- <div>  
         <div class="lasttime white">剩余支付时间  <span>{{minute}}</span> : <span>{{second}}</span></div>
         <div class="flex-container white commonpad">
             <p class="strong">应付金额</p>
-            <!-- <p class="shouldpay">￥{{orderParmar.Total}}</p> -->
             <p class="shouldpay">￥{{totalPrice}}</p>
         </div>
         <div class="slide"></div>
         <div class="white">
-            <!-- <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{orderParmar.Wallet}}</span>元</div> -->
             <div class="itempay commonpad">选择第三方支付，剩余支付<span class="shouldpay">¥{{totalPrice}}</span>元</div>
           <radio-group class="radio-group" @change="radioChange">
             <label class="radio" v-for="item in payitems" :key="item.id">
@@ -88,18 +89,20 @@
           </radio-group>
         </div>
         <div class="btncharge" @click="payMoney">立即支付</div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import orderCount from '@/components/orderCount.vue'
+import Pay from '@/components/pay.vue'
 import orderCard from '@/components/orderCard.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
+  onShow(){
+    this.showPay = false
     this.setBarTitle();
     //获取vuex商品信息
     this.proid=this.$store.state.visitconfirmorder.ProductId
@@ -121,6 +124,7 @@ export default {
   },
   data () {
     return {
+      showPay:false,
       couponList:[],//子组件展示信息
       CardTicketData:[],//卡券列表
       CouponData:[],//优惠券列表
@@ -134,7 +138,7 @@ export default {
       CardTicketPrice:"0.00",
       Token:"",
       UserId:"",
-      OrderNo:"",//订单编号
+      orderNumber:"",//订单编号
       Password:"",
       Remarks:"",
       orderinfo:[],
@@ -148,16 +152,18 @@ export default {
       ],
       showCoupon:false,//组件
       showCardTicket:false,
-      total:""//总价格
+      totalPrice:"",//总价格
     }
   },
   computed:{ //计算之后的总价格
-    totalPrice(){
-      return this.total-this.couponPrice-(this.total*this.CardTicketPrice)
+    total(){
+      let totals = 0;
+      totals= this.totalPrice-this.couponPrice-(this.totalPrice*this.CardTicketPrice)
+      return  totals.toFixed(2)
     }    
   },
   components: {
-    orderCount,orderCard
+    orderCount,orderCard,Pay
   },
   methods: {
     setBarTitle() {
@@ -215,80 +221,91 @@ export default {
       })
       console.log(result,"获取订单总金额")
       if(result.code==0){
-        this.total=result.data.allPayMoney
+        this.totalPrice=result.data.allPayMoney
       }
     },
     async goPay(){  //提交支付
-      this.isshow=false
       console.log(this.UserId,this.proid,this.CarInfoId,this.CouponId,this.CardTicketId,"提交信息")
-      
-      var result=await post("/Order/ServiceProductsPlaceOrder",{
-          UserId:this.UserId,
-          Token:this.Token,
-          ProductId:this.proid,
-          CarInfoId:this.CarInfoId,
-          CouponId:this.CouponId,
-          CardTicketId:this.CardTicketId,
-          Remarks:this.Remarks
-      })
-      console.log(result,"发起支付请求")
-      if(result.code==0){
-          this.OrderNo=result.data
-          //this.getOrderParam()
+      if(this.CarInfoId){
+          this.isshow=false
+          var result=await post("/Order/ServiceProductsPlaceOrder",{
+            UserId:this.UserId,
+            Token:this.Token,
+            ProductId:this.proid,
+            CarInfoId:this.CarInfoId,
+            CouponId:this.CouponId,
+            CardTicketId:this.CardTicketId,
+            Remarks:this.Remarks
+        })
+        console.log(result,"发起支付请求")
+        if(result.code==0){
+            this.orderNumber=result.data
+            setTimeout(()=> {
+            this.showPay=true
+            },500)
+        }
+      }else{
+          wx.showToast({
+            title: "请选择服务车辆",
+            icon: "none",
+            duration: 2000
+          });
+          return false
       }
+      
     },
-    payMoney(){
-        //判断哪种支付方法
-        for(let i=0;i<this.payitems.length;i++){
-          if(this.payitems[i].checked){
-            console.log(i)
-            if(i==0){
-              this.wxPay()
-            }else{
-              this.otherPay()
-            }
-          }
-        }
-    },
-    async wxPay(){
-      var res=await post("/Order/ConfirmWeiXinSmallPay",{
-           UserId:this.UserId,
-           Token:this.Token,
-          OrderNo:this.OrderNo
-        })
-        if(res.code==0){
-            let payData=JSON.parse(res.data.JsParam);
-            wx.requestPayment({
-            timeStamp: payData.timeStamp,
-            nonceStr: payData.nonceStr,
-            package: payData.package,
-            signType: payData.signType,
-            paySign: payData.paySign,
-            success(res) { 
-              wx.navigateTo({
-                url:"/pages/visitconfirmorder/main"
-              });
-            },
-            fail(res) {
+    // payMoney(){
+    //     //判断哪种支付方法
+    //     for(let i=0;i<this.payitems.length;i++){
+    //       if(this.payitems[i].checked){
+    //         console.log(i)
+    //         if(i==0){
+    //           this.wxPay()
+    //         }else{
+    //           this.otherPay()
+    //         }
+    //       }
+    //     }
+    // },
+    // async wxPay(){
+    //   var res=await post("/Order/ConfirmWeiXinSmallPay",{
+    //        UserId:this.UserId,
+    //        Token:this.Token,
+    //       OrderNo:this.orderNumber
+    //     })
+    //     if(res.code==0){
+    //         let payData=JSON.parse(res.data.JsParam);
+    //         wx.requestPayment({
+    //         timeStamp: payData.timeStamp,
+    //         nonceStr: payData.nonceStr,
+    //         package: payData.package,
+    //         signType: payData.signType,
+    //         paySign: payData.paySign,
+    //         success(res) { 
+    //           wx.navigateTo({
+    //             url:"/pages/visitconfirmorder/main"
+    //           });
+    //         },
+    //         fail(res) {
 
-            }
-          })
-       }
-    },
-    async otherPay(){
-      console.log(this.password,"支付密码")
-      var res=await post("/Order/PaymentOrder",{
-           UserId:this.UserId,
-          Token:this.Token,
-          Password:this.password, //会员支付密码
-          OrderNo:this.OrderNo
-        })
-        console.log(res,"余额支付")
-        if(res.code==0){
-          //余额支付成功
+    //         }
+    //       })
+    //    }
+    // },
+    // async otherPay(){
+    //   console.log(this.password,"支付密码")
+    //   var res=await post("/Order/PaymentOrder",{
+    //        UserId:this.UserId,
+    //       Token:this.Token,
+    //       Password:this.password, //会员支付密码
+    //       OrderNo:this.orderNumber
+    //     })
+    //     console.log(res,"余额支付")
+    //     if(res.code==0){
+    //       //余额支付成功
           
-        }
-    },
+    //     }
+    // },
     // async getOrderParam(){  //获取订单支付金额及支付剩余时间
     //     if(this.OrderNo){
     //         var result=await post("/Order/GetOrderParam",{

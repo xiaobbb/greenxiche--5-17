@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div class="flex-container pointmenu">
-                <p v-for="(item,index) in pointlist" :key="index" :class="{active3:first==index}" @click="changeComment(index)">{{item.name}}</p>
+                <p v-for="(item,index) in pointlist" :key="index" :class="{active3:first==index}" @click="changeComment(index)">{{item.name}}({{PageCount}})</p>
             </div>
             <div class="pointsheet">
                 <div v-for="(item,index) in commonlist" :key="index">
@@ -131,7 +131,7 @@ export default {
           {id:1,name:'服务'},{id:2,name:'套餐'},{id:3,name:'评价'}
         ],
         pointlist:[
-          {id:1,name:'全部(428)'},{id:2,name:'晒图(88)'},{id:3,name:'低分(60)'},{id:4,name:'最新'}
+          {id:1,name:'全部'},{id:2,name:'晒图'},{id:3,name:'低分'},{id:4,name:'最新'}
         ],
         commonlist:[],
         sershow:true,

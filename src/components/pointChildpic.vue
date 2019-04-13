@@ -1,43 +1,42 @@
 <template>
-    <div class="point" :iteminfo="iteminfo"> 
-        <div class="flex-container userinfo">
-            <div class="flex-container">
-                <div>
-                    <img src="/static/images/avatar.png" class="avatar">
+    <div>
+        <div class="point" v-for="(item,pindex) in commentlist" :key="pindex"> 
+            <div class="flex-container userinfo">
+                <div class="flex-container">
+                    <div>
+                        <img src="/static/images/avatar.png" class="avatar">
+                    </div>
+                    <div>
+                        <p>{{item.MemberName}}</p>
+                        <p>
+                            <img src="/static/images/xing.png" class="xing-point">
+                            <img src="/static/images/xing.png" class="xing-point">
+                            <img src="/static/images/xing.png" class="xing-point">
+                            <img src="/static/images/xing.png" class="xing-point">
+                            <img src="/static/images/gray1.png" class="xing-point">
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <p>{{iteminfo.MemberName}}</p>
-                    <p>
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/xing.png" class="xing-point">
-                        <img src="/static/images/gray1.png" class="xing-point">
-                    </p>
-                </div>
+                <div class="carname">{{item.ProductSpecText}}</div>
             </div>
-            <div class="carname">{{iteminfo.ProductSpecText}}</div>
-        </div>
-        <div>{{iteminfo.ContentText}}</div>
-        <!--评论图片列表-->
-        <!-- <div class="flex-container picslist">
-            <img src="/static/images/download9.png" class="pointpics">
-            <img src="/static/images/download9.png" class="pointpics">
-            <img src="/static/images/download9.png" class="pointpics">
-            <img src="/static/images/download9.png" class="pointpics">
-        </div> -->
-        <div class="usertime">{{iteminfo.AddTime}}</div>
-        <div class="callback" v-if="iteminfo.Reply.length>0">
-            {{iteminfo.Reply}}
+            <div>{{item.ContentText}}</div>
+            <!--评论图片列表-->
+            <div class="flex-container picslist" v-if="showPic">
+                <img src="/static/images/download9.png" class="pointpics" v-for="item in item.PicData" :key="item.id">
+            </div>
+            <div class="usertime">{{item.AddTime}}</div>
+            <div class="callback" v-if="item.Reply">
+                {{item.Reply}}
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-  props:["iteminfo"],
+  props:["commentlist","showPic"],
   onLoad(){
-    //console.log(this.iteminfo,"这是子页面的")
+    console.log(this.commentlist,"这是子页面的")
   }
   
 }

@@ -33,7 +33,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 18,
+			"current": 11,
 			"list": [
 				{
 					"id": 0,
@@ -113,7 +113,7 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 11,
 					"name": "服务详情",
 					"pathName": "pages/serdetail/main",
 					"query": "",
@@ -375,6 +375,13 @@
 					"id": -1,
 					"name": "支付",
 					"pathName": "pages/pay/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "全部评论",
+					"pathName": "pages/shopcommentlist/main",
 					"query": "",
 					"scene": null
 				}
