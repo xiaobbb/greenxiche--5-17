@@ -87,15 +87,6 @@ import Coupon from '@/components/coupon.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
-    this.setBarTitle();
-    this.getData()
-    // Promise.all(
-    // [this.getData(),this.getAddress()]).then((res)=> {
-    //   console.log('getFreight')
-    //   this.getFreight()
-    // })
-  },
   components: {
       Coupon,Pay
   },
@@ -103,7 +94,6 @@ export default {
     return {
       showPay:false,
       showway:false,
-      a:4,
       product:{},
       buyNum:1,
       productId:'',
@@ -139,11 +129,21 @@ export default {
   },
   watch:{
     // 更新id时更新地址
-    '$store.state.confirmOrder.addressId'(){
-      if(this.$store.state.confirmOrder.addressId){
-        this.getAddress();
+    '$store.state.addressId'(){
+      if(this.$store.state.addressId){
+        // this.getData();
       }
     }
+  },
+  onShow(){
+    this.showPay= false;
+    this.setBarTitle();
+    this.getData()
+    // Promise.all(
+    // [this.getData(),this.getAddress()]).then((res)=> {
+    //   console.log('getFreight')
+    //   this.getFreight()
+    // })
   },
   methods: {
     setBarTitle() {
@@ -180,15 +180,44 @@ export default {
           id: datas.ProductId,
           shopId: datas.ShopId,
           price: datas.Price,
-          // 积分
-          score: datas.Score,
           //   库存
           stock: datas.Stock,
-          // 邮费
-          freight: datas.Freight,
         };
         
       this.getAddress()
+    },
+    // 获取收货地址
+    async getAddress(){
+      this.address.id = this.$store.state.addressId
+      // 重置store选择地址
+      this.$store.commit('setSelectAddress',{
+        url:'',
+        status:false
+      })
+      
+      let res={}
+      // 还没选中地址，拿默认地址
+      if(!this.address.id){
+      res = await post('Address/defaultaddress_New',{
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token')
+      })
+      }else{
+        // 选择地址获取选择的信息
+        res = await post('Address/GetInfo',{
+        UserId:wx.getStorageSync('userId'),
+        Token: wx.getStorageSync('token'),
+          Id:this.address.id
+        })
+      }
+      const _res = res.data
+      this.address={
+        id:_res.id,
+        name:_res.name,
+        phone:_res.tel,
+        address:_res.addressinfo,
+      }
+      this.getFreight()
     },
     // 获取运费
     async getFreight(){
@@ -203,57 +232,6 @@ export default {
        const res = await post("Order/BuyNowToFreight",params)
        this.freight = res.data
     },
-    // 获取收货地址
-    async getAddress(){
-      // 重置store选择地址
-      this.$store.commit('setSelectAddress',{
-        url:'',
-        status:false
-      })
-       // 重置store选择优惠券
-      this.$store.commit('setSelectCoupon',{
-        price:0,
-        productId:0,
-        classifyId:0,
-        url:'',
-        status:false
-      })
-      
-      let res={}
-      const confirmOrder = this.$store.state.confirmOrder
-      // 还没选中地址，拿默认地址
-      if(!confirmOrder.addressId){
-      res = await post('Address/defaultaddress_New',{
-        UserId:wx.getStorageSync('userId'),
-        Token: wx.getStorageSync('token')
-      })
-      }else{
-        // 选择地址获取选择的信息
-        res = await post('Address/GetInfo',{
-        UserId:wx.getStorageSync('userId'),
-        Token: wx.getStorageSync('token'),
-          Id:confirmOrder.addressId
-        })
-      }
-      const _res = res.data
-      this.address={
-        id:_res.id,
-        name:_res.name,
-        phone:_res.tel,
-        address:_res.addressinfo,
-      }
-      this.getFreight()
-    },
-    // addNum(){
-    //   let num = this.buyNum*1
-    //     num +=1;
-    //     this.buyNum = num
-    // },
-    // lessNum(){
-    //   if(this.buyNum>1){
-    //     this.buyNum -=1;
-    //   }
-    // },
     // 提交订单
     async goPay(){
       const res = await post('Order/BuyNowSubmitOrder',{
@@ -298,9 +276,6 @@ export default {
         status:true
       })
       wx.navigateTo({url:'/pages/sitemanage/main'})
-    },
-    getCouponData(){
-
     },
     // 选择优惠券
     onShowCoupon (){

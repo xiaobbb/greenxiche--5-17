@@ -58,8 +58,8 @@ import "../../css/global.css";
 export default {
   data() {
     return {
-      userid: wx.getStorageSync("userId"),
-      token: wx.getStorageSync("token"),
+      userid:'',
+      token:'',
       isshow: false,
       data: 0,
       carinfolist: [],
@@ -67,7 +67,9 @@ export default {
   },
 
   components: {},
-  mounted() {
+  onLoad() {
+      this.userid=wx.getStorageSync("userId"),
+      this.token=wx.getStorageSync("token"),
     wx.setNavigationBarTitle({
       title: "地址管理"
     });
@@ -147,27 +149,15 @@ export default {
       wx.redirectTo({ url: "/pages/addnewsite/main?id="+id});
     },
     onSelect(id){
-      const confirmOrder = this.$store.state.confirmOrder;
       const selectAddress = this.$store.state.selectAddress;
       if(!selectAddress.status){
         return false
       }
       // 设置提交订单参数
-      this.$store.commit('setConfirmOrder',{
-        addressId:id,
-      productId:confirmOrder.productId,
-      sku:confirmOrder.sku,
-      buyNum:confirmOrder.buyNum,
-      couponId:confirmOrder.couponId
-      })
+      this.$store.commit('update',{'addressId':id})
       // 跳转到上一页
       // wx.redirectTo({ url: selectAddress.url});
       wx.navigateBack()
-      // 重置选择地址
-      this.$store.commit('setSelectAddress',{
-        url:'',
-        status:false
-      })
 
     }
   },

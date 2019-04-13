@@ -80,8 +80,8 @@ export default {
       carData:[],
       carNum:0,
       carPrice:0,
-      userId: wx.getStorageSync('userId'),
-      token: wx.getStorageSync('token'),
+      userId: '',
+      token: ''
     };
   },
   watch: {
@@ -101,7 +101,9 @@ export default {
     //     deep: true
     // }
   },
-  onLoad() {
+  onShow() {
+      this.userId=wx.getStorageSync('userId'),
+      this.token=wx.getStorageSync('token'),
     this.setBarTitle();
     // 分类列表
     this.getClassify();
@@ -210,11 +212,11 @@ export default {
       }
       const res = await post('Cart/CartList',params)
       this.carNum=0;
-      this.carPrice =0;
+      let carPrice =0;
       for(let i=0;i<res.data.length;i+=1){
         const datas = res.data[i]
         this.carNum += datas.Number
-        this.carPrice += (datas.SalePrice*datas.Number)
+        carPrice += (datas.SalePrice*datas.Number)
         this.carData.push(datas)
         const productlist = this.productlist;
         for(let j=0;j<productlist.length;j+=1){
@@ -224,6 +226,7 @@ export default {
           }
         }
       }
+      this.carPrice = carPrice.toFixed(2)
     },
     change(e) {
       console.log(e);

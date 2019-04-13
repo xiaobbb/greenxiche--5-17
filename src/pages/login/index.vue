@@ -23,7 +23,6 @@ export default {
     
   },
   created() {},
-  mounted() {},
   data() {
     return {
       phonecode: "获取验证码",
@@ -43,7 +42,7 @@ export default {
   components: {},
   methods: {
     doBind(){
-        logins();
+        logins(true);
     },
     // 没作用上的函数
     setOpenId(session_id) {

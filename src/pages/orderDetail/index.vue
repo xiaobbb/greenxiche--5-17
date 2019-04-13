@@ -1,46 +1,43 @@
 <template>
-  <div>
+  <div v-if="hasData">
     <div class="remind">
-      <text v-if="showDefaule">等待买家付款</text>
-      <text v-if="showDelOrder">订单已取消</text>
-      <text v-if="showPay">待使用</text>
-      <text v-if="shwoSuccess">交易成功</text>
+      <text v-if="shwoSuccess">{{info.StatusName}}</text>
     </div>
     <div class="flex-container orderhead white">
         <img src="/static/images/place.png" class="place">
-        <div class="flex-container clomn personinfo">
+        <div class="clomn personinfo">
             <div class="orderuser">
-                <p>张三</p>
-                <p>13125252626</p>
+                <p>{{info.ContactName}}</p>
+                <p>{{info.TelephoneNumber}}</p>
             </div>
-            <div>广东省 深圳市 龙岗区 坂田街道 雅兰新洲社区学府花园 5期12栋</div>
+            <div>{{info.Address}}</div>
         </div>
     </div>
     <div class="slide"></div>
-    <div class="flex-container prodetail">
+    <div class="flex-container prodetail" v-for="(item,index) in info.orderDetails" :key="index">
         <div class="orderpics">
-            <img src="/static/images/order10.png" class="orderpics">
+            <img :src="item.ProductImg" class="orderpics">
         </div>
-        <div class="flex-container proright">
-            <div class="flex-container clomn protitle">
-                <p>绿妞长效镀晶9H汽车度镀晶纳米水晶镀膜</p>
-                <p class="ordercolor">精选1年版（全国包施工）</p>
+        <div class="proright">
+            <div class="clomn protitle">
+              <p>{{item.ProductName}}</p>
             </div>
-            <div>
-                <p>￥1288.00</p>
-                <p class="ordercolor">x1</p>
+            <div class="flex-container">
+              <p class="ordercolor flex1"><span v-if="item.ProductSkuName">{{item.ProductSkuName}}</span><span v-else>无规格属性</span></p>
+              <p class="ordercolor">x{{item.ProductCount}}</p>
             </div>
+            <p>￥{{item.UnitPrice}}</p>
         </div>
     </div>
     <div class="orderlist">
         <div class="orderitem padtop">
             <div class="flex-container">
                 <p>运费（快递）</p>
-                <p>￥0.00</p>
+                <p>￥{{info.ExpressPrice}}</p>
             </div>
             <div class="flex-container">
                 <p>订单总价</p>
-                <p>￥1288.00</p>
+                <p>￥{{info.TotalPrice}}</p>
             </div>
             <div class="flex-container">
                 <p>优惠</p>
@@ -55,13 +52,13 @@
     <div class="slide"></div>
     <div class="orderinfo">
         <p class="infotitle">订单信息</p>
-        <p class="pitem">订单编号：20000054115841 <span class="copy">复制</span></p>
-        <p class="pitem">创建时间：2018-04-20 09:18:30</p>
-        <p class="pitem" v-if="showPay">支付时间：2018-04-20 10:20:59</p>
-        <div v-if="shwoSuccess">
+        <p class="pitem">订单编号：{{info.OrderNumber}} <span class="copy">复制</span></p>
+        <p class="pitem">创建时间：{{info.AddTime}}</p>
+        <p class="pitem" v-if="info.StatusId !==0">支付时间：{{item.PayTime}}</p>
+        <!-- <div v-if="shwoSuccess">
             <p class="pitem">到店时间：2018-04-20 17:20:59</p>
             <p class="pitem">成交时间：2018-04-20 18:20:59</p>
-        </div>
+        </div> -->
     </div>
     <div class="flex-container tipmenu">
         <p class="flex-container">
@@ -120,14 +117,26 @@
 </template>
 
 <script>
+import { post } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
   },
+  onShow(){
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
+    this.orderNo = this.$root.$mp.query.orderNo;
+    this.getOrderDetails();
+  },
   data () {
     return {
+      userId:"",
+      token:"",
+      orderNo:"",
+      info:{},
+      hasData:false,
       showMask:false,
       showCall:false,
       showDefaule:false,
@@ -166,6 +175,17 @@ export default {
     addCommont(){
       var a=2
       wx.navigateTo({ url: "/pages/addcomment/main?id="+a});
+    },
+    async getOrderDetails(){
+      let result = await post("Order/OrderDetails",{
+        UserId:this.userId,
+        Token:this.token,
+        OrderNo:this.orderNo
+      })
+      if(Object.keys(result.data).length>0){
+        this.info = result.data;
+        this.hasData = true;
+      }
     }
   },
 

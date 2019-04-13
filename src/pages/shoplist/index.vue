@@ -1,5 +1,5 @@
 <template>
-  <div class="bggray" style="height:100vh">
+  <div class="bggray">
     <div style="height:200rpx;">
         <!--顶部输入框-->
         <div class="white" >
@@ -346,7 +346,22 @@ export default {
     // let app = getApp()
   },
    onReachBottom(){
+<<<<<<< HEAD
    }
+=======
+     console.log("正在加载中国个古古怪怪")
+    if(this.isLoad){
+      this.Page++;
+      this.getShopList();
+    }else{
+      wx.showToast({
+          title: "没有更多啦。。。",
+          icon: "none",
+          duration: 2000
+        });
+    }
+  }
+>>>>>>> 9ab0905db14598973ce1bc5c4ebbc37158a595af
 }
 </script>
 

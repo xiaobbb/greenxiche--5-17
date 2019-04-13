@@ -57,7 +57,6 @@ export default {
   onShow() {
     this.setBarTitle();
   },
-  mounted() {},
   data() {
     return {
       btnText: "获取验证码",
@@ -103,7 +102,6 @@ export default {
         var openid = wx.getStorageSync("openId");
         var token = wx.getStorageSync("token");
         var unionid = wx.getStorageSync("unionid");
-        wx.setStorageSync("password",this.password);
         wx.request({
           url: "https://carapi.wtvxin.com/api/Login/BindOrRegister", //仅为示例，并非真实的接口地址
           method: "POST",
@@ -129,7 +127,7 @@ export default {
                   //绑定手机成功之后,延时2秒跳转到会员中心
                   setTimeout(function() {
                     // 登录
-                    logins()
+                    logins(true)
                     // wx.switchTab({
                     //   url: "/pages/mine/main"
                     // });

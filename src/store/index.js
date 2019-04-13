@@ -23,6 +23,7 @@ const store = new Vuex.Store({
       couponId:'',
     },
     // 是否正在选择地址
+    addressId:'',
     selectAddress:{
       url:'',
       status:false
@@ -36,7 +37,9 @@ const store = new Vuex.Store({
       status:false
     },
     // 优惠券价格
-    couponPrice:0.00
+    couponPrice:0.00,
+    // 购物车
+    carIds:[],
   },
   mutations: {
     /**
