@@ -17,13 +17,13 @@
       <div class="flex-container intitem" v-for="(item,index) in productlist" :key="item.id">
         <div class="flex-container cartdetal">
           <div>
-            <img :src="item.img" class="carpic" v-if="ispop" @click="goDetail(item.id)">
+            <img :src="item.img" class="carpic" v-if="ispop" @click="goDetail(item.brandId,item.id)">
             <!-- <img src="/static/images/comblo.png" class="carpic" v-else-if="comb"  @click="goDetail(2)">
             <img src="/static/images/cardshop.png" class="carpic" v-else  @click="goDetail(2)">-->
           </div>
           <div class="flex-container citeminfo">
-            <p class="itemtitle" @click="goDetail(item.id)">{{item.title}}</p>
-            <p class="progress" @click="goDetail(item.id)">
+            <p class="itemtitle" @click="goDetail(item.brandId,item.id)">{{item.title}}</p>
+            <p class="progress" @click="goDetail(item.brandId,item.id)">
               <text v-for="(tab,tabIndex) in item.tab" :key="tabIndex">{{tab}}</text>
             </p>
             <p class="sales">销量{{item.sale}}</p>
@@ -49,7 +49,7 @@
           </div>
           <div class="shopprice">￥{{carPrice}}</div>
         </div>
-        <div class="btn-confirm" @click="toPAy">确定</div>
+        <div class="btn-confirm" @click="goUrl('/pages/shopcart/main')">确定</div>
       </div>
     </div>
   </div>
@@ -143,6 +143,7 @@ export default {
           for (let i = 0; i < res.data.length; i += 1) {
             const datas = res.data[i];
             that.productlist.push({
+              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
               id: datas.Id,
               title: datas.Name,
               price: datas.Price,
@@ -249,17 +250,19 @@ export default {
       }
     },
     // 跳转
-    goDetail(id) {
-        console.log(id,'id')
-      wx.navigateTo({ url: "/pages/detail/main?id=" + id });
-      return false;
-      var a = e;
-      if (a == 1) {
+    goDetail(type,id) {
+      //type商品分类0--全部分类，21--商品，22--套餐，23--卡券
+        console.log(type,'type-id',id)
+      // wx.navigateTo({ url: "/pages/detail/main?id=" + id });
+      // return false;
+      var a = type*1;
+      if (a === 21) {
         wx.navigateTo({ url: "/pages/detail/main?id=" + id });
       }
-      if (a == 2) {
-        wx.navigateTo({ url: "/pages/coupondetail/main" });
+      if (a === 22||a===23) {
+        wx.navigateTo({ url: "/pages/coupondetail/main?id="+id });
       }
+      
     },
     toPAy() {
       wx.navigateTo({ url: "/pages/confirmorder/main" });
