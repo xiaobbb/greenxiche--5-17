@@ -68,13 +68,19 @@
 // <Pay :showPay.sync="showPay" :orderNumber="orderNumber" :total="total" ></Pay>
 // showPay.sync ---组件的显示隐藏状态。 orderNumber---订单号。 total---价格
 // 扩展
-// navigateUrl ---关闭支付跳转的页面。主要作用在提交订单后弹出支付窗口，关闭窗口跳转我的订单
-// :navigateUrl="'/pages/myorder/main'"
+// closeUrl ---关闭窗口跳转的页面。默认关闭窗口
+// :successUrl="'/pages/myorder/main'"
+// successUrl ---支付成功跳转的页面。
 import { post } from "@/utils/index";
 export default {
   props: {
+    // 支付成功跳转地址，默认不跳转
+    successUrl: {
+      type: String,
+      default: ""
+    },
     // 点击取消跳转地址，默认关闭弹窗
-    navigateUrl: {
+    closeUrl: {
       type: String,
       default: ""
     },
@@ -141,7 +147,7 @@ export default {
             });
             setTimeout(() => {
               wx.redirectTo({
-                url: "/pages/myorder/main"
+                url: this.successUrl
               });
             }, 1500);
           },
@@ -188,7 +194,7 @@ export default {
         });
         setTimeout(() => {
           wx.redirectTo({
-            url: "/pages/myorder/main"
+            url: this.successUrl
           });
         }, 1500);
       } catch (err) {
@@ -201,9 +207,9 @@ export default {
       console.log(e);
     },
     goUrl() {
-      if (this.navigateUrl) {
+      if (this.closeUrl) {
         console.log("跳转");
-        wx.redirectTo({ url: this.navigateUrl });
+        wx.redirectTo({ url: this.closeUrl });
       } else {
         console.log("关闭");
         this.$emit("update:showPay", false);
