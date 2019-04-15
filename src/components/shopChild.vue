@@ -4,7 +4,7 @@
       <div class="radius">
         <div class="flex-container item">
             <div class="flex-container  row">
-                <p class="sertitle">{{detailinfo[0].ShopNick}}</p>
+                <p class="sertitle">{{name}}</p>
                 <div class="shopclass flex-container">
                     <p>
                       <img src="/static/images/xing.png" class="xing-point">
@@ -30,10 +30,10 @@
                 <img src="/static/images/locat2.png" class="locationwid">
                 <div>
                   <p class="sertitle">地址</p>
-                  <p class="sercomplain">{{detailinfo[0].Address}}</p>
+                  <p class="sercomplain">{{address}}</p>
                 </div>
             </div>
-            <div class="flex-container range" style="width:30%;">
+            <div class="flex-container range" style="width:30%;"  @click="getMap">
               <p class="location">
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/to.png" class="small">
@@ -60,14 +60,25 @@
 export default {
   props:["isShow","detailinfo"],
    onLoad(){
-      console.log(this.detailinfo)
+      //console.log(this.detailinfo)
+    this.phoneNum=this.detailinfo[0].Phone
+    this.address=this.detailinfo[0].Address
+    // this.latitude=this.shopLat
+    // this.longitude=this.shopLng
+    this.latitude=this.detailinfo[0].Lat*1
+    this.longitude=this.detailinfo[0].Lng*1
+    this.name=this.detailinfo[0].ShopNick
   },
   onShow(){
-    this.phoneNum=this.detailinfo[0].Phone
+   
   },
   data () {
     return {
        phoneNum:"",
+       address:"",  //	地址的详细说明
+       latitude:"",
+       longitude:"",
+       name:"", //位置名
     }
   },
 
@@ -80,7 +91,18 @@ export default {
       wx.makePhoneCall({
         phoneNumber: this.phoneNum
       })
+    },
+    getMap(){
+      //console.log(this.latitude,typeof(this.latitude*1),"经度类型")
+      wx.openLocation({
+        latitude:this.latitude,
+        longitude:this.longitude,
+        address:this.address,
+        name:this.name,
+        scale: 18
+      })
     }
+   
     
   },
 

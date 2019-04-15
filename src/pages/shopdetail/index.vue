@@ -1,6 +1,6 @@
 <template>
   <div>
-    <shopChild :detailinfo="detailinfo" v-if="detailinfo.length>0"></shopChild>
+    <shopChild :detailinfo="detailinfo" v-if="detailinfo.length>0" :shopLat="shopLat" :shopLng="shopLng"></shopChild>
     <!--操作菜单-->
     <div class="shopmian">
         <div class="flex-container title">
@@ -92,8 +92,6 @@ import "../../css/global.css";
 
 export default {
   onLoad(){
-    this.servincelist=[]
-    this.commonlist=[]
     this.setBarTitle();
     this.shopid=this.$root.$mp.query.shopid
     console.log(this.shopid,"详情页接收")
@@ -101,12 +99,21 @@ export default {
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
+    
+  },
+  onShow(){
+    this.servincelist=[]
+    this.commonlist=[]
+    this.detailinfo=[]
     this.getShopDetail()
     this.getBarlist()
     this.showItem()
+    
   },
   data () {
     return {
+        shopLat:"",  //商铺经纬度 用于服务详情导航
+        shopLng:"",
         shopid:"",
         lat:"",
         lng:"",
@@ -120,7 +127,7 @@ export default {
         Token:"",
         UserId:"",
         Page:"1",
-        PageSize:"5", //////////////////////////
+        PageSize:"5", 
         PageCount:"",
         allPage:"", //页数
         ProductId:"",
@@ -154,8 +161,9 @@ export default {
         })
         if(res.code==0){
           this.$set(res.data[0],"Distance",parseFloat(res.data[0].Distance).toFixed(2));
-          //  res.data[0].Distance = parseFloat(res.data[0].Distance).toFixed(2);
           this.detailinfo=res.data
+          this.shopLat=res.data[0].Lat*1
+          this.shopLng=res.data[0].Lng*1
         }
         //console.log(this.detailinfo,"商家详情")
         
@@ -184,7 +192,7 @@ export default {
         },
         success:(res)=> {
           if(res.data.code==0){
-              console.log(res,"服务列表")
+              //console.log(res,"服务列表")
               this.PageCount=res.data.count
               if(parseInt(this.PageCount) % this.PageSize === 0){
                   this.allPage=this.PageCount / this.PageSize
@@ -197,6 +205,7 @@ export default {
               }else{
                 this.isLoad=false
               }
+              console.log(this.servincelist,"服务产品列表")
           }
         }
       })
@@ -233,7 +242,7 @@ export default {
           })
           if(res.code==0){
             this.meallist=res.data
-            console.log(res.data,"套餐列表")
+            //console.log(res.data,"套餐列表")
           }
     },
     
@@ -243,7 +252,7 @@ export default {
         this.servincelist=[]
         this.activecolor=e
         this.typeid=this.barlist[e].Id
-        console.log(this.typeid)
+        //console.log(this.typeid)
         this.showItem()
     },
     setBarTitle() {
@@ -283,10 +292,10 @@ export default {
         this.showComment()
     },
     async goServiceProductsDetail(e){
-        wx.navigateTo({ url: "/pages/serdetail/main?proid="+e});  //获取商户服务产品详情
+        wx.navigateTo({ url: "/pages/serdetail/main?proid="+e+"&shopLat="+this.shopLat+"&shopLng="+this.shopLng});  //获取商户服务产品详情
     },
     choseItem(e){
-      console.log(e)
+      //console.log(e)
        this.$store.commit("setVisitConfirmOrder",{
           ProductId:e
       })

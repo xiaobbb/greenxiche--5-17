@@ -138,10 +138,14 @@
     font-size:24rpx;
 }
 .btn{
+    position:fixed;
+    width:100%;
+    bottom:0;
     height:90rpx;
     display: flex;
     justify-content: space-between;
     line-height: 90rpx;
+    z-index:99
 }
 .btnmoney{
     color:rgb(243, 70, 70);
@@ -150,6 +154,7 @@
     border-top:1rpx solid #eee;
     box-sizing: border-box;
     width:70%;
+    background: #fff;
 }
 .btncharge{
     background: #ff6325;

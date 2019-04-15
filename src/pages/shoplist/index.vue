@@ -41,7 +41,7 @@
     </div>
     <!--商户列表-->
     <scroll-view class="shoplist" scroll-y="true"   :scroll-into-view="scrollTopId" @scrolltolower="scrolltolower">
-      <div class="shopitem flex-container white" @click="showShopDetail(index)" v-for="(item,index) in shoplist" :key="index">
+      <div class="shopitem flex-container white" @click="showShopDetail(item.ShopId)" v-for="(item,index) in shoplist" :key="index">
           <img :src="item.Logo" class="mycar">
           <div class="shopinfo flex-container">
               <div class="shopnamelist">{{item.ShopNick}}</div>
@@ -56,12 +56,12 @@
                   <text class="grad">{{item.ServiceScore}}.0分</text>
                   <text class="numb">({{item.TransactionNumber}}条订单)</text>
               </div>
-              <div class="shoplocat">
-                  <text>{{item.Address}}</text><text>{{item.Distance}}km</text>
+              <div class="shoplocat flex-contaniner">
+                  <text class="textoverflow" style="width:70%;">{{item.Address}}</text><text class="textoverflow" style="width:25%;">{{item.Distance}}km</text>
               </div>
           </div>
       </div>
-      
+      <p  class="ovedMsg"  v-if="isOved"  style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;" >我也是有底线的</p>
     </scroll-view>
 
     <!--点击导航栏弹框-->
@@ -142,7 +142,7 @@ export default {
         showload:false,   //距离
         showplace:false,  //区域
         aa:"" , //导航栏高亮显示
-        
+        isOved:false
     }
   },
   computed:{
@@ -163,7 +163,7 @@ export default {
           SearchKey:this.SearchKey,//关键词
           Sort:this.Sort,//距离查询
         })
-        console.log(result)
+        console.log(result,"商户列表数据")
         if(result.code==0){
           if(result.data.length==0){
               wx.showToast({
@@ -291,28 +291,6 @@ export default {
       }
       
     },
- 
-    // async choseItem(e){  //选择服务类型展示列表
-    //   console.log(e)
-    //   this.seractive=e
-    //   this.disactive=e
-    //   this.active=e
-    //   //console.log(e)
-    //   if(e==99){
-    //       //console.log(666)
-    //       this.defaultactive=true
-    //       this.getShopList()
-    //       this.isServe=false
-    //   }else if(e==199){
-    //        this.defaultplace=true
-    //        this.getShopList()
-    //        this.isServe=false
-    //   }   
-    //   else{
-    //      this.defaultactive=false
-    //   }
-      
-    // },
     trimData(){
       //console.log(123)
       this.SearchKey=this.SearchKey.slice(0,-1)
@@ -331,7 +309,7 @@ export default {
     },
     showShopDetail(e){ //商户详情
         //console.log(e)
-        var shopid=this.shoplist[e].ShopId
+        const shopid=e
         wx.navigateTo({ url: "/pages/shopdetail/main?shopid="+shopid})
     },
     showBrand(){  //展示排行榜
@@ -342,11 +320,7 @@ export default {
         this.Page++;
         this.getShopList();
       }else{
-        wx.showToast({
-            title: "没有更多啦。。。",
-            icon: "none",
-            duration: 2000
-          });
+        this.isOved=true
       }
     },
     searchShop(){

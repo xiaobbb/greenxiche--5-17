@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="13" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -22,7 +22,7 @@
         <cover-view v-if="showmember" class="mask">
             <cover-view >
                 <cover-image src="/static/images/modal.png" class="mask-img"/>
-                <cover-image src="/static/images/close3.png" class="close" style="border:1px solid blue"  @click="closeModal"/>
+                <cover-image src="/static/images/close3.png" class="close"  @click="closeModal"/>
                 <cover-view class="text text1">
                   <cover-view>优惠洗车</cover-view>
                   <cover-view>到店洗车减免20%</cover-view>
@@ -44,17 +44,20 @@
         <!--提示不在服务范围内-->
         <cover-view v-if="showShop" class="maskshop">
             <cover-view class="title">
-              <cover-view>您的当前位置不在服务范围内，无法提供上门服务，是否到店服务？</cover-view>
+              您的当前位置不在服务范围内，无法提供上门服务，是否到店服务？
+                <cover-view style="margin-top:20rpx;">
+               提供上门服务，是否到店服务？
+                </cover-view>
             </cover-view>
             <cover-view class="flex-container bottombtn">
-                <cover-view>取消</cover-view>
-                <cover-view @click="confirmDel">确认</cover-view>
+                <cover-view style="width:50%;text-align:center;height:110rpx;line-height:110rpx" @click="close">取消</cover-view>
+                <cover-view @click="confirm" style="width:50%;text-align:center;height:110rpx;line-height:110rpx;color:#ff6325;border-left:1rpx solid #f5f5f5">确认</cover-view>
             </cover-view>
         </cover-view>
         <!--新用户礼券-->
         <cover-view v-if="isnew" class="newgroup">
             <cover-image src="/static/images/newbg.png" class="newpic"/>
-            <cover-image src="/static/images/close3.png" class="close"  @click="closeModal"/>
+            <cover-image src="/static/images/close3.png" class="close"  @click="closeNewModal"/>
             <cover-view class="tuantile cover-text">送10元立减券</cover-view>
             <cover-view class="tuannew cover-text">绿妞新用户专享</cover-view>
             <cover-view class="tuanpick cover-text" @click="getNewConpon">立即领取</cover-view>
@@ -71,11 +74,11 @@
           <cover-view class="wash" @click="washCar">我要洗车</cover-view>
         </cover-view>
         <!--到店-->
-        <cover-view class="modal-goshop" v-if="isGoshop" @click="goTo(3)">
-          <cover-view>
+        <cover-view class="modal-goshop" v-if="isGoshop">
+          <cover-view  @click="toShopdet(shopInfo.ShopId)">
             <img :src="shopInfo.Logo" class="showimg">
           </cover-view>
-          <cover-view class="shopinfoflex">
+          <cover-view class="shopinfoflex"  @click="toShopdet(shopInfo.ShopId)">
             <cover-view class="shopname">{{shopInfo.ShopNick}}</cover-view>
             <cover-view class="addressflex">
               <cover-view class="flex-container">
@@ -90,7 +93,7 @@
             </cover-view>
             <cover-view class="address">{{shopInfo.Address}}</cover-view>
           </cover-view>
-          <cover-view class="rights">
+          <cover-view class="rights" style="z-index:999" @click="getMap">
             <cover-image src="/static/images/rembg.png" class="big"/>
             <cover-image src="/static/images/wei.png" class="small"/>
             <cover-view class="span-info">{{shopInfo.Distance}}m</cover-view>
@@ -110,25 +113,21 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
-    
-   
-  },
-  onShow(){
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     if(this.userId && this.token){
-      console.log("userId:"+this.userId+"token:"+this.token);
+      console.log("userId:"+this.userId+"token:"+this.token,"首页获取");
         Promise.all([
-            this.getCityName(), this.isNewVip(),this.getCoupon()
+            this.getCityName(), this.getCoupon(),this.isNewVip()
         ])
     }else{
       wx.navigateTo({ url :"/pages/login/main"})
     }
-  
-    
-    this.getCityName()
-    this.getCoupon()//是否新用户
-    this.isNewVip() //是否vip
+   
+  },
+  onShow(){
+    this.initData()
+    this.getMapShow()
   },
   watch:{
     '$store.state':{
@@ -141,10 +140,28 @@ export default {
         // }
         },
         deep: true 
-    }
+    },
+    isshow:function(){
+        if(this.isshow==false){
+            this.isXiche=true
+        }
+    },
+    shopArr:function(){
+        if(this.shopArr == ""){
+          this.isshow=true
+          this.showShop=true
+      }
+    },
+    // cityName:function(){
+    //   this.getMapShow()
+    // }
   },
   data () {
     return {
+      shopLat:"",
+      shopLng:"",//店铺的经纬度 用户导航
+      address:"",
+      name:"",
       userId:"",
       token:"",
       markerId: 0,
@@ -152,7 +169,17 @@ export default {
       shopArr:[],//商铺信息集合
       shopInfo:{}, //marker店铺信息
       markers: [], //不显示
-      controls: [],
+      controls: [{  //控件不随着地图移动
+          id: 1,
+          iconPath: '/static/images/location.png',
+          position: {
+            left: 0,
+            top: 250,
+            width: 40,
+            height: 40
+          },
+          clickable: true
+      }],
       titlelist:[
        {name:"上门"}, {name:"到店"},
       ],
@@ -172,24 +199,31 @@ export default {
   
   methods: {
     ...mapMutations(["update"]),
-    
+    initData(){
+        this.isshow=false
+        this.showmember=false
+        this.isnew=false
+        this.isGoshop=false
+        this.showShop=false
+        this.active='上门'
+    },
     controltap(){  //点击地图上control 回到当前定位点
         this.getCityName()
     },
     choseLocation(){
         wx.navigateTo({ url: "/pages/locationorder/main" });
     },
-    getCityName(){
+    getCityName(){  //获取手机所在地城市经纬度
       wx.getLocation({
           type: 'wgs84',
           success:(data)=> {
           // console.log(data,"微信地图")
-          // this.latitude=data.latitude
-          // this.longitude=data.longitude
+          this.latitude=data.latitude
+          this.longitude=data.longitude
           this.$store.commit('update',{ latitude:data.latitude,
                         longitude:data.longitude
                         });
-                        console.log(data.latitude,data.longitude);
+         //console.log(data.latitude,data.longitude);
           this.getCityinfo()
         },
         fail:(info)=>{
@@ -202,7 +236,7 @@ export default {
         }
       });
     },
-    getCityinfo(){
+    getCityinfo(){   //根据经纬度获取城市名称 反地理转码
        //console.log(this.latitude,this.longitude,"首页")
       // KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG
          wx.setStorageSync("latitude",this.latitude)
@@ -222,7 +256,7 @@ export default {
                 })
                 wx.setStorageSync("cityName",this.cityName)
                 }
-              console.log(this.cityName,this.nowPlace)
+              console.log(this.cityName,this.nowPlace,"获取城市以及中心点位置")
           }
         })
         
@@ -233,7 +267,7 @@ export default {
           Lat:this.latitude,
           Lng:this.longitude
       })
-      console.log(res)
+      //console.log(res,"所有的商铺信息")
       if(res.code==0){
         this.shopArr=res.data
         this.getNearShop()
@@ -254,11 +288,15 @@ export default {
           // arr.push(marker)
         }
         this.markers=arr
-        console.log(this.markers,"markers数组")
+        //console.log(this.markers,"markers数组")
       }
     },
     getNearShop(){  //获取markers标记时的商户信息
         this.shopInfo=this.shopArr[this.markerId]
+        this.shopLat=this.shopInfo.Lat*1
+        this.shopLng=this.shopInfo.Lng*1
+        this.address=this.shopInfo.Address
+        this.name=this.shopInfo.ShopNick
         this.$set(this.shopInfo,'Distance',this.shopInfo.Distance.toFixed(2))
         this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
         console.log(this.shopInfo,"店铺详情")
@@ -290,7 +328,7 @@ export default {
           UserId: this.userId,
           Token:this.token
       })
-      console.log(res,"判断是否是新人")
+      //console.log(res,"判断是否是新人")
       if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
          this.isshow=true
          this.isnew=true
@@ -319,26 +357,43 @@ export default {
             UserId: this.userId,
             Token:this.token
         })
-        console.log(res,"领取vip  ")
+        //console.log(res,"领取vip  ")
         if(res.code==0){
           if(res.data.IsVip==0){
             //不是vip弹出领取vip点击开通vip
-            this.isshow=true
-            this.showmember=true
-            this.isnew=false
+            if(this.isnew==true){  //如果弹出来新人框
+                this.showmember=false
+            }else{
+                this.isshow=true
+                this.showmember=true
+                this.isnew=false
+            }
+            
           }
         }
     },
-    close:function(){
-      this.isnew=true
-      this.showmember=false,
-      this.isXiche=false
+    closeNewModal(){  //关闭新人框
+        this.isnew=false,
+        this.isshow=true,
+        this.showmember=true,
+        this.isXiche=false
     },
-    closeModal(){
+    closeModal(){  //关闭vip框
         this.isnew=false,
         this.isshow=false,
         this.showmember=false,
         this.isXiche=true
+    },
+    close(){
+      this.isshow=false
+      this.showShop=false
+    },
+    confirm(){
+      this.isshow=false
+      this.showShop=false
+      this.active='到店'
+      this.isGoshop=true
+      this.getShopinfo()
     },
     change:function(name){
       //console.log(name)
@@ -359,16 +414,59 @@ export default {
        wx.navigateTo({ url: "/pages/location/main" });
     },
     goTo(e){
-        var id=e
-        if(id==1){
+        if(e==1){
             wx.navigateTo({ url: "/pages/city/main" });
         }
-        if(id==2){
+        if(e==2){
             wx.navigateTo({ url: "/pages/shoplist/main" });
         }
-        if(id==3){
-            wx.navigateTo({ url: "/pages/shopdetail/main" });
-        }
+    },
+    toShopdet(e){
+      wx.navigateTo({ url: "/pages/shopdetail/main?shopid=" +e});
+    },
+    getMap(){  //导航功能
+      wx.openLocation({
+        latitude:this.shopLat*1,
+        longitude:this.shopLng*1,
+        address:this.address,
+        name:this.name,
+        scale: 18
+      })
+    },
+    getMapShow(){  //根据城市名称获取地图
+       wx.request({
+            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+this.cityName+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+              console.log(res,"根据市获取地图")
+              if(res.data.result){
+                const _res = res.data.result.location
+                this.update({ latitude:res.data.result.location.lat,
+                              longitude:res.data.result.location.lng
+                });
+                //   //console.log(this,"选择位置页面")
+                const MapContext=wx.createMapContext("map")
+                MapContext.getCenterLocation({
+                  success:(res)=>{
+                      console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
+                      this.markers=[{
+                          iconPath: "/static/images/person.png",
+                          id:1,
+                          latitude: this.latitude,
+                          longitude: this.longitude,
+                          width:40,
+                          height:45
+                      }]
+                  }
+                })
+                this.getCityinfo()
+              }
+              
+          }
+        })
+        
     }
   },
 

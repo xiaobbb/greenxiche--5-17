@@ -35,11 +35,11 @@
       <!--位置-->
       <div class="flex-container item">
           <div>
-              <p class="sertitle">{{detailinfo.Name}}</p>
+              <p class="sertitle">{{detailinfo.ShopData[0].ShopNick}}</p>
               <p class="sercomplain">{{detailinfo.ShopData[0].Address}}</p>
           </div>
           <div class="flex-container range">
-            <p class="location">
+            <p class="location" @click="getMap">
                 <img src="/static/images/bg9.png" class="big">
                 <img src="/static/images/to.png" class="small">
             </p>
@@ -64,7 +64,7 @@
       </div>
       <div class="slide"></div>
       <!--购买须知-->
-      <div class="point pointnow">
+      <div class="point pointnow" style="margin-bottom:100rpx;">
           <div class="main">购买需知</div>
           <div class="pmenu">
               <img src="/static/images/time.png" class="tippic">
@@ -99,14 +99,21 @@ export default {
   onLoad(){
     this.setBarTitle();
     this.proid=this.$root.$mp.query.proid;
+    this.shopLat=this.$root.$mp.query.shopLat;
+    this.shopLng=this.$root.$mp.query.shopLng;
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
     this.getSerdetail()
+    console.log(this.shopLng,this.shopLat,"商铺经纬度")
   },
   data () {
     return {
+      shopLat:"",  //商铺经纬度 
+      shopLng:"",
+       name:"",
+       address:"",
        proid:"",
        lat:"",
        lng:"",
@@ -114,6 +121,7 @@ export default {
        UserId:"",
        detailinfo:[],
        commentlist:[]
+      
     }
   },
  
@@ -134,19 +142,30 @@ export default {
             Lat:this.lat,
             Lng:this.lng
         })
-        //console.log(result)
         if(result.code==0){
             this.detailinfo=result.data[0];
+            this.address=result.data[0].ShopData[0].ShopNick
+            this.name=result.data[0].ShopData[0].Address
             this.commentlist=result.data[0].CommentData;
-           
             this.$set(result.data[0].ShopData[0],"Distance",parseFloat(result.data[0].ShopData[0].Distance).toFixed(2))
             console.log(this.detailinfo,"服务详情");
-             console.log("数据长度："+this.commentlist.length);
+            this.address=result.data[0].ShopData[0].Address
+            this.name=result.data[0].ShopData[0].ShopNick 
+            //console.log("数据长度："+this.commentlist.length);
         }
     },
     showAllComment(){
         wx.navigateTo({ url: "/pages/shopcommentlist/main?proid="+this.proid });
     },//获取所有评价
+    getMap(){
+       wx.openLocation({
+        latitude:this.shopLat*1,
+        longitude:this.shopLng*1,
+        address:this.address,
+        name:this.name,
+        scale: 18
+      })
+    },
     toPay(e){//跳转到确认订单页面
       this.$store.commit("setVisitConfirmOrder",{
           ProductId:e

@@ -27,8 +27,9 @@ import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
-    this.getAround()
-    console.log(this.latitude)
+    this.getAround()  //获取周边pio信息（经纬度 关键词）
+    //this.getMapShow() //测试------根据城市名称获取地图
+    //console.log(this.latitude)
   },
   data () {
     return {
@@ -46,6 +47,7 @@ export default {
           },
           clickable: true
       }],
+      markers:[]
     }
   },
   computed:{
@@ -61,7 +63,7 @@ export default {
         title: "位置"
       });
     },
-    getAround(){
+    getAround(){  //获取周边城市信息
       wx.request({
             url:"https://api.map.baidu.com/place/search?&query=大厦&location="+this.latitude+","+this.longitude+"&radius=1000&output=json&key=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&",
             header: {
@@ -122,6 +124,38 @@ export default {
       //   })
       
     },
+    getMapShow(){  //测试根据城市名称获取地图
+       wx.request({
+            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address=广州市&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+              const _res = res.data.result.location
+                console.log(_res.lat,_res.lng,"state")
+                // this.longitude=res.data.result.location.lng
+                // this.latitude=res.data.result.location.lat
+                this.update({ latitude:res.data.result.location.lat,
+                              longitude:res.data.result.location.lng
+                        });
+                //console.log(this,"选择位置页面")
+          }
+        })
+        const MapContext=wx.createMapContext("map")
+        MapContext.getCenterLocation({
+          success:(res)=>{
+              console.log(res,"获取地图中心位置经纬度")
+              this.markers=[{
+                  iconPath: "/static/images/person.png",
+                  id:1,
+                  latitude: res.latitude,
+                  longitude: res.longitude,
+                  width:48,
+                  height:55
+              }]
+          }
+        })
+    }
     
   },
 
