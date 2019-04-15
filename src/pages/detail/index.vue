@@ -356,13 +356,24 @@ export default {
           });
         }
         // sku
+        let _sku = {}
         for (let i = 0; i < datas.ProductSpecList.length; i += 1) {
           const sku = datas.ProductSpecList[i];
-          // let value =JSON.parse(sku.SpecValue)
-          // console.log(value,'对象')
+          let value =JSON.parse(sku.SpecValue)
+          // Object.keys(value).map((item,index,arr)=>{
+          //   console.log(item,index,'对象')
+          // })
+
           // for(let j in value){
-          //    console.log(j,value[j], "产品详情");
+          //    if(!_sku[j]){
+          //      _sku[j] = []
+          //    }
+          //    if(_sku[j].indexOf(value[j])===-1){
+          //       _sku[j].push(value[j])
+          //    }
           // }
+          //    console.log(_sku,"产品详情");
+          // 更改sku之前
           that.product.sku.push({
             id:sku.Id,
             productId: sku.ProId,
@@ -375,7 +386,6 @@ export default {
           });
           that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
          }
-        console.log('comment',this.product.comment)
     },
     // 获取优惠券列表
     async getCoupon() {
