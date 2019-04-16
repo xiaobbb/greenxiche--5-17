@@ -35,6 +35,12 @@
                 <div class="flex-container cityhot">
                     <div class="name" v-for="item in hotCity" :key="item.id" :data-city="item.name" @click="bindCity">{{item.name}}</div>
                 </div>
+                <div class="citylist" v-for="(item,sindex) in searchlist" :key="sindex">
+                    <div class="item" :id="item.initial">{{ item.initial }}</div>
+                    <div style="padding:20rpx 30rpx;border-bottom:1rpx solid #f4f4f4" @click="bindCity">
+                        {{item.city}}
+                    </div>  
+                </div>
                 <!--城市列表-->
                   <div class="citylist" v-for="(item, idx) in citylist" :key="idx">
                     <div class="item" :id="item.initial">{{ item.initial }}</div>
@@ -64,7 +70,8 @@ export default {
         inputName:"",
         winHeight:"",
         searchLetter:['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z'],
-        citylist:[],
+        citylist:[],//加载城市列表
+        searchlist:[],//搜索城市的列表
         hotCity:[
           {id:1,name:"深圳"},{id:2,name:"上海"},{id:3,name:"杭州"},{id:4,name:"广州"},{id:5,name:"南京"},{id:6,name:"武汉"},{id:7,name:"成都"},{id:8,name:"北京"},
         ],
@@ -84,16 +91,65 @@ export default {
     ...mapMutations(["update"]),
      bindBlur(e) {
       this.inputName = '';
-      
+      this.searchlist=[]
+      this.cityList()
     },
     bindKeyInput(e){  //输入搜索
-      console.log(e)
+      //console.log(e)
        this.inputName = e.mp.detail.value;
        // 空搜索框时 取消匹配显示
         if (this.inputName.length < 1) {
+          this.searchlist=[]
           this.cityList()
-        }    
+        }
+        this.scrollTopId='citylist' 
+        this.citylist=[]
+        this.auto() 
         
+    },
+    auto(){
+      let inputSd = this.inputName.trim();//去掉空格
+      let sd = inputSd.toLowerCase();  //转为小写
+      let num = sd.length;
+      let finalCityList = [];
+      //拼音搜索
+      let temp = this.allCity.filter(
+        item => {
+          let text = item.short.slice(0, num).toLowerCase(); //把拼音转为小写
+          // eslint-disable-next-line
+          return (text && text == sd);
+        }
+      );
+      //中文搜索
+      let tempChinese = this.allCity.filter(
+        itemChinese => {
+          let textChinese = itemChinese.city.slice(0,num);
+          return (textChinese && textChinese == sd)
+        }
+      )
+      if (temp[0]) {
+        temp.map(
+          item=>{
+            let testObj = {}
+            testObj.city = item.city
+            testObj.code = item .code 
+            finalCityList.push(testObj)
+          }
+        );
+        
+        this.searchlist = finalCityList
+      }else if(tempChinese[0]){
+        tempChinese.map(
+          item => {
+            let testObj = {}
+            testObj.city=item.city
+            testObj.code=item.code
+            finalCityList.push(testObj)
+          }
+        );
+        console.log(finalCityList,"城市集合")
+        this.searchlist=finalCityList
+      }
     },
     clickLetter(e){
         //console.log(e)
@@ -113,6 +169,7 @@ export default {
     },
     // 对城市信息进行分组
     cityList(){
+      this.citylist=[]
       this.searchLetter.map(
       initial => {
         let tempObj = {};
@@ -126,6 +183,7 @@ export default {
            this.citylist.push(tempObj);
         }
      );
+     //console.log(this.citylist)
         //this.citylist=JSON.stringify(this.citylist)  不用转码
         //console.log(this.citylist);
     //   //return tempArr;

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="point" v-for="(item,pindex) in commentlist" :key="pindex"> 
+        <div class="point" v-for="(item,pindex) in commonlist" :key="pindex"> 
             <div class="flex-container userinfo">
                 <div class="flex-container">
                     <div>
@@ -21,7 +21,7 @@
             </div>
             <div>{{item.ContentText}}</div>
             <!--评论图片列表-->
-            <div class="flex-container picslist" v-if="showPic">
+            <div class="flex-container picslist" v-if="item.PicData">
                 <img src="/static/images/download9.png" class="pointpics" v-for="item in item.PicData" :key="item.id">
             </div>
             <div class="usertime">{{item.AddTime}}</div>
@@ -34,9 +34,9 @@
 
 <script>
 export default {
-  props:["commentlist","showPic"],
+  props:["commonlist"],
   onLoad(){
-    console.log(this.commentlist,"这是子页面的")
+    console.log(this.commonlist,"这是子页面的")
   }
   
 }

@@ -2,10 +2,7 @@
   <div>
     <!--填写订单-->
     <div class="glo-relative">
-        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="16" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width:750rpx; height: 516rpx;"></map>
-        <!-- <cover-view class="cover-pic">
-            <cover-image src="/static/images/location.png" class="cover-logo"/>
-        </cover-view> -->
+        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width:750rpx; height: 516rpx;"></map>
     </div>
     <!--列表-->
     <div class="list">
@@ -29,15 +26,27 @@ export default {
     this.setBarTitle();
     this.getAround()  //获取周边pio信息（经纬度 关键词）
     //this.getMapShow() //测试------根据城市名称获取地图
+    
+  },
+  onShow(){
+    this.latitude=this.$store.state.latitude
+    this.longitude=this.$store.state.longitude
     //console.log(this.latitude)
   },
   data () {
     return {
       locationlist:[ ],
       active:'0',
-      markers:[],
+      markers:[{
+        iconPath: "/static/images/person.png",
+        id:1,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        width:20,
+        height:25
+      }],
       controls: [{  //控件不随着地图移动
-          id: 1,
+          id: 2,
           iconPath: '/static/images/location.png',
           position: {
             left: 0,
@@ -47,7 +56,6 @@ export default {
           },
           clickable: true
       }],
-      markers:[]
     }
   },
   computed:{

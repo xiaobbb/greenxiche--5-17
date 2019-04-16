@@ -1,12 +1,9 @@
 <template>
-  <div  class="height:100%">
+  <div>
     <!--填写订单-->
-    <div class="glo-relative bg-cart">
+    <div class="glo-relative">
         <!-- <img src="/static/images/cartbg5.png" class="shopbg"> -->
         <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:480rpx;"></map>
-        <cover-view>
-            <cover-image src="/static/images/cart.png" class="cart-img"/>
-        </cover-view>
     </div>
     <!--列表-->
     <div class="list">
@@ -77,6 +74,8 @@ export default {
     this.showPay = false;
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
+    this.latitude=this.$store.state.latitude
+    this.longitude=this.$store.state.longitude
     this.setBarTitle();
     this.cartip = "请选择车辆";
     this.timetip = "请选择服务时间";
@@ -137,8 +136,7 @@ export default {
       AppointmentEndTime: "", //预约结束时间
       PicList: "", //图片合集; JsonString格式(多图)
       Remarks: "", //备注
-      controls: [
-        {
+      controls: [{
           //控件不随着地图移动
           id: 1,
           iconPath: "/static/images/location.png",
@@ -149,8 +147,15 @@ export default {
             height: 30
           },
           clickable: true
-        }
-      ]
+        }],
+      markers:[{
+        iconPath: "/static/images/person.png",
+        id:3,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        width:40,
+        height:45
+      }],
     };
   },
   computed: {

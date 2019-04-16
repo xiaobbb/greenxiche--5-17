@@ -73,9 +73,7 @@
                 <p v-for="(item,index) in pointlist" :key="index" :class="{active3:first==index}" @click="changeComment(index)">{{item.name}}({{PageCount}})</p>
             </div>
             <div class="pointsheet">
-                <div v-for="(item,index) in commonlist" :key="index">
-                    <pointChildpic :iteminfo="item"></pointChildpic>
-                </div>
+                <pointChildpic :commonlist="commonlist" v-if="commonlist.length>0"></pointChildpic>
             </div>
         </div>
     </div>
@@ -85,7 +83,6 @@
 <script>
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import shopChild from "@/components/shopChild"; //公用组件
-import pointChild from "@/components/pointChild"; //公用评论组件
 import pointChildpic from "@/components/pointChildpic"; //公用评论带图片组件
 import "../../css/common.css";
 import "../../css/global.css";
@@ -105,10 +102,10 @@ export default {
     this.servincelist=[]
     this.commonlist=[]
     this.detailinfo=[]
-    this.getShopDetail()
     this.getBarlist()
+    this.getShopDetail()
     this.showItem()
-    
+    this.initData()
   },
   data () {
     return {
@@ -118,7 +115,7 @@ export default {
         lat:"",
         lng:"",
         detailinfo:[],
-        typeid:"33",
+        typeid:" ",
         active:"服务",
         activecolor:"0",
         servincelist:"",
@@ -149,10 +146,17 @@ export default {
  
   components: {
     shopChild,
-    pointChild,
     pointChildpic
   },
   methods: {
+    //初始化页面数据
+    initData(){
+      this.active="服务"
+      this.activecolor=0
+      this.getBarlist()
+      this.typeid=this.barlist[0].Id
+     
+    },
      async getShopDetail(){  //商户详情
         var res=await post("Shop/GetMerchantDetail",{
           ShopId:this.shopid,
@@ -218,7 +222,7 @@ export default {
             ShopId:this.shopid,
             CommentType:this.first
       })
-      //console.log(res,"评价列表")
+      console.log(res,"评价列表")
       if(res.code==0){
         this.PageCount=res.count
         if(parseInt(this.PageCount) % this.PageSize === 0){
@@ -227,6 +231,7 @@ export default {
           this.allPage=parseInt(this.PageCount / this.PageSize) +1
         }
         this.commonlist=this.commonlist.concat(res.data)
+        console.log(this.commonlist)
         if(this.allPage>this.Page){
             this.isLoadCom=true
         }else{
@@ -261,19 +266,19 @@ export default {
       });
     },
     async change(e){
-      //console.log(e)
+      console.log(e)
       this.active=e
       if(e=="服务"){
           this.sershow=true,
           this.dishshow=false,
           this.pointshow=false,
           this.getBarlist()
+          this.initData()
           this.showItem()
       }else if(e=="套餐"){
           this.dishshow=true,
           this.sershow=false,
           this.pointshow=false
-
           this.getServiceMeal()
       }else{
           this.pointshow=true,

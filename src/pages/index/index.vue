@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 900rpx;"></map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -116,7 +116,7 @@ export default {
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     if(this.userId && this.token){
-      console.log("userId:"+this.userId+"token:"+this.token,"首页获取");
+      console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
         Promise.all([
             this.getCityName(), this.getCoupon(),this.isNewVip()
         ])
@@ -127,7 +127,7 @@ export default {
   },
   onShow(){
     this.initData()
-    this.getMapShow()
+    //this.getMapShow()
   },
   watch:{
     '$store.state':{
@@ -152,9 +152,9 @@ export default {
           this.showShop=true
       }
     },
-    // cityName:function(){
-    //   this.getMapShow()
-    // }
+    cityName:function(){
+      this.getMapShow()
+    }
   },
   data () {
     return {
@@ -263,6 +263,7 @@ export default {
     },
     //根据手机所在地经纬度获取周围商铺信息
     async getShopinfo(){
+      this.markers=[]
       var res=await post("/Shop/NearbyShop",{
           Lat:this.latitude,
           Lng:this.longitude
