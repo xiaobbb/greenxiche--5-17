@@ -4,7 +4,7 @@
         <!--顶部输入框-->
         <div class="white" >
             <div class="topinput">
-                <input type="text" placeholder="搜索商户" v-model="SearchKey"  @input="searchShop">
+                <input type="text" :placeholder="phValue" v-model="SearchKey"  @input="searchShop" @blur='onBlur' @focus='onFocus'>
                 <img src="/static/images/search.png" class="searchpic absolu">
                 <img src="/static/images/cancle.png" class="canclepic absolu" @click="trimData">
             </div>
@@ -79,8 +79,8 @@
     </div>
     <div v-if="showplace" class="load">
         <!-- <div >全部区域</div> -->
-        <div>
-            <span @click="chosePlace(199)" :class="{yellow:active}" class="ttborder">全部区域</span>
+        <div  @click="chosePlace(199)">
+            <span :class="{yellow:active}" class="ttborder">全部区域</span>
             <span class="dui ttborder" :class="{active1:active}">✔</span>
         </div>
         <div v-for="(item,sindex) in placelist" :key="sindex" @click="chosePlace(sindex)">
@@ -108,6 +108,9 @@ export default {
     this.getServe()
     this.getShopList()
     this.getPlace()
+  },
+  onShow(){
+    this.isOved=false
   },
   data () {
     return {
@@ -142,7 +145,8 @@ export default {
         showload:false,   //距离
         showplace:false,  //区域
         aa:"" , //导航栏高亮显示
-        isOved:false
+        isOved:false,
+        phValue:"请输入关键字搜索"
     }
   },
   computed:{
@@ -293,10 +297,15 @@ export default {
     },
     trimData(){
       //console.log(123)
-      this.SearchKey=this.SearchKey.slice(0,-1)
-      if(this.SearchKey==""){
-          this.getShopList()
-      }
+      this.SearchKey=""
+      this.phValue="请输入关键字搜索"
+      this.getShopList()
+    },
+    onBlur(){
+      this.phValue="请输入关键字搜索"
+    },
+    onFocus(){
+      this.phValue=" "
     },
     closeMask(){ //关闭弹框
        setTimeout(

@@ -48,18 +48,18 @@
       </div>
       <div class="slide"></div>
       <!--评分-->
-      <div class="point">
+      <div class="point" v-if="commonlist.length>0">
         <div class="flex-container">
             <p class="left">
               <text>评分</text><text>4.0</text>
             </p>
             <p @click="showAllComment">
-              <text>{{commentlist.length  || 0 }}条评论</text>
+              <text>{{ commonlist.length || 0 }}条评论</text>
               <img src="/static/images/back.png" class="arrowback">
             </p>
         </div>
         <div class="pointsheet">
-            <pointChildpic :commentlist="commentlist" v-if="commentlist.length>0" :showPic="false"></pointChildpic>
+            <pointChildpic :commonlist="commonlist" v-if="commonlist.length>0" :showPic="false"></pointChildpic>
         </div>
       </div>
       <div class="slide"></div>
@@ -120,7 +120,7 @@ export default {
        Token:"",
        UserId:"",
        detailinfo:[],
-       commentlist:[]
+       commonlist:[]
       
     }
   },
@@ -146,7 +146,7 @@ export default {
             this.detailinfo=result.data[0];
             this.address=result.data[0].ShopData[0].ShopNick
             this.name=result.data[0].ShopData[0].Address
-            this.commentlist=result.data[0].CommentData;
+            this.commonlist=result.data[0].CommentData;
             this.$set(result.data[0].ShopData[0],"Distance",parseFloat(result.data[0].ShopData[0].Distance).toFixed(2))
             console.log(this.detailinfo,"服务详情");
             this.address=result.data[0].ShopData[0].Address

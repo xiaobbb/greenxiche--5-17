@@ -5,12 +5,13 @@
       <!--预约上门订单-->
       <div class="border" v-if="appraiseType==1">
         <div class="flex-container head white">
-          <img src="/static/images/avatar.png" class="avatar">
+          <img :src="info.order.ArtificerPic" class="avatar" v-if="info.order.ArtificerPic">
+          <img src="/static/images/default.png" class="avatar" v-else>
           <div>
-            <p class="person">服务技师：张若筠</p>
-            <p class="time">服务时间：2019-03-19 11:00</p>
+            <p class="person">服务技师：{{info.order.Artificer}}</p>
+            <p class="time">服务时间：{{info.order.Fahuodate}}</p>
           </div>
-        </div>
+        </div>  
         <div class="white flex-container mark">
           <p>服务打分</p>
           <p>
@@ -101,12 +102,15 @@ export default {
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
     this.orderNo = this.$root.$mp.query.orderNo;
+    this.pramas=this.$root.$mp.query.url
     this.appraiseType = this.$root.$mp.query.appraiseType;
     this.appraiseId = this.$root.$mp.query.appraiseId;
+    console.log( this.orderNo,"发表评论的订单编号")
     this.getOrderComment();
   },
   data() {
     return {
+      pramas:"",//url参数
       userId: "",
       token: "",
       orderNo: "",
@@ -212,6 +216,7 @@ export default {
         Token: this.token,
         OrderNo: this.orderNo
       });
+      console.log(result,"获取到的评论对象")
       if (Object.keys(result.data).length > 0) {
         this.hasData = true;
         this.info = result.data;

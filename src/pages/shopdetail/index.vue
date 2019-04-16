@@ -52,7 +52,7 @@
         </div>
         <!--评价显示-->
         <div v-if="pointshow" class="dish">
-            <div class="head flex-container">
+            <div class="head flex-container" v-if="commonlist.length>0">
                 <div class="titleline">
                   <p class="shot"></p>
                   <p class="main">商户服务评价</p>
@@ -69,13 +69,14 @@
                     <text class="grad">5.0分</text>
                 </div>
             </div>
-            <div class="flex-container pointmenu">
+            <div class="flex-container pointmenu" v-if="commonlist.length>0">
                 <p v-for="(item,index) in pointlist" :key="index" :class="{active3:first==index}" @click="changeComment(index)">{{item.name}}({{PageCount}})</p>
             </div>
             <div class="pointsheet">
                 <pointChildpic :commonlist="commonlist" v-if="commonlist.length>0"></pointChildpic>
             </div>
         </div>
+        <p  class="ovedMsg"  v-if="isOved"  style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;" >我也是有底线的</p>
     </div>
   </div>
 </template>
@@ -96,16 +97,21 @@ export default {
     this.lng=wx.getStorageSync('longitude');
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
-    
   },
   onShow(){
     this.servincelist=[]
+    this.meallist=[]
     this.commonlist=[]
     this.detailinfo=[]
-    this.getBarlist()
+    this.sershow=true
+    this.dishshow=false
+    this.pointshow=false
+    this.Page="1"
+    this.typeid="33"
     this.getShopDetail()
+    this.getBarlist()
     this.showItem()
-    this.initData()
+    console.log(this.typeid,"page服务类型id")
   },
   data () {
     return {
@@ -115,11 +121,11 @@ export default {
         lat:"",
         lng:"",
         detailinfo:[],
-        typeid:" ",
+        typeid:"33",
         active:"服务",
         activecolor:"0",
-        servincelist:"",
-        meallist:"",
+        servincelist:[],
+        meallist:[],
         first:0,
         Token:"",
         UserId:"",
@@ -140,7 +146,8 @@ export default {
         commonlist:[],
         sershow:true,
         dishshow:false,
-        pointshow:false
+        pointshow:false,
+        isOved:false
     }
   },
  
@@ -149,14 +156,6 @@ export default {
     pointChildpic
   },
   methods: {
-    //初始化页面数据
-    initData(){
-      this.active="服务"
-      this.activecolor=0
-      this.getBarlist()
-      this.typeid=this.barlist[0].Id
-     
-    },
      async getShopDetail(){  //商户详情
         var res=await post("Shop/GetMerchantDetail",{
           ShopId:this.shopid,
@@ -177,7 +176,7 @@ export default {
       })
       if(res.code==0){
         this.barlist=res.data
-        //console.log(this.barlist,"服务分类")
+        console.log(this.barlist,"barlist服务分类")
       }
     },
     showItem(){   //服务列表
@@ -218,7 +217,7 @@ export default {
       var res=await post("/Server/ServiceCommentList",{
             Page:this.Page,
             PageSize:this.PageSize,
-            ProductId:this.ProductId,
+            // ProductId:this.ProductId,
             ShopId:this.shopid,
             CommentType:this.first
       })
@@ -231,6 +230,9 @@ export default {
           this.allPage=parseInt(this.PageCount / this.PageSize) +1
         }
         this.commonlist=this.commonlist.concat(res.data)
+        for(let i of this.commonlist){
+            this.$set(i,"AddTime",i.AddTime.split("T").join("  "))
+        }
         console.log(this.commonlist)
         if(this.allPage>this.Page){
             this.isLoadCom=true
@@ -247,16 +249,15 @@ export default {
           })
           if(res.code==0){
             this.meallist=res.data
-            //console.log(res.data,"套餐列表")
+            console.log(res.data,"套餐列表")
           }
     },
-    
-   
     async showItemServe(e){ //不同服务类型列表
         //console.log(e)
         this.servincelist=[]
         this.activecolor=e
         this.typeid=this.barlist[e].Id
+        this.Page="1"
         //console.log(this.typeid)
         this.showItem()
     },
@@ -268,12 +269,15 @@ export default {
     async change(e){
       console.log(e)
       this.active=e
+      this.Page="1"
       if(e=="服务"){
+          this.servincelist=[]
           this.sershow=true,
           this.dishshow=false,
           this.pointshow=false,
+          this.activecolor=0
+          this.typeid="33"
           this.getBarlist()
-          this.initData()
           this.showItem()
       }else if(e=="套餐"){
           this.dishshow=true,
@@ -284,7 +288,6 @@ export default {
           this.pointshow=true,
           this.sershow=false,
           this.dishshow=false
-          this.commonlist=[]
           this.showComment()
 
       }
@@ -321,11 +324,7 @@ export default {
         this.Page++;
         this.showComment()
     }else{
-      wx.showToast({
-          title: "没有更多啦。。。",
-          icon: "none",
-          duration: 2000
-        });
+      this.isOved=true
     }
   }
 }

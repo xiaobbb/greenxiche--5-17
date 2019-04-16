@@ -115,7 +115,7 @@
               <p class="tips">{{item.StatusName}}</p>
             </div>
             <!--切换上门服务-->
-            <div class="seritem" @click="toOrderDetail(2)">
+            <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
               <p>项目：{{item.ProductName}}</p>
               <p>地址：{{item.ServiceAddr}}</p>
               <p>
@@ -237,6 +237,7 @@ export default {
     console.log("orderBigType:" + this.orderBigType);
     console.log("status:" + this.status);
     console.log("serviceMode:" + this.serviceMode);
+    console.log(this.orderNo,"订单列表")
   },
   data() {
     return {
@@ -304,7 +305,7 @@ export default {
         wx.navigateTo({ url: "/pages/orderdetail/main?orderNo=" + orderNo });
       }
       if (e == 2) {
-        wx.navigateTo({ url: "/pages/appointorderdet/main" });
+        wx.navigateTo({ url: "/pages/appointorderdet/main?orderNo=" + orderNo  });
       }
     },
     initData() {
@@ -365,7 +366,7 @@ export default {
         } else {
           this.isLoad = false;
         }
-        console.log(this.orderList);
+        console.log(this.orderList,"订单列表");
       }
     },
     async getReserveOrderList() {
@@ -381,6 +382,7 @@ export default {
       }
       if (result.data.length > 0) {
         this.bookList = this.bookList.concat(result.data);
+        console.log(this.bookList,"上门订单")
       }
     },
     showReasonMak(index, orderNo) {
@@ -493,14 +495,17 @@ export default {
       }
     },
     toPay(index,orderNo){
+      console.log(index)
       if(this.orderBigType===1){
         this.totalPrice =this.orderList[index].TotalPrice;
+        
       }
       if(this.orderBigType===2){
         this.totalPrice =this.bookList[index].TotalPrice;
       }
+      console.log(this.totalPrice)
       this.orderNo = orderNo;
-      this.showPay = true;
+    //  this.showPay = true;
     },
     loadMoreOrder(e) {
       console.log("ffffffffff");

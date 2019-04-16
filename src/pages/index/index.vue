@@ -115,14 +115,16 @@ export default {
   onLoad() {
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
+    
     if(this.userId && this.token){
       console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
         Promise.all([
-            this.getCityName(), this.getCoupon(),this.isNewVip()
+            this.getCityName(),this.getCoupon(),this.isNewVip()
         ])
     }else{
       wx.navigateTo({ url :"/pages/login/main"})
     }
+    
    
   },
   onShow(){
