@@ -52,7 +52,10 @@
       <div class="slide"></div>
       <!--说明-->
       <div class="state">
-        <div class="flex-container statetips" v-if="product.serviceTab&&product.serviceTab.length>0">
+        <div
+          class="flex-container statetips"
+          v-if="product.serviceTab&&product.serviceTab.length>0"
+        >
           <p class="tipname">服务</p>
           <div class="flex-container stateinfo">
             <p v-for="(item,index) in product.serviceTab" :key="index">
@@ -180,37 +183,41 @@
         <div class="flex-container choosetitle">
           <div class="flex-container">
             <!-- <img :src="activeImg" class="maskshop"> -->
-            <img :src="activeImg||product.img" class="maskshop">
+            <img :src="selectSku.img||product.img" class="maskshop">
             <div class="chooseinfo">
-              <p class="price">{{selectSkuPrice||product.price}}</p>
-              <p class="tips count">库存{{selectSkuNum||product.stock}}件</p>
-              <p class="tips" v-show="selectSkuValue">已选:“{{selectSkuValue}}”</p>
+              <p class="price">{{selectSku.price||product.price}}</p>
+              <p class="tips count">库存{{selectSku.num||product.stock}}件</p>
+              <p class="tips" v-show="selectSku.text">已选:“{{selectSku.text}}”</p>
             </div>
           </div>
           <div>
             <img src="/static/images/close.png" @click="onMask" class="close">
           </div>
         </div>
-        <div class="spcestitle" v-if="product.sku.length>0">规格</div>
-        <div class="specs" v-if="product.sku.length>0">
-          <!-- <div class="flex-container">
+        <!-- sku -->
+        <div class="sku" v-for="(sku,val) in sku" :key="val">
+          <div class="spcestitle">{{val}}</div>
+          <div class="specs">
+            <!-- <div class="flex-container">
                       <img src="/static/images/specimg.png" class="specpic">
                       <text>精选1年版（全国包施工）</text>
-          </div>-->
-          <div
-            class="flex-container spec"
-            :class="activeSkuIndex === index?'specactive':''"
-            v-for="(item,index) in product.sku"
-            :key="index"
-            @click="selectSku(index)"
-          >
-            <img :src="item.img" class="specpic">
-            <text>{{item.value}}</text>
+            </div>-->
+            <div
+              class="flex-container spec"
+              :class="item.selectStatus?'specactive':''"
+              :style="item.status?'color:#999;border:1px red solid;':''"
+              v-for="(item,index) in sku"
+              :key="index"
+              @click="onSelectSku(val,index)"
+            >
+              <!-- <img :src="item.img" class="specpic"> -->
+              <text>{{item.val}}{{item.selectStatus}}</text>
+            </div>
+            <!-- <div class="flex-container">
+                      <img src="/static/images/specimg.png" class="specpic">
+                      <text>精选1年版（全国包施工）</text>
+            </div>-->
           </div>
-          <!-- <div class="flex-container">
-                      <img src="/static/images/specimg.png" class="specpic">
-                      <text>精选1年版（全国包施工）</text>
-          </div>-->
         </div>
         <div class="flex-container choosenums">
           <p>购买数量</p>
@@ -253,8 +260,8 @@ import "../../css/global.css";
 export default {
   data() {
     return {
-      userId: '',
-      token: '',
+      userId: "",
+      token: "",
       id: "",
       isshow: false,
       showDiscount: false,
@@ -271,9 +278,20 @@ export default {
       selectSkuPrice: "",
       selectSkuNum: "",
       selectSkuValue: "",
-      selectSkuValueSubmit:'',
+      selectSkuValueSubmit: "",
       // 优惠券
-      coupon: []
+      coupon: [],
+      // sku
+      sku: {},
+      skuAll: [],
+      selectSku: {
+        //选中的sku组合
+        value: {},
+        img: "",
+        num: "",
+        price: "",
+        text: "" //sku组合用下划线分隔_
+      }
     };
   },
 
@@ -281,9 +299,31 @@ export default {
     detailChild,
     detailChildpic
   },
+  watch: {
+    sku1: {
+      handler() {
+        this.skuAll.map(item => {
+          Object.keys(this.selectSku.value).map(selectItem => {
+            if (this.selectSku.value[selectItem] === item.value[selectItem]) {
+              console.log(item, "sku");
+              // 选中的sku图片库存、价格
+              this.selectSku = {
+                img: item.img,
+                num: item.num,
+                price: item.price
+              };
+            }
+            // console.log(this.selectSku.value, "sku");
+            return false;
+          });
+        });
+      },
+      deep: true
+    }
+  },
   onShow() {
-      this.userId= wx.getStorageSync("userId")
-      this.token= wx.getStorageSync("token")
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
     this.id = this.$root.$mp.query.id;
     this.setBarTitle();
     this.getData();
@@ -297,95 +337,223 @@ export default {
     async getData() {
       const that = this;
       const id = this.$root.$mp.query.id;
-      const res = await post("Goods/ProductInfo", { proId: id * 1 })
+      const res = await post("Goods/ProductInfo", { proId: 311 * 1 });
 
-        const datas = res.data;
-        // 获取优惠券信息
-        that.getCoupon();
-        that.product = {
-          img: datas.ProductImgList[0].PicUrl||'',
-          imgs: [],
-          comment: [],
-          sku: [],
-          title: datas.ProductName,
-          id: datas.ProductId,
-          shopId: datas.ShopId,
-          price: datas.ProductPrice,
-          // 积分
-          score: datas.Score,
-          //   库存
-          stock: datas.Stock,
-          detail: datas.ContentDetail,
-          // 销量
-          salesNum: datas.SalesVolume,
-          // 邮费
-          freight: datas.freight || "免运费",
-          // 省份
-          province: datas.ProvinceName,
-          // 城市
-          city: datas.CityName,
-          serviceTab: datas.ServiceName?JSON.parse(datas.ServiceName):[],
-          productParams: {
-            // 品牌
-            name: datas.BrandName,
-            // 型号
-            typeNum: datas.ModelName,
-            // 服务类型
-            serviceType: datas.TypeName,
-             attr:'',
+      const datas = res.data;
+      // 获取优惠券信息
+      that.getCoupon();
+      that.product = {
+        img: datas.ProductImgList[0].PicUrl || "",
+        imgs: [],
+        comment: [],
+        sku: [],
+        title: datas.ProductName,
+        id: datas.ProductId,
+        shopId: datas.ShopId,
+        price: datas.ProductPrice,
+        // 积分
+        score: datas.Score,
+        //   库存
+        stock: datas.Stock,
+        detail: datas.ContentDetail,
+        // 销量
+        salesNum: datas.SalesVolume,
+        // 邮费
+        freight: datas.freight || "免运费",
+        // 省份
+        province: datas.ProvinceName,
+        // 城市
+        city: datas.CityName,
+        serviceTab: datas.ServiceName ? JSON.parse(datas.ServiceName) : [],
+        productParams: {
+          // 品牌
+          name: datas.BrandName,
+          // 型号
+          typeNum: datas.ModelName,
+          // 服务类型
+          serviceType: datas.TypeName,
+          attr: ""
+        }
+      };
+      // 商品图片
+      for (let i = 0; i < datas.ProductImgList.length; i += 1) {
+        that.product.imgs.push(datas.ProductImgList[i].PicUrl);
+      }
+      // 评论列表
+      for (let i = 0; i < datas.EvaluateList.length; i += 1) {
+        const comments = datas.EvaluateList[i];
+        that.product.comment.push({
+          id: comments.Id,
+          userId: comments.MemberId,
+          userName: comments.MemberName,
+          userImg: comments.MemberHeadImg,
+          content: comments.ContentText,
+          time: comments.AddTime,
+          rank: comments.Rank,
+          img: comments.EvaluateImgList.split(","),
+          // 回复
+          reply: datas.Reply
+        });
+      }
+      // sku
+      let _sku = {}; //渲染的sku数据
+      let skuAll = []; //全部sku数据
+      for (let i = 0; i < datas.ProductSpecList.length; i += 1) {
+        const sku = datas.ProductSpecList[i];
+        let value = JSON.parse(sku.SpecValue);
+        // Object.keys(value).map((item,index,arr)=>{
+        //   console.log(item,index,'对象')
+        // })
+
+        for (let j in value) {
+          // 保存渲染的data到_sku
+          if (!_sku[j]) {
+            _sku[j] = [];
           }
-        };
-        // 商品图片
-        for (let i = 0; i < datas.ProductImgList.length; i += 1) {
-          that.product.imgs.push(datas.ProductImgList[i].PicUrl);
+          if (JSON.stringify(_sku[j]).indexOf(value[j]) === -1) {
+            _sku[j].push({
+              val: value[j],
+              status: false, //是否可选
+              selectStatus: false //选择状态
+            });
+            // console.log(JSON.stringify(_sku[j]), value[j], "产品详情");
+          }
         }
-        // 评论列表
-        for (let i = 0; i < datas.EvaluateList.length; i += 1) {
-          const comments = datas.EvaluateList[i];
-          that.product.comment.push({
-            id: comments.Id,
-            userId: comments.MemberId,
-            userName: comments.MemberName,
-            userImg: comments.MemberHeadImg,
-            content: comments.ContentText,
-            time: comments.AddTime,
-            rank: comments.Rank,
-            img: comments.EvaluateImgList.split(','),
-            // 回复
-            reply:datas.Reply
-          });
-        }
-        // sku
-        let _sku = {}
-        for (let i = 0; i < datas.ProductSpecList.length; i += 1) {
-          const sku = datas.ProductSpecList[i];
-          let value =JSON.parse(sku.SpecValue)
-          // Object.keys(value).map((item,index,arr)=>{
-          //   console.log(item,index,'对象')
-          // })
+        // 保存全部sku数据
+        skuAll.push({
+          num: sku.ProStock,
+          price: sku.PunitPrice,
+          img: sku.SpecImage,
+          value,
+          text: sku.SpecText
+        });
+        // 更改sku之前
+        // that.product.sku.push({
+        //   id:sku.Id,
+        //   productId: sku.ProId,
+        //   num: sku.ProStock,
+        //   price: sku.PunitPrice,
+        //   img: sku.SpecImage,
+        //   text: sku.SpecText,
+        //   value: sku.SpecText.replace(/_/g, " "),
+        //   sbumitValue:sku.SpecText
+        // });
+        // that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
+      }
+      this.sku = _sku;
+      this.skuAll = skuAll;
+    },
+    // 选择sku
+    onSelectSku(val, index) {
+      // 更改选择sku的状态
+      this.sku[val].map((oeb, i) => {
+        this.$set(this.sku[val][i],'selectStatus',false)
+        // this.sku[val][i].selectStatus = false;
+      });
+      // const a = this.sku[val]
+      // a[index].selectStatus = true
+      //   this.$set(this.sku,val,a)
+        this.$set(this.sku[val][index],'selectStatus',true)
+      // this.sku[val][index].selectStatus = true;
+        console.log( this.sku[val][index],this.sku[val][index].selectStatus)
+      this.selectSku.value[val] = this.sku[val][index].val;
+      // return false;
+      // 是否选择完sku属性
+      this.checkedSku();
+      this.isUseSku();
+    },
+    // 全部选择完sku属性执行
+    checkedSku() {
+      //首先，选择后的属性肯定是不会重复的，只会特换选择的sku。
+      //再判断选择后的数量是否等于数据返回的属性数量。
+      // 只有相等的情况再执行判断，遍历数组，存在相等属性的话+1.
+      // 如果相等的数量等于返回数据的属性数量，那就是唯一的sku了
 
-          // for(let j in value){
-          //    if(!_sku[j]){
-          //      _sku[j] = []
-          //    }
-          //    if(_sku[j].indexOf(value[j])===-1){
-          //       _sku[j].push(value[j])
-          //    }
-          // }
-          //    console.log(_sku,"产品详情");
-          // 更改sku之前
-          that.product.sku.push({
-            id:sku.Id,
-            productId: sku.ProId,
-            num: sku.ProStock,
-            price: sku.PunitPrice,
-            img: sku.SpecImage,
-            text: sku.SpecText,
-            value: sku.SpecText.replace(/_/g, " "),
-            sbumitValue:sku.SpecText
+      // 选择sku的数量
+      let selectSkuNum = 0;
+      Object.keys(this.selectSku.value).map(() => {
+        selectSkuNum += 1;
+      });
+      // 判断sku选择的数量是否全部选择
+      let skuAttrNum = 0;
+      Object.keys(this.sku).map(() => {
+        skuAttrNum += 1;
+      });
+      // 全部选择完sku属性
+      if (skuAttrNum === selectSkuNum) {
+        this.skuAll.map(skuAllItem => {
+          // 遍历全部数组的对象，如果存在相同的属性则数量+1
+          let skuAllNum = 0;
+          Object.keys(skuAllItem.value).map(skuAllItemValue => {
+            Object.keys(this.selectSku.value).map(selectItem => {
+              if (
+                skuAllItemValue === selectItem &&
+                skuAllItem.value[selectItem] ===
+                  this.selectSku.value[selectItem]
+              ) {
+                skuAllNum += 1;
+              }
+            });
           });
-          that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
-         }
+          // 判断全部属性相等的数量是否等于sku全部属性的数量
+          if (skuAttrNum === skuAllNum) {
+            console.log(skuAllItem, "选择的sku");
+            const value = this.selectSku.value;
+            this.selectSku = {
+              num: skuAllItem.num,
+              price: skuAllItem.price,
+              img: skuAllItem.img,
+              text: skuAllItem.text,
+              value
+            };
+          }
+        });
+      }
+    },
+    // 判断可使用的sku
+    isUseSku() {
+      // 创建一个对象,用于进行添加值判断
+      Object.keys(this.sku).map(skuItem => {
+        // 遍历渲染的sku值，只有跟选中的key值不相同的情况。再把值添加到obj
+        let obj = JSON.parse(JSON.stringify(this.selectSku.value));
+        // Object.keys(this.selectSku.value).map(selectItem => {
+        this.sku[skuItem].map((skuItemValue,skuItemIndex) => {
+          if (!this.selectSku.value[skuItem]) {
+            obj[skuItem] = skuItemValue.val;
+            const status = this.isUseSku2(obj)
+            this.sku[skuItem][skuItemIndex].status = status
+            console.log("333", this.sku[skuItem][skuItemIndex]);
+          }
+        });
+        // });
+      });
+    },
+    isUseSku2(obj){
+            let status = false;
+            console.log(obj, "obj");
+            let objNum = 0;
+            Object.keys(obj).map(()=>{
+              objNum+=1
+              })
+            // 渲染全部sku，判断跟boj的值相同剩余可选的sku属性库存
+          this.skuAll.map(skuAllItem=>{
+            let sameNum = 0;
+            Object.keys(skuAllItem.value).map(skuAllValueItem=>{
+              Object.keys(obj).map(bojItem=>{
+                if(skuAllValueItem===bojItem&&skuAllItem.value[bojItem] === obj[bojItem]){
+                  sameNum+=1;
+                }
+              })
+            })
+            // 相等的情况下
+            if(objNum === sameNum){
+               if((skuAllItem.num*1)>0){
+                 status= true;
+                 return true;
+               }
+            }
+          })
+          return status;
     },
     // 获取优惠券列表
     async getCoupon() {
@@ -397,7 +565,7 @@ export default {
           page: 1
         };
         const res = await post("Coupon/CouponCenter", params);
-        this.coupon=[]
+        this.coupon = [];
         for (let i = 0; i < res.data.length; i += 1) {
           const _res = res.data[i];
           this.coupon.push({
@@ -435,7 +603,7 @@ export default {
     // 加入购物车
     async addCart() {
       // 判断库存
-      if(!this.stockCheck()){
+      if (!this.stockCheck()) {
         return false;
       }
       const params = {
@@ -446,20 +614,19 @@ export default {
         SpecText: this.selectSkuValueSubmit
       };
       try {
-       const res = await post("Cart/AddCart", params);
+        const res = await post("Cart/AddCart", params);
         wx.showToast({
-            title: "添加成功！",
-            icon: "success"
-          });
-      }
-      catch(e){
-        console.log('e')
-        console.log(e)
+          title: "添加成功！",
+          icon: "success"
+        });
+      } catch (e) {
+        console.log("e");
+        console.log(e);
       }
     },
     // 校验购买数量
-    stockCheck(){
-      const stock = this.selectSkuNum||this.product.stock
+    stockCheck() {
+      const stock = this.selectSkuNum || this.product.stock;
       if (stock < this.payNum) {
         wx.showToast({
           title: "购买数量大于剩余库存！",
@@ -472,32 +639,21 @@ export default {
     // 购买
     confirm() {
       // 判断库存
-      if(!this.stockCheck()){
+      if (!this.stockCheck()) {
         return false;
       }
       this.showNums = false;
       this.isshow = false;
-      
-    this.$store.commit('setConfirmOrder',{
-      addressId:'',
-      productId:this.product.id,
-      sku:this.selectSkuValueSubmit,
-      // buyNum:this.selectSkuNum,
-      buyNum:this.payNum,
-      couponId:''
-    })
+
+      this.$store.commit("setConfirmOrder", {
+        addressId: "",
+        productId: this.product.id,
+        sku: this.selectSkuValueSubmit,
+        // buyNum:this.selectSkuNum,
+        buyNum: this.payNum,
+        couponId: ""
+      });
       wx.navigateTo({ url: `/pages/confirmorder/main` });
-    },
-    // 选择sku
-    selectSku(index) {
-      this.activeSkuIndex = index;
-      this.activeSkuId = this.product.sku[index].id;
-      this.selectSkuPrice = this.product.sku[index].price;
-      this.activeImg = this.product.sku[index].img;
-      // this.selectSkuNum = this.payNum;
-      this.selectSkuNum = this.product.sku[index].stock;
-      this.selectSkuValue = this.product.sku[index].value;
-      this.selectSkuValueSubmit = this.product.sku[index].sbumitValue;
     },
     share() {
       this.isshow = true;
@@ -553,8 +709,10 @@ export default {
     },
     commentList() {
       wx.navigateTo({
-        url:`/pages/comment-list/main?productId=${this.product.id}&shopId=${this.product.shopId}`
-      })
+        url: `/pages/comment-list/main?productId=${this.product.id}&shopId=${
+          this.product.shopId
+        }`
+      });
     }
   },
 
