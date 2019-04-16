@@ -204,14 +204,14 @@
             </div>-->
             <div
               class="flex-container spec"
-              :class="item.selectStatus?'specactive':''"
-              :style="item.status?'color:#999;border:1px red solid;':''"
+              :class="{'specactive':item.selectStatus}"
+              :style="item.status?'color:#999;':''"
               v-for="(item,index) in sku"
               :key="index"
               @click="onSelectSku(val,index)"
             >
               <!-- <img :src="item.img" class="specpic"> -->
-              <text>{{item.val}}{{item.selectStatus}}</text>
+              <text>{{item.val}}</text>
             </div>
             <!-- <div class="flex-container">
                       <img src="/static/images/specimg.png" class="specpic">
@@ -448,14 +448,11 @@ export default {
       // 更改选择sku的状态
       this.sku[val].map((oeb, i) => {
         this.$set(this.sku[val][i],'selectStatus',false)
-        // this.sku[val][i].selectStatus = false;
       });
-      // const a = this.sku[val]
-      // a[index].selectStatus = true
-      //   this.$set(this.sku,val,a)
-        this.$set(this.sku[val][index],'selectStatus',true)
-      // this.sku[val][index].selectStatus = true;
-        console.log( this.sku[val][index],this.sku[val][index].selectStatus)
+      let sku = JSON.parse(JSON.stringify(this.sku[val]))
+      sku[index].selectStatus = true
+        this.$set(this.sku,val,sku)
+
       this.selectSku.value[val] = this.sku[val][index].val;
       // return false;
       // 是否选择完sku属性
@@ -529,7 +526,8 @@ export default {
       });
     },
     isUseSku2(obj){
-            let status = false;
+      // true为不可选，false--可选状态
+            let status = true;
             console.log(obj, "obj");
             let objNum = 0;
             Object.keys(obj).map(()=>{
@@ -548,8 +546,8 @@ export default {
             // 相等的情况下
             if(objNum === sameNum){
                if((skuAllItem.num*1)>0){
-                 status= true;
-                 return true;
+                 status = false;
+                 return false;
                }
             }
           })
