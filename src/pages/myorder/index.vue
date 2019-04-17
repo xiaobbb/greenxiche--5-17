@@ -305,7 +305,7 @@ export default {
         wx.navigateTo({ url: "/pages/orderdetail/main?orderNo=" + orderNo });
       }
       if (e == 2) {
-        wx.navigateTo({ url: "/pages/appointorderdet/main?orderNo=" + orderNo  });
+        wx.navigateTo({ url: "/pages/appointorderdet/main?orderNo=" + orderNo+"&serType=" + this.serviceMode  });
       }
     },
     initData() {

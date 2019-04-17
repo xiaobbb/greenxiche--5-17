@@ -31,10 +31,10 @@
     </div>
     <div class="orderlist">
         <div class="orderitem padtop">
-            <div class="flex-container">
+            <!-- <div class="flex-container">
                 <p>运费（快递）</p>
                 <p>￥{{info.ExpressPrice}}</p>
-            </div>
+            </div> -->
             <div class="flex-container">
                 <p>订单总价</p>
                 <p>￥{{info.TotalPrice}}</p>
@@ -46,7 +46,7 @@
         </div>
         <div class="flex-container padtop">
               <p>需付款</p>
-              <p class="pricecolor">￥1288.00</p>
+              <p class="pricecolor">￥{{info.TotalPrice}}</p>
         </div>
     </div>
     <div class="slide"></div>
