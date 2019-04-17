@@ -182,12 +182,11 @@
       <div class="mask choose" v-if="showNums">
         <div class="flex-container choosetitle">
           <div class="flex-container">
-            <!-- <img :src="activeImg" class="maskshop"> -->
             <img :src="selectSku.img||product.img" class="maskshop">
             <div class="chooseinfo">
               <p class="price">{{selectSku.price||product.price}}</p>
               <p class="tips count">库存{{selectSku.num||product.stock}}件</p>
-              <p class="tips" v-show="selectSku.text">已选:“{{selectSku.text}}”</p>
+              <p class="tips" v-show="selectSku.value">已选:“{{selectSku.value}}”</p>
             </div>
           </div>
           <div>
@@ -195,30 +194,7 @@
           </div>
         </div>
         <!-- sku -->
-        <div class="sku" v-for="(sku,val) in sku" :key="val">
-          <div class="spcestitle">{{val}}</div>
-          <div class="specs">
-            <!-- <div class="flex-container">
-                      <img src="/static/images/specimg.png" class="specpic">
-                      <text>精选1年版（全国包施工）</text>
-            </div>-->
-            <div
-              class="flex-container spec"
-              :class="{'specactive':item.selectStatus}"
-              :style="item.status?'color:#999;':''"
-              v-for="(item,index) in sku"
-              :key="index"
-              @click="onSelectSku(val,index)"
-            >
-              <!-- <img :src="item.img" class="specpic"> -->
-              <text>{{item.val}}</text>
-            </div>
-            <!-- <div class="flex-container">
-                      <img src="/static/images/specimg.png" class="specpic">
-                      <text>精选1年版（全国包施工）</text>
-            </div>-->
-          </div>
-        </div>
+        <Sku :sku="sku" :skuAll="skuAll" v-if="showSku" @getSkuData="getSkuData"></Sku>
         <div class="flex-container choosenums">
           <p>购买数量</p>
           <p class="flex-container">
@@ -254,6 +230,7 @@
 <script>
 import detailChild from "@/components/detailChild"; //公用组件
 import detailChildpic from "@/components/detailChildpic"; //公用组件
+import Sku from "@/components/sku.vue"; //公用组件
 import { post } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
@@ -272,16 +249,10 @@ export default {
       showEvaluate: true,
       payNum: 1,
       product: {},
-      //   选择的sku图片
-      activeImg: "",
-      activeSkuIndex: "",
-      selectSkuPrice: "",
-      selectSkuNum: "",
-      selectSkuValue: "",
-      selectSkuValueSubmit: "",
       // 优惠券
       coupon: [],
       // sku
+      showSku:false,
       sku: {},
       skuAll: [],
       selectSku: {
@@ -290,36 +261,18 @@ export default {
         img: "",
         num: "",
         price: "",
-        text: "" //sku组合用下划线分隔_
+        text: "", //sku组合用下划线分隔_
+        value:''  //sku组合，不带下划线
       }
     };
   },
 
   components: {
     detailChild,
-    detailChildpic
+    detailChildpic,
+    Sku
   },
   watch: {
-    sku1: {
-      handler() {
-        this.skuAll.map(item => {
-          Object.keys(this.selectSku.value).map(selectItem => {
-            if (this.selectSku.value[selectItem] === item.value[selectItem]) {
-              console.log(item, "sku");
-              // 选中的sku图片库存、价格
-              this.selectSku = {
-                img: item.img,
-                num: item.num,
-                price: item.price
-              };
-            }
-            // console.log(this.selectSku.value, "sku");
-            return false;
-          });
-        });
-      },
-      deep: true
-    }
   },
   onShow() {
     this.userId = wx.getStorageSync("userId");
@@ -327,6 +280,10 @@ export default {
     this.id = this.$root.$mp.query.id;
     this.setBarTitle();
     this.getData();
+  },
+    // 初始化
+  onInit(){
+    this.showSku = false
   },
   methods: {
     setBarTitle() {
@@ -346,7 +303,6 @@ export default {
         img: datas.ProductImgList[0].PicUrl || "",
         imgs: [],
         comment: [],
-        sku: [],
         title: datas.ProductName,
         id: datas.ProductId,
         shopId: datas.ShopId,
@@ -426,144 +382,19 @@ export default {
           img: sku.SpecImage,
           value,
           text: sku.SpecText
-        });
-        // 更改sku之前
-        // that.product.sku.push({
-        //   id:sku.Id,
-        //   productId: sku.ProId,
-        //   num: sku.ProStock,
-        //   price: sku.PunitPrice,
-        //   img: sku.SpecImage,
-        //   text: sku.SpecText,
-        //   value: sku.SpecText.replace(/_/g, " "),
-        //   sbumitValue:sku.SpecText
-        // });
-        // that.product.productParams.attr+=(sku.SpecText.replace(/_/g, " ")+'，')
-      }
+        });}
       this.sku = _sku;
       this.skuAll = skuAll;
-      this.isUseSku();
+      this.showSku = true;
     },
-    // 选择sku
-    onSelectSku(val, index) {
-      // 更改选择sku的状态
-      this.sku[val].map((oeb, i) => {
-        this.$set(this.sku[val][i],'selectStatus',false)
-      });
-      let sku = JSON.parse(JSON.stringify(this.sku[val]))
-      sku[index].selectStatus = true
-        this.$set(this.sku,val,sku)
-
-      this.selectSku.value[val] = this.sku[val][index].val;
-      // return false;
-      // 是否选择完sku属性
-      this.checkedSku();
-      this.isUseSku();
-    },
-    // 全部选择完sku属性执行
-    checkedSku() {
-      //首先，选择后的属性肯定是不会重复的，只会特换选择的sku。
-      //再判断选择后的数量是否等于数据返回的属性数量。
-      // 只有相等的情况再执行判断，遍历数组，存在相等属性的话+1.
-      // 如果相等的数量等于返回数据的属性数量，那就是唯一的sku了
-
-      // 选择sku的数量
-      let selectSkuNum = 0;
-      Object.keys(this.selectSku.value).map(() => {
-        selectSkuNum += 1;
-      });
-      // 判断sku选择的数量是否全部选择
-      let skuAttrNum = 0;
-      Object.keys(this.sku).map(() => {
-        skuAttrNum += 1;
-      });
-      // 全部选择完sku属性
-      if (skuAttrNum === selectSkuNum) {
-        this.skuAll.map(skuAllItem => {
-          // 遍历全部数组的对象，如果存在相同的属性则数量+1
-          let skuAllNum = 0;
-          Object.keys(skuAllItem.value).map(skuAllItemValue => {
-            Object.keys(this.selectSku.value).map(selectItem => {
-              if (
-                skuAllItemValue === selectItem &&
-                skuAllItem.value[selectItem] ===
-                  this.selectSku.value[selectItem]
-              ) {
-                skuAllNum += 1;
-              }
-            });
-          });
-          // 判断全部属性相等的数量是否等于sku全部属性的数量
-          if (skuAttrNum === skuAllNum) {
-            console.log(skuAllItem, "选择的sku");
-            const value = this.selectSku.value;
+    getSkuData(skuAllItem){
             this.selectSku = {
               num: skuAllItem.num,
               price: skuAllItem.price,
               img: skuAllItem.img,
               text: skuAllItem.text,
-              value
+              value:skuAllItem.text.replace(/_/g,' ')
             };
-          }
-        });
-      }
-    },
-    // 判断可使用的sku
-    isUseSku() {
-      // 创建一个对象,用于进行添加值判断
-      Object.keys(this.sku).map(skuItem => {
-        // 遍历渲染的sku值，只有跟选中的key值不相同的情况。再把值添加到obj
-        let obj = JSON.parse(JSON.stringify(this.selectSku.value));
-        this.sku[skuItem].map((skuItemValue,skuItemIndex) => {
-      // 选择sku的数量
-          let selectSkuNum = 0;
-        Object.keys(this.selectSku.value).map(() => {
-          selectSkuNum+=1;
-        });
-        // 判断sku选择的数量是否全部选择
-        let skuAttrNum = 0;
-        Object.keys(this.sku).map(() => {
-          skuAttrNum += 1;
-        });
-        if(selectSkuNum === skuAttrNum){
-            obj[skuItem] = skuItemValue.val;
-            const status = this.isUseSku2(obj)
-            this.sku[skuItem][skuItemIndex].status = status
-        }else if (!this.selectSku.value[skuItem] ) {
-            obj[skuItem] = skuItemValue.val;
-            const status = this.isUseSku2(obj)
-            this.sku[skuItem][skuItemIndex].status = status
-          }
-        });
-      });
-    },
-    isUseSku2(obj){
-      // true为不可选，false--可选状态
-            let status = true;
-            console.log(obj, "obj");
-            let objNum = 0;
-            Object.keys(obj).map(()=>{
-              objNum+=1
-              })
-            // 渲染全部sku，判断跟boj的值相同剩余可选的sku属性库存
-          this.skuAll.map(skuAllItem=>{
-            let sameNum = 0;
-            Object.keys(skuAllItem.value).map(skuAllValueItem=>{
-              Object.keys(obj).map(bojItem=>{
-                if(skuAllValueItem===bojItem&&skuAllItem.value[bojItem] === obj[bojItem]){
-                  sameNum+=1;
-                }
-              })
-            })
-            // 相等的情况下
-            if(objNum === sameNum){
-               if((skuAllItem.num*1)>0){
-                 status = false;
-                 return false;
-               }
-            }
-          })
-          return status;
     },
     // 获取优惠券列表
     async getCoupon() {
@@ -621,7 +452,7 @@ export default {
         Token: this.token,
         ProId: this.product.id,
         Count: this.payNum,
-        SpecText: this.selectSkuValueSubmit
+        SpecText: this.selectSku.text
       };
       try {
         const res = await post("Cart/AddCart", params);
@@ -636,7 +467,7 @@ export default {
     },
     // 校验购买数量
     stockCheck() {
-      const stock = this.selectSkuNum || this.product.stock;
+      const stock = this.selectSku.num || this.product.stock;
       if (stock < this.payNum) {
         wx.showToast({
           title: "购买数量大于剩余库存！",
@@ -658,8 +489,7 @@ export default {
       this.$store.commit("setConfirmOrder", {
         addressId: "",
         productId: this.product.id,
-        sku: this.selectSkuValueSubmit,
-        // buyNum:this.selectSkuNum,
+        sku: this.selectSku.text,
         buyNum: this.payNum,
         couponId: ""
       });
