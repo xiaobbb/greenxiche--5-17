@@ -189,7 +189,7 @@ export default {
     // 判断是否有库存
 
     // 全部选中sku的话，则每个组合都进行判断，是否有库存
-    
+
     // 每次执行isUseSku2传过来的obj应该只有一个渲染数据this.sku的遍历
     isUseSku2(obj) {
       // true为不可选，false--可选状态

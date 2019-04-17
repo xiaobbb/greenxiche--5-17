@@ -252,7 +252,7 @@ export default {
       // 优惠券
       coupon: [],
       // sku
-      showSku:false,
+      showSku: false,
       sku: {},
       skuAll: [],
       selectSku: {
@@ -262,7 +262,7 @@ export default {
         num: "",
         price: "",
         text: "", //sku组合用下划线分隔_
-        value:''  //sku组合，不带下划线
+        value: "" //sku组合，不带下划线
       }
     };
   },
@@ -272,8 +272,7 @@ export default {
     detailChildpic,
     Sku
   },
-  watch: {
-  },
+  watch: {},
   onShow() {
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
@@ -281,9 +280,9 @@ export default {
     this.setBarTitle();
     this.getData();
   },
-    // 初始化
-  onInit(){
-    this.showSku = false
+  // 初始化
+  onInit() {
+    this.showSku = false;
   },
   methods: {
     setBarTitle() {
@@ -382,20 +381,21 @@ export default {
           img: sku.SpecImage,
           value,
           text: sku.SpecText
-        });}
+        });
+      }
       this.sku = _sku;
       this.skuAll = skuAll;
       this.showSku = true;
     },
     // 过去sku组件传过来的数据
-    getSkuData(skuAllItem){
-            this.selectSku = {
-              num: skuAllItem.num,
-              price: skuAllItem.price,
-              img: skuAllItem.img,
-              text: skuAllItem.text,
-              value:skuAllItem.text.replace(/_/g,' ')
-            };
+    getSkuData(skuAllItem) {
+      this.selectSku = {
+        num: skuAllItem.num,
+        price: skuAllItem.price,
+        img: skuAllItem.img,
+        text: skuAllItem.text,
+        value: skuAllItem.text.replace(/_/g, " ")
+      };
     },
     // 获取优惠券列表
     async getCoupon() {
@@ -468,8 +468,7 @@ export default {
     },
     // 校验购买数量、是否选择sku
     stockCheck() {
-
-      if(this.skuAll.length>0&&!this.selectSku.text){
+      if (this.skuAll.length > 0 && !this.selectSku.text) {
         wx.showToast({
           title: "请选择购买规格！",
           icon: "none"
