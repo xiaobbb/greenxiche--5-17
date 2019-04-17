@@ -18,21 +18,59 @@
   </div>
 </template>
 <script>
+// 获取的sku格式：渲染的数据格式
+//   {
+//     尺寸:{
+//       selectStatus:false, //选中状态
+//       status:true,  //可选状态
+//       val:"S"
+//     },
+//     颜色:{
+//       selectStatus:false,
+//       status:true,
+//       val:"白色"
+//     },
+//   }
+// 获取的skuAll格式：全部sku列表 数组
+// [
+//   {
+//     img:"", //sku图片
+//     num:10,  //sku数量
+//     price:1, //sku价格
+//     text:"白色_S_T恤", //sku组合，下划线分隔
+//     value:{    //sku的key和值
+//       尺寸:"S",
+//       款式:"T恤",
+//       颜色:"白色"
+//     }
+//   },
+//   {
+//     img:"", //sku图片
+//     num:10,  //sku数量
+//     price:1, //sku价格
+//     text:"白色_S_T恤", //sku组合，下划线分隔
+//     value:{    //sku的key和值
+//       尺寸:"M",
+//       款式:"T恤",
+//       颜色:"白色"
+//     }
+//   },
+// ]
 export default {
-    props:{
-        sku:{
-            type:Object,
-            dafault(){
-                return {}
-            }
-        },
-        skuAll:{
-            type:Array,
-            default(){
-                return []
-            }
-        }
+  props: {
+    sku: {
+      type: Object,
+      dafault() {
+        return {};
+      }
     },
+    skuAll: {
+      type: Array,
+      default() {
+        return [];
+      }
+    }
+  },
   data() {
     return {
       selectSku: {
@@ -45,18 +83,15 @@ export default {
       }
     };
   },
-  onShow() {
-  },
-  onLoad(){
-            console.log('初始化sku数据执行')
-            this.isUseSku();
+  onLoad() {
+    this.isUseSku();
   },
   methods: {
     // 选择sku
     onSelectSku(val, index) {
-        if(this.sku[val][index].status){
-            return false;
-        }
+      if (this.sku[val][index].status) {
+        return false;
+      }
       // 更改选择sku的状态
       this.sku[val].map((oeb, i) => {
         this.$set(this.sku[val][i], "selectStatus", false);
@@ -115,7 +150,7 @@ export default {
               text: skuAllItem.text,
               value
             };
-            this.$emit('getSkuData',skuAllItem)
+            this.$emit("getSkuData", skuAllItem);
           }
         });
       }
@@ -149,10 +184,17 @@ export default {
         });
       });
     },
+    // 拿到组合的数据来判断是否有库存
+    // 没有选择全部sku的话，拿选中的key和值+遍历的每一个没选中的进行判断，
+    // 判断是否有库存
+
+    // 全部选中sku的话，则每个组合都进行判断，是否有库存
+    
+    // 每次执行isUseSku2传过来的obj应该只有一个渲染数据this.sku的遍历
     isUseSku2(obj) {
       // true为不可选，false--可选状态
       let status = true;
-      console.log(obj, "obj");
+      // console.log(obj, "obj");
       let objNum = 0;
       Object.keys(obj).map(() => {
         objNum += 1;
@@ -170,7 +212,9 @@ export default {
             }
           });
         });
-        // 相等的情况下
+        // 相等的情况下,判断库存是否大于0，
+        // 大于0：状态为可选，跳出
+        // 没有一个大于0：则没有库存，状态为禁用
         if (objNum === sameNum) {
           if (skuAllItem.num * 1 > 0) {
             status = false;
@@ -184,34 +228,33 @@ export default {
 };
 </script>
 <style scoped>
-
-.spcestitle{
-    padding:20rpx 0;
+.spcestitle {
+  padding: 20rpx 0;
 }
-.specs{
-    flex-wrap: wrap;
-    display:flex;
-    align-items:center;
+.specs {
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
 }
-.specs div{
-    font-size:24rpx;
-    margin-top:20rpx;
-    padding:5rpx 20rpx;
-    background: #f3f3f3;
+.specs div {
+  font-size: 24rpx;
+  margin-top: 20rpx;
+  padding: 5rpx 20rpx;
+  background: #f3f3f3;
 }
-.spec{
-    border:1rpx solid #fff;
-    border-radius:10rpx;
-    background: #fff7f4;
-    margin-right:20rpx;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.spec {
+  border: 1rpx solid #fff;
+  border-radius: 10rpx;
+  background: #fff7f4;
+  margin-right: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.specactive{
-    border:1rpx solid #ff6325;
-    border-radius:10rpx;
-    background: #fff7f4;
+.specactive {
+  border: 1rpx solid #ff6325;
+  border-radius: 10rpx;
+  background: #fff7f4;
 }
 </style>
 

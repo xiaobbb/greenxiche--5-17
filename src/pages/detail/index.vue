@@ -387,6 +387,7 @@ export default {
       this.skuAll = skuAll;
       this.showSku = true;
     },
+    // 过去sku组件传过来的数据
     getSkuData(skuAllItem){
             this.selectSku = {
               num: skuAllItem.num,
@@ -465,9 +466,17 @@ export default {
         console.log(e);
       }
     },
-    // 校验购买数量
+    // 校验购买数量、是否选择sku
     stockCheck() {
-      const stock = this.selectSku.num || this.product.stock;
+
+      if(this.skuAll.length>0&&!this.selectSku.text){
+        wx.showToast({
+          title: "请选择购买规格！",
+          icon: "none"
+        });
+        return false;
+      }
+      let stock = this.selectSku.num || this.product.stock;
       if (stock < this.payNum) {
         wx.showToast({
           title: "购买数量大于剩余库存！",
