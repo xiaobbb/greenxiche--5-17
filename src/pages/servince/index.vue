@@ -7,6 +7,7 @@
         </div>
     </div>
     <!--右列表-->
+    <div v-if="servicelist.length<0">暂无满足条件的商品，敬请期待！</div>
     <div class="list" style="margin-left:32%;margin-bottom:100rpx;">
         <div class="flex-container intitem" v-for="(item,pindex) in servicelist" :key="item.Id">
             <div class="flex-container" style="width:85%;">
@@ -46,14 +47,20 @@ export default {
    onLoad(){
     this.latitude=this.$store.state.latitude
     this.longitude=this.$store.state.longitude
-    this.servicelist=[]
+    this.shopId=this.$root.$mp.query.shopId
     this.setBarTitle();
-    this.getMenulist();
+    console.log(this.shopId)
+  },
+  onShow(){
+      this.Page="1"
+      this.servicelist=[]
+      this.getMenulist();
   },
   data () {
     return {
       latitude:"",
       longitude:"",
+      shopId:"",
       Page:1,//当前页码
       PageSize:5,//数量
       pageCount:"",//商品总数
@@ -97,12 +104,13 @@ export default {
           Page:this.Page,
           PageSize:this.PageSize,
           TypeId:this.TypeId,
+          ShopId:this.shopId,
           Lat:"1.000000",
           Lng:"2.000000"
           // Lat:this.latitude,
           // Lng:this.longitude
       })
-      //console.log(res,"商品列表")
+      console.log(res,"商品列表")
       if(res.code==0){
           this.pageCount=res.count;
           if(parseInt(this.pageCount) % this.PageSize === 0){
@@ -122,6 +130,7 @@ export default {
     },
     change(e){  //点击菜单获取产品列表
       this.active=e
+      this.Page=1
       this.TypeId=this.menulist[e].Id
       this.servicelist=[]
       this.getProlist()

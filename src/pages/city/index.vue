@@ -33,11 +33,12 @@
               
                 <div class="item">热门城市</div>
                 <div class="flex-container cityhot">
-                    <div class="name" v-for="item in hotCity" :key="item.id" :data-city="item.name" @click="bindCity">{{item.name}}</div>
+                    <div class="name" v-for="item in hotCity" :key="item.id" :data-city="item.name"  @click="bindCity">{{item.name}}</div>
                 </div>
+                <!--搜索城市-->
                 <div class="citylist" v-for="(item,sindex) in searchlist" :key="sindex">
                     <div class="item" :id="item.initial">{{ item.initial }}</div>
-                    <div style="padding:20rpx 30rpx;border-bottom:1rpx solid #f4f4f4" @click="bindCity">
+                    <div style="padding:20rpx 30rpx;border-bottom:1rpx solid #f4f4f4"  :data-city="item.city" @click="bindCity">
                         {{item.city}}
                     </div>  
                 </div>
@@ -80,7 +81,14 @@ export default {
           ]
     }
   },
- 
+  watch:{
+      inputName(){
+        if(this.inputName.length== 0){
+          this.searchlist=[]
+          this.cityList()
+        }
+      }
+  },
   components: {
     
   },
@@ -161,6 +169,8 @@ export default {
       this.update({ cityName: e.currentTarget.dataset.city });
       this.scrollTopId=""  //清空
       this.scrollTopId= 'currentcity'
+      this.searchlist=[]
+      this.cityList()
     },
     setBarTitle() {
       wx.setNavigationBarTitle({

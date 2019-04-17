@@ -71,7 +71,9 @@ import { get, myget, mypost, post, toLogin } from "../../utils";
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onShow() {
+    console.log(this.latitude,this.longitude,"填写订单")
     this.showPay = false;
+    this.shopId=this.$root.$mp.query.shopId
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
     this.latitude=this.$store.state.latitude
@@ -80,6 +82,7 @@ export default {
     this.cartip = "请选择车辆";
     this.timetip = "请选择服务时间";
     this.serTip = "请选择服务项目";
+    this.total="0.00"
     //转换时间
     this.changeTime();
     //服务项目
@@ -121,12 +124,13 @@ export default {
     return {
       showPay: false,
       address: "",
-      serTip: "",
-      timetip: "",
-      cartip: "",
-      total: "",
+      serTip: "",  //服务项目
+      timetip: "", //服务时间
+      cartip: "",  //车辆
+      total: "",  //总价
       userId: "",
       token: "",
+      shopId:"",
       orderNumber: "", //订单编号
       personName: "", //姓名
       personPhone: "", //手机
@@ -150,7 +154,7 @@ export default {
         }],
       markers:[{
         iconPath: "/static/images/person.png",
-        id:3,
+        id:1,
         latitude: this.latitude,
         longitude: this.longitude,
         width:40,
@@ -239,7 +243,7 @@ export default {
     },
     choseItem() {
       //选择服务项目
-      wx.navigateTo({ url: "/pages/servince/main?url=location" });
+      wx.navigateTo({ url: "/pages/servince/main?shopId=" + this.shopId});
     },
     choseMoney() {
       wx.navigateTo({ url: "/pages/sum/main" }); //充值
