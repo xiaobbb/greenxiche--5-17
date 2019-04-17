@@ -26,7 +26,7 @@
             @click="oneClick(pindex)"
           >
         </div>
-        <orderChild :showButton="!isShow" :data="item" @editCar="editCar"></orderChild>
+        <orderChild :showButton="!isShow" :data="item" @editCar="editCar" :gotoDetail="true"></orderChild>
       </div>
     </div>
     <!--底部按钮-->
@@ -67,8 +67,8 @@ import "../../css/global.css";
 export default {
   data() {
     return {
-      userId: wx.getStorageSync("userId"),
-      token: wx.getStorageSync("token"),
+      userId: "",
+      token: "",
       carData: [],
 
       showMask: false,
@@ -121,22 +121,24 @@ export default {
     specChild
   },
   computed: {
-    total(){
-      let total=0
+    total() {
+      let total = 0;
       for (var i = 0; i < this.carData.length; i++) {
-        const _carData = this.carData[i]
+        const _carData = this.carData[i];
         if (_carData.isSelect) {
-          total += _carData.price * _carData.num
+          total += _carData.price * _carData.num;
         }
       }
-      return total.toFixed(2)
+      return total.toFixed(2);
     }
   },
-  onLoad() {
+  onShow() {
+    // 初始化全选
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
+    this.isSelectAll = false;
     this.setBarTitle();
     this.getCarData();
-    // 初始化全选
-    this.isSelectAll = false;
   },
   methods: {
     setBarTitle() {
@@ -151,8 +153,8 @@ export default {
         UserId: this.userId,
         Token: this.token
       };
-      this.carData = [];
       const res = await post("Cart/CartList", params);
+      this.carData = [];
       for (let i = 0; i < res.data.length; i += 1) {
         const datas = res.data[i];
         this.carData.push({
@@ -163,10 +165,13 @@ export default {
           skuSubmit: datas.SpecText,
           shopName: datas.ShopName,
           shopId: datas.ShopId,
+          productId:datas.ProductId,
           price: datas.SalePrice,
+          maxBuyNum: datas.MaxBuyNum,
           num: datas.Number,
           stock: datas.Stock,
-          isSelect: false
+          isSelect: false,
+          type:datas.BrandId //商品分类0--全部分类，21--商品，22--套餐，23--卡券
         });
       }
     },
@@ -197,9 +202,9 @@ export default {
       this.editCar(id, "less");
     },
     // 编辑购物车
-    async editCar(id,num) {
-      console.log(id,num)
-      num = num*1
+    async editCar(id, num) {
+      console.log(id, num);
+      num = num * 1;
       let index = "";
       for (let i = 0; i < this.carData.length; i += 1) {
         const _carData = this.carData[i];
@@ -290,21 +295,47 @@ export default {
       this.showDelete = false;
       this.isShow = true;
     },
-    submit(){
-      const cartIds =[]
-      this.carData.map((data)=>{
-        if(data.isSelect){
-        cartIds.push(data.id)
+    submit() {
+      const cartIds = [];
+      let status = false;
+      this.carData.map(data => {
+        if (data.isSelect) {
+          if(!this.checked(data)){
+            status = true;
+             return false
+          } 
+          cartIds.push(data.id);
         }
-      })
-      console.log('a',cartIds)
-      this.$store.commit('update',{'cartIds':cartIds})
+      });
+      if(status){
+        return false;
+      }
+      console.log("a", cartIds);
+      this.$store.commit("update", { cartIds: cartIds });
       wx.navigateTo({
-        url:'/pages/confirm-cart-order/main'
-      })
-    }
+        url: "/pages/confirm-cart-order/main"
+      });
+    },
+    // 检查库存和最大购买数量
+    checked(data){
+      if(data.num>data.stock||data.num>data.maxBuyNum){
+        wx.showToast({
+          title:'超出购买数量！',
+          icon:'none'
+        })
+        return false
+      }
+      return true
+    },
+    
   },
 
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.getCarData();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
+  },
   created() {
     // let app = getApp()
   }

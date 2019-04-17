@@ -59,12 +59,12 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.params=this.$root.$mp.query.url
-    console.log(this.params)
     this.setBarTitle();
   },
   onShow(){
-    this.userId = wx.getStorageSync('userId');
+    this.userId =wx.getStorageSync('userId') ;
     this.token = wx.getStorageSync("token");
+    console.log(wx.getStorageSync('userId'))
     this.carinfolist = [];
     this.getAllcar(); 
   },
@@ -148,7 +148,7 @@ export default {
     },
     choseCar(e){
       //console.log(e)
-      console.log(this.carinfolist[e])
+      console.log(this.carinfolist[e],'???')
       let CarInfo=this.carinfolist[e]
       wx.setStorageSync("CarInfo",CarInfo)
       wx.navigateTo({ url: "/pages/"+this.params+"/main"});

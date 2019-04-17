@@ -178,6 +178,12 @@ export default {
     //   this.getFreight()
     // })
   },
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.onShow();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
+  },
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({

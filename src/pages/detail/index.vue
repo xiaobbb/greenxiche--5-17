@@ -11,10 +11,12 @@
           </p>
           <div class="flex-container">
             <p class="headinfo">{{product.title}}</p>
-            <p class="flex-container headright" @click="share">
+            <div class="flex-container headright">
+              <button open-type="share" class="shareBtn">
               <img src="/static/images/shareicon.png" class="share">
               <text>分享</text>
-            </p>
+            </button>
+            </div>
           </div>
           <div class="flex-container headtips">
             <P>快递:{{product.freight||'免运费'}}</P>
@@ -210,7 +212,7 @@
         </div>
       </div>
       <!--分享-->
-      <div class="mask mask2" v-if="showShare">
+      <!-- <div class="mask mask2" v-if="showShare">
         <div class="flex-container maskshare">
           <p class="flex-container clomn">
             <img src="/static/images/friend.png" class="friend">
@@ -218,11 +220,11 @@
           </p>
           <p class="flex-container clomn">
             <img src="/static/images/friend2.png" class="friend">
-            <text>微信好友</text>
+            <text>微信朋友圈</text>
           </p>
         </div>
         <div class="cancleshare" @click="cancleShare">取消分享</div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -293,7 +295,7 @@ export default {
     async getData() {
       const that = this;
       const id = this.$root.$mp.query.id;
-      const res = await post("Goods/ProductInfo", { proId: 311 * 1 });
+      const res = await post("Goods/ProductInfo", { proId: id * 1 });
 
       const datas = res.data;
       // 获取优惠券信息
@@ -572,6 +574,17 @@ export default {
   },
   created() {
     // let app = getApp()
+  },
+  // 分享
+  onShareAppMessage(){
+    let pages = getCurrentPages() //获取加载的页面
+    let currentPage = pages[pages.length-1] //获取当前页面的对象
+    let url = currentPage.route //当前页面url
+    console.log(url,pages)
+    return {
+      title: this.product.title,
+      path:url+'?id='+this.product.id
+    }
   }
 };
 </script>
