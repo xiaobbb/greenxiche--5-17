@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 900rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="13" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 900rpx;"></map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -63,18 +63,18 @@
             <cover-view class="tuanpick cover-text" @click="getNewConpon">立即领取</cover-view>
         </cover-view>
         <!--我要洗车-->
-        <cover-view class="modal-xiche" v-if="isXiche">
+        <cover-view class="modal-xiche" v-if="isXiche && shopArr.length>0">
           <cover-view class="line flex-container" style="padding:30rpx">
-            <cover-view class="flex-container"  @click="choseLocation">
+            <cover-view class="flex-container">
                 <cover-image src="/static/images/yellow.png" class="diandian"/>
-                <cover-view class="location-self">{{nowPlace}}</cover-view>
+                <cover-view class="location-self">{{name}}</cover-view>
             </cover-view>
-            <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;border:1px solid red"/>
+            <!-- <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;"/> -->
           </cover-view>
           <cover-view class="wash" @click="washCar">我要洗车</cover-view>
         </cover-view>
         <!--到店-->
-        <cover-view class="modal-goshop" v-if="isGoshop">
+        <cover-view class="modal-goshop" v-if="isGoshop && shopArr.length>0">
           <cover-view  @click="toShopdet(shopInfo.ShopId)">
             <img :src="shopInfo.Logo" class="showimg">
           </cover-view>
@@ -119,7 +119,7 @@ export default {
     if(this.userId && this.token){
       console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
         Promise.all([
-            this.getCityName(),this.getCoupon(),this.isNewVip()
+            this.getCityName(),this.getShopinfo(),this.getCoupon(),this.isNewVip()
         ])
     }else{
       wx.navigateTo({ url :"/pages/login/main"})
@@ -129,7 +129,7 @@ export default {
   },
   onShow(){
     this.initData()
-    //this.getMapShow()
+    
   },
   watch:{
     '$store.state':{
@@ -148,25 +148,26 @@ export default {
             this.isXiche=true
         }
     },
-    shopArr:function(){
-        if(this.shopArr == ""){
-          this.isshow=true
-          this.showShop=true
-      }
-    },
+    // shopArr:function(){
+    //     if(this.shopArr == ""){
+    //       this.isshow=true
+    //       this.showShop=true
+    //   }
+    // },
     cityName:function(){
       this.getMapShow()
     }
   },
   data () {
     return {
+      shopId:"",//展示的商户id
+      name:"", //展示的商户名称
       shopLat:"",
       shopLng:"",//店铺的经纬度 用户导航
       address:"",
-      name:"",
       userId:"",
       token:"",
-      markerId: 0,
+      markerId: "1",
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       shopArr:[],//商铺信息集合
       shopInfo:{}, //marker店铺信息
@@ -225,7 +226,7 @@ export default {
           this.$store.commit('update',{ latitude:data.latitude,
                         longitude:data.longitude
                         });
-         //console.log(data.latitude,data.longitude);
+         console.log(data.latitude,data.longitude);
           this.getCityinfo()
         },
         fail:(info)=>{
@@ -265,18 +266,18 @@ export default {
     },
     //根据手机所在地经纬度获取周围商铺信息
     async getShopinfo(){
-      this.markers=[]
+      console.log(this.markerId,"markerid信息")
       var res=await post("/Shop/NearbyShop",{
           Lat:this.latitude,
           Lng:this.longitude
       })
-      //console.log(res,"所有的商铺信息")
+      console.log(res,"所有的商铺信息")
       if(res.code==0){
         this.shopArr=res.data
         this.getNearShop()
         let arr=[]  //保存markers数组
         for (let i=0;i<res.data.length;i++){
-          //console.log(res.data[i])
+          console.log(res.data[i])
           let latitude =res.data[i].Lat; 
           let longitude =res.data[i].Lng;
           let marker= {
@@ -285,31 +286,37 @@ export default {
             // name:res.data[i].ShopNick || '',
             latitude: latitude,
             longitude: longitude,
-            width:48,
-            height:55
+            width:24,
+            height:27.5
           };
-          // arr.push(marker)
+          arr.push(marker)
         }
         this.markers=arr
-        //console.log(this.markers,"markers数组")
+        console.log(this.markers,"markers数组")
       }
     },
     getNearShop(){  //获取markers标记时的商户信息
-        this.shopInfo=this.shopArr[this.markerId]
+        console.log(this.markerId,"要显示的商铺的信息")
+        this.shopInfo=this.shopArr[this.markerId-1]
         this.shopLat=this.shopInfo.Lat*1
         this.shopLng=this.shopInfo.Lng*1
         this.address=this.shopInfo.Address
         this.name=this.shopInfo.ShopNick
+        this.shopId=this.shopInfo.ShopId
         this.$set(this.shopInfo,'Distance',this.shopInfo.Distance.toFixed(2))
         this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
         console.log(this.shopInfo,"店铺详情")
     },
     markertap(e){  //点击标记点
-        console.log(e)
+        console.log(e,"正在点击标记")
         this.markerId  = e.mp.markerId;
-        // //this.showMarkerInfo(marker);//展示标记的信息
-        this.changeMarkerColor(); //更改样式
-        this.getNearShop()
+        if(this.markerId==0){
+            return false
+        }else{
+          this.changeMarkerColor(); //更改样式
+          this.getNearShop()
+        }
+        
     },
     changeMarkerColor() { //更改用户选中的标记样式
       this.markers.forEach((item, index) => {
@@ -396,17 +403,17 @@ export default {
       this.showShop=false
       this.active='到店'
       this.isGoshop=true
-      this.getShopinfo()
+      //this.getShopinfo()
     },
     change:function(name){
       //console.log(name)
       this.active=name
       if(name=="到店"){
         //console.log(666)
-        this.isXiche=false,
-        this.isGoshop=true,
+        this.isXiche=false
+        this.isGoshop=true
         //获取最近的商家显示
-        this.getShopinfo() //获取地图上的商铺标记信息
+        //this.getShopinfo() //获取地图上的商铺标记信息
       }else if(name=="上门"){
         this.isXiche=true,
         this.isGoshop=false,
@@ -414,7 +421,8 @@ export default {
       }
     },
     washCar(){
-       wx.navigateTo({ url: "/pages/location/main" });
+      //console.log(this.shopId)
+       wx.navigateTo({ url: "/pages/location/main?shopId="+this.shopId });
     },
     goTo(e){
         if(e==1){
@@ -443,7 +451,7 @@ export default {
               "content-type": "application/x-www-form-urlencoded"
             },
             success:(res)=>{
-              console.log(res,"根据市获取地图")
+              //console.log(res,"根据市获取地图")
               if(res.data.result){
                 const _res = res.data.result.location
                 this.update({ latitude:res.data.result.location.lat,
@@ -453,10 +461,10 @@ export default {
                 const MapContext=wx.createMapContext("map")
                 MapContext.getCenterLocation({
                   success:(res)=>{
-                      console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
+                      //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
                       this.markers=[{
                           iconPath: "/static/images/person.png",
-                          id:1,
+                          id:0,
                           latitude: this.latitude,
                           longitude: this.longitude,
                           width:40,
