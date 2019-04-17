@@ -135,6 +135,7 @@ export default {
       userId:"",
       token:"",
       orderNo:"",
+      orderItemNum:"",//发表评论的订单编号
       info:{},
       hasData:false,
       showMask:false,
@@ -173,8 +174,7 @@ export default {
       this.showDelOrder=true
     },
     addCommont(){
-      var a=2
-      wx.navigateTo({ url: "/pages/addcomment/main?id="+a});
+      wx.navigateTo({ url: "/pages/addcomment/main?orderNo="+this.orderItemNum+"&url=addcomment"});
     },
     async getOrderDetails(){
       let result = await post("Order/OrderDetails",{
@@ -182,8 +182,11 @@ export default {
         Token:this.token,
         OrderNo:this.orderNo
       })
+      console.log(result,"订单详情")
       if(Object.keys(result.data).length>0){
         this.info = result.data;
+        this.orderItemNum=result.data.OrderNumber
+        console.log(this.orderItemNum,"子单号")
         this.hasData = true;
       }
     }

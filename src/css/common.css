@@ -195,3 +195,20 @@ img{
 .color333{
   color:#333!important;
 }
+.textoverflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/*2行溢出*/
+
+.text-line2 {
+  display: -webkit-box!important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}

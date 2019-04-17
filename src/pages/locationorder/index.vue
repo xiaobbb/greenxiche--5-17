@@ -2,10 +2,7 @@
   <div>
     <!--填写订单-->
     <div class="glo-relative">
-        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="16" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width:750rpx; height: 516rpx;"></map>
-        <!-- <cover-view class="cover-pic">
-            <cover-image src="/static/images/location.png" class="cover-logo"/>
-        </cover-view> -->
+        <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width:750rpx; height: 516rpx;"></map>
     </div>
     <!--列表-->
     <div class="list">
@@ -27,16 +24,29 @@ import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
-    this.getAround()
-    console.log(this.latitude)
+    this.getAround()  //获取周边pio信息（经纬度 关键词）
+    //this.getMapShow() //测试------根据城市名称获取地图
+    
+  },
+  onShow(){
+    this.latitude=this.$store.state.latitude
+    this.longitude=this.$store.state.longitude
+    //console.log(this.latitude)
   },
   data () {
     return {
       locationlist:[ ],
       active:'0',
-      markers:[],
+      markers:[{
+        iconPath: "/static/images/person.png",
+        id:1,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        width:20,
+        height:25
+      }],
       controls: [{  //控件不随着地图移动
-          id: 1,
+          id: 2,
           iconPath: '/static/images/location.png',
           position: {
             left: 0,
@@ -61,7 +71,7 @@ export default {
         title: "位置"
       });
     },
-    getAround(){
+    getAround(){  //获取周边城市信息
       wx.request({
             url:"https://api.map.baidu.com/place/search?&query=大厦&location="+this.latitude+","+this.longitude+"&radius=1000&output=json&key=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&",
             header: {
@@ -122,6 +132,38 @@ export default {
       //   })
       
     },
+    getMapShow(){  //测试根据城市名称获取地图
+       wx.request({
+            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address=广州市&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+              const _res = res.data.result.location
+                console.log(_res.lat,_res.lng,"state")
+                // this.longitude=res.data.result.location.lng
+                // this.latitude=res.data.result.location.lat
+                this.update({ latitude:res.data.result.location.lat,
+                              longitude:res.data.result.location.lng
+                        });
+                //console.log(this,"选择位置页面")
+          }
+        })
+        const MapContext=wx.createMapContext("map")
+        MapContext.getCenterLocation({
+          success:(res)=>{
+              console.log(res,"获取地图中心位置经纬度")
+              this.markers=[{
+                  iconPath: "/static/images/person.png",
+                  id:1,
+                  latitude: res.latitude,
+                  longitude: res.longitude,
+                  width:48,
+                  height:55
+              }]
+          }
+        })
+    }
     
   },
 

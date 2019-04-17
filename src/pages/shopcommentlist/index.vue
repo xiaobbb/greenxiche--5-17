@@ -1,6 +1,6 @@
 <template>
   <div class="comment">
-    <pointChildpic :commentlist="commentlist" :showPic="true"></pointChildpic>
+    <pointChildpic :commonlist="commonlist" :showPic="true"></pointChildpic>
   </div>
 </template>
 
@@ -22,7 +22,7 @@ export default {
       Page:"1",
       PageSize:"5",
       CommentType:"0",
-      commentlist:[]
+      commonlist:[]
     }
   },
  
@@ -44,7 +44,10 @@ export default {
        })
        console.log(res,"商品全部评价")
        if(res.code==0){
-         this.commentlist=res.data
+         this.commonlist=res.data
+         for(let i of this.commonlist){
+            this.$set(i,"AddTime",i.AddTime.split("T").join("  "))
+        }
        }
     }
   },

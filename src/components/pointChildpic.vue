@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="point" v-for="(item,pindex) in commentlist" :key="pindex"> 
+        <div class="point" v-for="(item,pindex) in commonlist" :key="pindex"> 
             <div class="flex-container userinfo">
                 <div class="flex-container">
                     <div>
@@ -34,9 +34,9 @@
 
 <script>
 export default {
-  props:["commentlist","showPic"],
+  props:["commonlist","showPic"],
   onLoad(){
-    console.log(this.commentlist,"这是子页面的")
+    console.log(this.commonlist,"这是子页面的")
   }
   
 }
