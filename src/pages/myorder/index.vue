@@ -479,6 +479,7 @@ export default {
         if(this.orderList[index].orderDetails.length>1){  //跳到评价列表页面
            
         }else{  //跳到评价页面
+        
            wx.navigateTo({
              url:"/pages/addcomment/main?appraiseType=0&orderNo="+orderNo
            })
@@ -489,23 +490,23 @@ export default {
            
         }else{  //跳到评价页面
            wx.navigateTo({
-             url:"/pages/addcomment/main?appraiseType="+this.serviceMode+"+&orderNo="+orderNo
+             url:"/pages/addcomment/main?appraiseType="+ this.serviceMode +"&orderNo="+orderNo
            })
         }
       }
     },
     toPay(index,orderNo){
-      console.log(index)
-      if(this.orderBigType===1){
+      console.log(index,this.orderBigType)
+      if(this.orderBigType*1===1){
         this.totalPrice =this.orderList[index].TotalPrice;
         
       }
-      if(this.orderBigType===2){
+      if(this.orderBigType*1===2){
         this.totalPrice =this.bookList[index].TotalPrice;
       }
       console.log(this.totalPrice)
       this.orderNo = orderNo;
-    //  this.showPay = true;
+      this.showPay = true;
     },
     loadMoreOrder(e) {
       console.log("ffffffffff");

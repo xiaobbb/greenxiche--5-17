@@ -14,8 +14,8 @@
         </div>  
         <div class="white flex-container mark">
           <p>服务打分</p>
-          <p>
-            <span v-for="(item,index) in starChecked" :key="index">
+            <p>
+            <span v-for="(item,index) in starChecked" :key="index" @click="shiftStar(index)">
               <img v-if="item" src="/static/images/xing.png" class="xing-point">
               <img v-else src="/static/images/gray1.png" class="xing-point">
             </span>
@@ -216,10 +216,11 @@ export default {
         Token: this.token,
         OrderNo: this.orderNo
       });
-      console.log(result,"获取到的评论对象")
+      console.log(result,this.appraiseType,"获取到的评论对象")
       if (Object.keys(result.data).length > 0) {
         this.hasData = true;
         this.info = result.data;
+        this.$set(this.info.order,"Fahuodate",this.info.order.Fahuodate.split("T").join(" "))
         // this.appraiseId = 
       }
     },
@@ -239,17 +240,18 @@ export default {
         CommentList:[obj]
       });
       if(result.code===0){
-        let pageUrl = '';
         //0:商品评价；1：上门服务评价；2：到店评价
-        if(this.appraiseType===0){
+        let pageUrl = ''
+        if(this.appraiseType*1===0){
           pageUrl = '/pages/myorder/main?orderBigType=1&status=4';
         }
-        if(this.appraiseType===1){
+        if(this.appraiseType*1===1){
           pageUrl = '/pages/myorder/main?orderBigType=2&status=1';
         }
-        if(this.appraiseType===2){
+        if(this.appraiseType*1===2){
           pageUrl = '/pages/myorder/main?orderBigType=2&status=2';
         }
+        console.log(pageUrl,"要去的页面")
         wx.redirectTo({
           url:pageUrl
         })

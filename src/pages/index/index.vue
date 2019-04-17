@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="13" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 900rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="13" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -64,12 +64,18 @@
         </cover-view>
         <!--我要洗车-->
         <cover-view class="modal-xiche" v-if="isXiche && shopArr.length>0">
-          <cover-view class="line flex-container" style="padding:30rpx">
+          <cover-view class="line flex-container" @click="choseLocation">
+            <cover-view class="flex-container">
+                <cover-image src="/static/images/yellow.png" class="diandian"/>
+                <cover-view class="location-self">{{nowPlace}}</cover-view>
+            </cover-view>
+            <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;"/>
+          </cover-view>
+          <cover-view class="line flex-container">
             <cover-view class="flex-container">
                 <cover-image src="/static/images/yellow.png" class="diandian"/>
                 <cover-view class="location-self">{{name}}</cover-view>
             </cover-view>
-            <!-- <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;"/> -->
           </cover-view>
           <cover-view class="wash" @click="washCar">我要洗车</cover-view>
         </cover-view>
@@ -120,7 +126,15 @@ export default {
       console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
         Promise.all([
             this.getCityName(),this.getShopinfo(),this.getCoupon(),this.isNewVip()
-        ])
+        ]).then(
+          ()=>{
+            if(this.isshow==false){
+              this.isXiche=true
+            }else{
+              this.isXiche=false
+            }
+          }
+        )
     }else{
       wx.navigateTo({ url :"/pages/login/main"})
     }
@@ -129,7 +143,6 @@ export default {
   },
   onShow(){
     this.initData()
-    
   },
   watch:{
     '$store.state':{
@@ -143,11 +156,7 @@ export default {
         },
         deep: true 
     },
-    isshow:function(){
-        if(this.isshow==false){
-            this.isXiche=true
-        }
-    },
+    
     // shopArr:function(){
     //     if(this.shopArr == ""){
     //       this.isshow=true
@@ -177,7 +186,7 @@ export default {
           iconPath: '/static/images/location.png',
           position: {
             left: 0,
-            top: 250,
+            top: 200,
             width: 40,
             height: 40
           },
@@ -213,9 +222,7 @@ export default {
     controltap(){  //点击地图上control 回到当前定位点
         this.getCityName()
     },
-    choseLocation(){
-        wx.navigateTo({ url: "/pages/locationorder/main" });
-    },
+   
     getCityName(){  //获取手机所在地城市经纬度
       wx.getLocation({
           type: 'wgs84',
@@ -420,6 +427,9 @@ export default {
         this.markers=[]
       }
     },
+    choseLocation(){
+        wx.navigateTo({ url: "/pages/locationorder/main" });
+    },
     washCar(){
       //console.log(this.shopId)
        wx.navigateTo({ url: "/pages/location/main?shopId="+this.shopId });
@@ -461,6 +471,7 @@ export default {
                 const MapContext=wx.createMapContext("map")
                 MapContext.getCenterLocation({
                   success:(res)=>{
+                      console.log(this.latitude,this.longitude,"经纬度中心")
                       //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
                       this.markers=[{
                           iconPath: "/static/images/person.png",
@@ -474,10 +485,8 @@ export default {
                 })
                 this.getCityinfo()
               }
-              
           }
         })
-        
     }
   },
 
