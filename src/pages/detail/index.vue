@@ -442,6 +442,7 @@ export default {
       }
       this.sku = _sku;
       this.skuAll = skuAll;
+      this.isUseSku();
     },
     // 选择sku
     onSelectSku(val, index) {
@@ -513,16 +514,27 @@ export default {
       Object.keys(this.sku).map(skuItem => {
         // 遍历渲染的sku值，只有跟选中的key值不相同的情况。再把值添加到obj
         let obj = JSON.parse(JSON.stringify(this.selectSku.value));
-        // Object.keys(this.selectSku.value).map(selectItem => {
         this.sku[skuItem].map((skuItemValue,skuItemIndex) => {
-          if (!this.selectSku.value[skuItem]) {
+      // 选择sku的数量
+          let selectSkuNum = 0;
+        Object.keys(this.selectSku.value).map(() => {
+          selectSkuNum+=1;
+        });
+        // 判断sku选择的数量是否全部选择
+        let skuAttrNum = 0;
+        Object.keys(this.sku).map(() => {
+          skuAttrNum += 1;
+        });
+        if(selectSkuNum === skuAttrNum){
             obj[skuItem] = skuItemValue.val;
             const status = this.isUseSku2(obj)
             this.sku[skuItem][skuItemIndex].status = status
-            console.log("333", this.sku[skuItem][skuItemIndex]);
+        }else if (!this.selectSku.value[skuItem] ) {
+            obj[skuItem] = skuItemValue.val;
+            const status = this.isUseSku2(obj)
+            this.sku[skuItem][skuItemIndex].status = status
           }
         });
-        // });
       });
     },
     isUseSku2(obj){
