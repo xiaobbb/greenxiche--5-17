@@ -92,7 +92,8 @@
       :showPay.sync="showPay"
       :orderNumber="orderNumber"
       :total="total"
-      :navigateUrl="'/pages/myorder/main'"
+      :successUrl="'/pages/myorder/main'"
+      :closeUrl="'/pages/myorder/main'"
     ></Pay>
   </div>
 </template>
@@ -177,6 +178,12 @@ export default {
     //   console.log('getFreight')
     //   this.getFreight()
     // })
+  },
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.onShow();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
   },
   methods: {
     setBarTitle() {

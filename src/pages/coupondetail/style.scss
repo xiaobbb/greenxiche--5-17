@@ -100,3 +100,41 @@
     text-align: center;
     margin:20rpx auto;
 }
+// 添加商户店铺信息
+.shopimg{
+    width:112rpx;
+    height:112rpx;
+}
+.ranklist{
+    width:100%;
+    padding:0 30rpx;
+    border-top:20rpx #f4f7fc solid;
+    border-bottom:20rpx #f4f7fc solid;
+}
+.rankitem{
+    padding:20rpx 0;
+    width:100%;
+    border-bottom:1rpx solid #eee;
+}
+.shopnum{
+    width:100%;
+    justify-content: space-between;
+}
+.options{
+    width:8%;
+    text-align:center;
+}
+.rankcol{
+    margin-left: 25rpx;
+}
+.shopname{
+    font-weight: bold;
+    width:100%;
+}
+.ranknums{
+    border:1rpx #ff6325 solid;
+    color:#ff6325;
+    padding:0 20rpx;
+    line-height:50rpx;
+    border-radius:30rpx;
+}

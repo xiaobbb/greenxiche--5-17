@@ -29,6 +29,7 @@
             <p class="sales">销量{{item.sale}}</p>
             <div class="flex-container around">
               <p class="price">￥{{item.price}}</p>
+              <!-- <div v-show="item.isAttr"> -->
               <div v-show="item.isAttr">
                 <img src="/static/images/s1.png" @click="lessNumber(index)" class="tippic">
                 <text class="nums">{{item.num}}</text>
@@ -45,7 +46,7 @@
         <div class="btn-shop">
           <div class="cartshopbg" @click="goUrl('/pages/shopcart/main')">
             <img src="/static/images/shopcart.png" class="cartshop">
-            <text class="numright">{{carNum}}</text>
+            <div class="numright">{{carNum>99?99+'+':carNum}}</div>
           </div>
           <div class="shopprice">￥{{carPrice}}</div>
         </div>
@@ -138,12 +139,19 @@ export default {
       const that = this;
       that.activeId = id;
       that.productlist = [];
-      post("/Goods/GoodsList", { page: 1, pageSize: 30, TypeId: id }).then(
+      const params = {
+         page: 1, 
+         pageSize: 30,
+          TypeId: id,
+        Lat:0,
+        Lng:0
+      }
+      post("/Goods/GoodsList", params).then(
         res => {
           for (let i = 0; i < res.data.length; i += 1) {
             const datas = res.data[i];
             that.productlist.push({
-              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
+              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，23--套餐，22--卡券
               id: datas.Id,
               title: datas.Name,
               price: datas.Price,
@@ -151,7 +159,8 @@ export default {
               sale: datas.SalesVolume,
               num: 0,
               tab:datas.KeywordName?JSON.parse(datas.KeywordName):[],
-              isAttr:datas.SpecificationValue&&datas.BrandId===21
+              // isAttr:datas.SpecificationValue&&datas.BrandId===21
+              isAttr:datas.SpecificationValue
             });
           }
         that.getCarData()
@@ -216,11 +225,11 @@ export default {
         Token:this.token,
       }
       const res = await post('Cart/CartList',params)
-      this.carNum=0;
+      this.carNum=res.data.length;
       let carPrice =0;
       for(let i=0;i<res.data.length;i+=1){
         const datas = res.data[i]
-        this.carNum += datas.Number
+        // this.carNum += datas.Number
         carPrice += (datas.SalePrice*datas.Number)
         this.carData.push(datas)
         const productlist = this.productlist;

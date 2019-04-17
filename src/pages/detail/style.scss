@@ -26,11 +26,24 @@
     width:75%;
 }
 .headright{
+    line-height:38rpx;
     margin-right:-20rpx;
-    padding:5rpx 20rpx;
     background: #ececec;
     border-top-left-radius: 25rpx;
     border-bottom-left-radius: 25rpx;
+    position:static;
+    .shareBtn{
+        font-size:25rpx;
+        line-height:38rpx;
+        padding:5rpx 20rpx;
+        &::after{
+            border-radius: 0;
+            border: 0; 
+        }
+        display:flex;
+        align-items:center;
+        color:#999;
+    }
 }
 .headtips{
     color:#999;

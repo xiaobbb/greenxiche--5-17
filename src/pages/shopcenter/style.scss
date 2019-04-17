@@ -106,9 +106,8 @@
     border-bottom-right-radius: 50rpx;
 }
 .cartshop,.cartshopbg{
-    width:62rpx;
-    height:50rpx;
-
+    width:50rpx;
+    height:40rpx;
 }
 .cartshopbg{
     position:relative;
@@ -119,8 +118,15 @@
     line-height:28rpx;
     height:28rpx;
     top:5rpx;
-    right:8rpx;
+    left:25rpx;
+    font-size:25rpx;
+    background:#f00;
+    border-radius:20rpx;
+    text-align:center;
+    display:flex;
+    padding:0 6rpx;
     color:#fff;
+    white-space:nowrap;
 }
 .shopprice{
     margin-left:60rpx;

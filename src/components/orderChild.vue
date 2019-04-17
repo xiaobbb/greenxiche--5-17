@@ -1,10 +1,10 @@
 <template>
   <div class="proinfo flex-container pad">
-    <div>
+    <div @click="goDetail">
       <img :src="data.img" class="orderimg">
     </div>
     <div class="inforight">
-      <div class="infotitle">{{data.title}}</div>
+      <div class="infotitle" @click="goDetail">{{data.title}}</div>
       <div class="infospec">{{data.sku}}</div>
       <div class="infoprice flex-container">
         <p>￥{{price}}</p>
@@ -26,17 +26,34 @@
 //           sku: datas.SpecText,
 //           skuSubmit: datas.SpecText,
 //           shopName: datas.ShopName,
+//            productId:datas.productId,
 //           shopId:datas.ShopId,
 //           price: datas.SalePrice,
 //           num: datas.Number,
 //           stock:datas.Stock,
+   //        type:商品分类0--全部分类，21--商品，22--套餐，23--卡券
 //         }
 // showButton；为数量是否可编辑，true--显示数量；false--显示编辑按钮
 export default {
   onLoad() {
     // this.setBarTitle();
   },
-  props: ["showButton", "data"],
+  props: {
+    showButton:{
+      type:Object,
+      default(){
+        return {}
+      },
+    },
+      data:{
+        type:Boolean,
+        default:false
+      },
+      gotoDetail:{
+        type:Boolean,
+        default:false
+      }
+    },
   data() {
     return {
       isshow: false,
@@ -70,7 +87,26 @@ export default {
     },
     lessNum() {
         this.$emit("editCar", this.data.id,this.data.num-1);
-    }
+    },
+    
+    // 跳转详情
+    goDetail() {
+      if(this.gotoDetail){
+        
+      //type商品分类0--全部分类，21--商品，22--套餐，23--卡券
+        let type = this.data.type;
+        let id = this.data.productId
+        console.log(type,'type-id',id)
+      var a = type*1;
+      if (a === 21) {
+        wx.navigateTo({ url: "/pages/detail/main?id=" + id });
+      }
+      if (a === 22||a===23) {
+        wx.navigateTo({ url: "/pages/coupondetail/main?id="+id });
+      }
+      }
+      
+    },
   },
 
   created() {

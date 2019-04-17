@@ -1,7 +1,9 @@
 <template>
   <div class="backgray">
     <!--地址栏-->
-    <div class="flex-container clomn orderhead white" @click="goSelectAddress" v-if="isCard">
+    <!-- v-if="isCard" 是否卡券商品 -->
+    <!-- <div class="flex-container clomn orderhead white" @click="goSelectAddress" v-if="isCard"> -->
+    <div class="flex-container clomn orderhead white" @click="goSelectAddress">
       <div class="orderuser">
         <p>收货人：{{address.name}}</p>
         <p>{{address.phone}}</p>
@@ -42,7 +44,7 @@
               <div>支付方式</div>
               <div class="infoway">在线支付</div>
       </div>-->
-      <div v-if="isCard">
+      <div>
         <div class="flex-container infoslide white pad" @click="onShowCoupon">
           <div>优惠券</div>
           <div>
@@ -212,9 +214,9 @@ export default {
         stock: datas.Stock
       };
       // 判断是否在购买卡券
-      if(this.isCard){
+      // if(this.isCard){
        this.getAddress();
-      }
+      // }
     },
     // 获取收货地址
     async getAddress() {

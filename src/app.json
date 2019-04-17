@@ -19,7 +19,7 @@
         "backgroundColor": "#fffff",
         "borderStyle": "white",
         "selectedColor": "#ff6325",
-        "color": "#fff",
+        "color": "#333",
         "list": [{
                 "pagePath": "pages/index/main",
                 "iconPath": "static/images/footer/home1.png",

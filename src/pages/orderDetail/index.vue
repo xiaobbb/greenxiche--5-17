@@ -54,7 +54,7 @@
         <p class="infotitle">订单信息</p>
         <p class="pitem">订单编号：{{info.OrderNumber}} <span class="copy">复制</span></p>
         <p class="pitem">创建时间：{{info.AddTime}}</p>
-        <p class="pitem" v-if="info.StatusId !==0">支付时间：{{item.PayTime}}</p>
+        <p class="pitem" v-if="info.StatusId !==0&&info.PayTime">支付时间：{{info.PayTime}}</p>
         <!-- <div v-if="shwoSuccess">
             <p class="pitem">到店时间：2018-04-20 17:20:59</p>
             <p class="pitem">成交时间：2018-04-20 18:20:59</p>
