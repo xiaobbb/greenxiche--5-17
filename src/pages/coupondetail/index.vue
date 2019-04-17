@@ -15,7 +15,8 @@
       </div>
     </div>
     <div class="slide"></div>
-    <div>
+    <!-- 套餐 -->
+    <div v-if="product.BrandId===23">
       <div class="titleinfo">
         <img src="/static/images/fontborder.png" class="itemtitle">
         <p>{{product.Name}}</p>
@@ -47,16 +48,12 @@
       <div class="rankitem flex-container">
         <div class="flex-container shopnum">
           <div class="flex-container rankinfo">
-            <img src="/static/images/1.png" class="shopimg">
+            <img :src="shop.img" class="shopimg">
             <div class="rankcol">
               <p class="shopname">{{shop.name}}</p>
               <p>
-                <img src="/static/images/xing.png" class="xing-point">
-                <img src="/static/images/xing.png" class="xing-point">
-                <img src="/static/images/xing.png" class="xing-point">
-                <img src="/static/images/xing.png" class="xing-point">
-                <img src="/static/images/xing.png" class="xing-point">
-                <text>{{item.ServiceScore}}.0分</text>
+                <img src="/static/images/xing.png" v-for="item in shop.score" :key="item" class="xing-point">
+                <text>{{shop.score}}.0分</text>
               </p>
             </div>
           </div>
@@ -125,6 +122,7 @@ export default {
     },
     async getData() {
       const res = await post("Server/ServiceMealProductsDetails", {
+        // ProductId: 309 * 1,
         ProductId: this.id * 1,
         UserId: this.userId,
         Token: this.token,
@@ -133,33 +131,17 @@ export default {
       });
       // debugger;
       this.product = res.data[0];
-      const img = [];
+      let imgs = [];
       this.product.PicData.map(img => {
-        img.push(img.PicUrl);
+        imgs.push(img.PicUrl);
       });
-      this.product.img = img[0];
-      console.log("a", this.product);
-      return false;
-      const datas = res.data;
-      this.product = {
-        img: datas.ProductImgList[0].PicUrl || "",
-        imgs: [],
-        title: datas.ProductName,
-        id: datas.ProductId,
-        shopId: datas.ShopId,
-        price: datas.ProductPrice,
-        // 积分
-        score: datas.Score,
-        //   库存
-        stock: datas.Stock,
-        detail: datas.ContentDetail,
-        // 销量
-        salesNum: datas.SalesVolume
-      };
-      const shop = datas.ShopData[0]
+      this.product.img = imgs[0];
+      const shop = res.data[0].ShopData[0]
       this.shop={
-        id:shop.Id,
-        name:shop.ShopNick
+        shopId:shop.ShopId,
+        name:shop.ShopNick,
+        img:shop.Logo,
+        score:shop.ServiceScore
       }
     },
     // 购买
@@ -184,7 +166,7 @@ export default {
     // 进店逛逛
     goShopHome(){
       wx.navigateTo({
-        url:`/pages/shopdetail/main?shopid=${this.shop.id}`
+        url:`/pages/shopdetail/main?shopid=${this.shop.shopId}`
       })
     }
   },

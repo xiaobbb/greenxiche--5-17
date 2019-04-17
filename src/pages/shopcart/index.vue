@@ -300,10 +300,11 @@ export default {
       let status = false;
       this.carData.map(data => {
         if (data.isSelect) {
-          if(!this.checked(data)){
-            status = true;
-             return false
-          } 
+          // 检查是否超出购买数量
+          // if(!this.checked(data)){
+          //   status = true;
+          //    return false
+          // } 
           cartIds.push(data.id);
         }
       });

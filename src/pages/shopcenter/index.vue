@@ -29,6 +29,7 @@
             <p class="sales">销量{{item.sale}}</p>
             <div class="flex-container around">
               <p class="price">￥{{item.price}}</p>
+              <!-- <div v-show="item.isAttr"> -->
               <div v-show="item.isAttr">
                 <img src="/static/images/s1.png" @click="lessNumber(index)" class="tippic">
                 <text class="nums">{{item.num}}</text>
@@ -150,7 +151,7 @@ export default {
           for (let i = 0; i < res.data.length; i += 1) {
             const datas = res.data[i];
             that.productlist.push({
-              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
+              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，23--套餐，22--卡券
               id: datas.Id,
               title: datas.Name,
               price: datas.Price,
@@ -158,7 +159,8 @@ export default {
               sale: datas.SalesVolume,
               num: 0,
               tab:datas.KeywordName?JSON.parse(datas.KeywordName):[],
-              isAttr:datas.SpecificationValue&&datas.BrandId===21
+              // isAttr:datas.SpecificationValue&&datas.BrandId===21
+              isAttr:datas.SpecificationValue
             });
           }
         that.getCarData()
