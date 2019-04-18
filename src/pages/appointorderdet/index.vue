@@ -101,7 +101,7 @@
             <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' ">成交时间：{{info.CompleteTime}}</p>
         </div>
     </div>
-    <p class="flex-container" style="padding-right:50rpx;justify-content:flex-end">
+    <p class="flex-container" style="padding-right:50rpx;justify-content:flex-end" @click="phoneCall">
           <img src="/static/images/phonecall.png" class="tippics1">
           <span>拨打电话</span>
     </p>
@@ -136,7 +136,7 @@
             <p class="rightbtn" @click="appointAgain">重新预约</p>
         </div>
         <!--上门、到店交易成功-->
-        <div class="orderapybottom white " v-if="info.StatusId == '13'">
+        <div class="orderapybottom white " v-if="info.StatusId == '13' || info.StatusId == '3'" >
             <p class="rightbtn" @click="addCommont">去评价</p>
         </div>
         <!--到店申请退款-->
@@ -228,6 +228,7 @@ export default {
       if(Object.keys(result.data).length>0){
         this.info = result.data;
         this.orderItemNum=result.data.OrderNumber
+        this.phoneNumber=result.data.ShopMobile
         //console.log(this.orderItemNum,"子单号")
         this.hasData = true;
       }
@@ -318,6 +319,12 @@ export default {
     //重新预约
     appointAgain(){
        wx.navigateTo({url:"/pages/index/main"})
+    },
+    //联系客服
+    phoneCall(){
+      wx.makePhoneCall({
+        phoneNumber: this.phoneNumber // 仅为示例，并非真实的电话号码
+      })
     }
   },
 

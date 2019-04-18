@@ -161,7 +161,7 @@ export default {
             }
         });
         return false
-       }else if(this.active==0 && this.time[0]<this.nowhour && this.time[1] <this.nowminute){
+       }else if(this.active==0 && this.time[0]<=this.nowhour && this.time[1] <this.nowminute){
           wx.showToast({
             title: '您选择的时间已过...',
             icon: 'none',

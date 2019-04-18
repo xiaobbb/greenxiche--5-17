@@ -102,15 +102,21 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+  },
+  onShow(){
+    this.isOved=false
+    this.shoplist=[]
+    this.Page=1
+    this.ServiceType=''
+    this.Sort='0'
+    this.RegionId=''
     this.latitude=wx.getStorageSync('latitude');
     this.longitude=wx.getStorageSync('longitude');
     this.cityName=wx.getStorageSync("cityName")
     this.getServe()
     this.getShopList()
     this.getPlace()
-  },
-  onShow(){
-    this.isOved=false
+
   },
   data () {
     return {
@@ -128,7 +134,7 @@ export default {
         ServiceType:"",//服务类型
         RegionId:"",//区域id
         SearchKey:"",//关键词
-        Sort:"",//距离查询
+        Sort:"0",//距离查询
         shoplist:[],
         serlist:[ ],
         distancelist:[
@@ -199,6 +205,7 @@ export default {
         }
     },
     choseServe(e){   //选择服务列表
+     this.Page='1'
       //console.log(e)
       this.seractive=e
       this.defaultactive=""
@@ -216,6 +223,7 @@ export default {
      // this.closeMask()
     },
     choseDistance(e){  //选择距离列表
+      this.Page='1'
       console.log(e)
       this.disactive=e
       this.Sort=e
@@ -226,6 +234,7 @@ export default {
      
     },
     chosePlace(e){   //选择区域列表
+      this.Page='1'
       console.log(e)
       this.placeactive=e
       this.active=""

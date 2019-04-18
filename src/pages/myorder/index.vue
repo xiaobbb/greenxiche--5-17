@@ -86,86 +86,93 @@
         </scroll-view>
       </div>
       <!--预约订单-->
-      <div v-if="orderBigType===2">
+      <div  v-if="orderBigType===2">
         <div class="menuhead flex-container white visit">
-          <div
-            class="item flex1 center"
-            v-for="item in visitlist"
-            :key="item.id"
-            @click="change(item.id)"
-          >
-            <p class="inline-block" :class="{active:serviceMode==item.id}">{{item.name}}</p>
+            <div class="item flex1 center" v-for="item in visitlist" :key="item.id" @click="change(item.id)" >
+              <p class="inline-block" :class="{active:serviceMode==item.id}">{{item.name}}</p>
+            </div>
+            <!-- <p
+              v-for="item in visitlist"
+              :key="item.id"
+              :class="{active:active==item.id}"
+              @click="change(item.id)"
+            >{{item.name}}</p>-->
           </div>
-          <!-- <p
-            v-for="item in visitlist"
-            :key="item.id"
-            :class="{active:active==item.id}"
-            @click="change(item.id)"
-          >{{item.name}}</p>-->
+          <scroll-view scroll-y class="shoplist" @scrolltolower="loadMoreOrder">
+            <div class="shopitem white" v-for="(item,index) in bookList" :key="index">
+              <!--切换上门服务-->
+              <div  v-if="serviceMode===1">
+                  <div class="flex-container commonpad">
+                    <p class="number">订单编号：{{item.OrderNumber}}</p>
+                    <p class="tips">{{item.StatusName}}</p>
+                  </div>
+                  <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
+                    <p>项目：{{item.ProductName}}</p>
+                    <p>地址：{{item.ServiceAddr}}</p>
+                    <p>
+                      车辆：
+                      <span style="margin-right:10rpx;">
+                        {{item.CarBrand}}
+                        <span v-if="item.CarType">-{{item.CarType}}</span>
+                      </span>
+                      <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
+                      <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
+                    </p>
+                    <p>时间：{{item.StartTime}}</p>
+                    <p>手机号：{{item.TelephoneNumber}}</p>
+                  </div>
+              </div>
+              <!--切换到店服务-->
+              <div  v-if="serviceMode===2">
+                  <div class="flex-container commonpad">
+                        <p class="number">订单编号：{{item.OrderNumber}}</p>
+                        <p class="tips">{{item.StatusName}}</p>
+                    </div>
+                  <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
+                    <p>项目：{{item.ProductName}}</p>
+                    <p>门店：{{item.ShopName}}</p>
+                    <p>
+                      车辆：
+                      <span style="margin-right:10rpx;">
+                        {{item.CarBrand}}
+                        <span v-if="item.CarType">-{{item.CarType}}</span>
+                      </span>
+                      <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
+                      <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
+                    </p>
+                    <p>手机号： {{item.TelephoneNumber}}</p>
+                  </div>
+              </div>
+              <!-- 未付款的 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
+                <text class="btn" @click="showReasonMak(index,item.OrderNumber)">取消订单</text>
+                <text class="btn active" @click="toPay(index,item.OrderNumber)">支付</text>
+              </div>
+              <!-- 已使用 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3 || item.StatusId===20">
+                <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
+              </div>
+              <!-- 已经取消订单、已完成订单删除 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===4 || item.StatusId===13 || item.StatusId===14">
+                <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
+              </div>
+              
+              <!-- <div class="menubtn flex-container flexEnd">
+                <text class="btn">取消订单</text>
+                <text class="btn active">付款</text>
+              </div> -->
+            </div>
+            <p
+              style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;"
+              v-if="hasData"
+            >暂无数据</p>
+            <p
+              class="ovedMsg"
+              v-if="isOved"
+              style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
+            >我也是有底线的</p>
+          </scroll-view>
         </div>
-        <scroll-view scroll-y class="shoplist" @scrolltolower="loadMoreOrder">
-          <div
-            class="shopitem white"
-            v-for="(item,index) in bookList"
-            :key="index"
-            
-          >
-            <div class="flex-container commonpad">
-              <p class="number">订单编号：{{item.OrderNumber}}</p>
-              <p class="tips">{{item.StatusName}}</p>
-            </div>
-            <!--切换上门服务-->
-            <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
-              <p>项目：{{item.ProductName}}</p>
-              <p>地址：{{item.ServiceAddr}}</p>
-              <p>
-                车辆：
-                <span style="margin-right:10rpx;">
-                  {{item.CarBrand}}
-                  <span v-if="item.CarType">-{{item.CarType}}</span>
-                </span>
-                <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
-                <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
-              </p>
-              <p>时间：2019-03-18 14:00-16:00</p>
-              <p>手机号：13682293390</p>
-            </div>
-            <!-- 未付款的 -->
-            <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
-              <text class="btn" @click="showReasonMak(index,item.OrderNumber)">取消订单</text>
-              <text class="btn active" @click="toPay(index,item.OrderNumber)">支付</text>
-            </div>
-            <!-- 已使用 -->
-            <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3 || item.StatusId===20">
-              <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
-            </div>
-            <!-- 已经取消订单、已完成订单删除 -->
-            <div class="menubtn flex-container flexEnd" v-if="item.StatusId===4 || item.StatusId===13 || item.StatusId===14">
-              <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
-            </div>
-            <!--切换到店服务-->
-            <!-- <div class="seritem" v-if="active==2">
-              <p>项目：外观简单清洗洗车</p>
-              <p>门店：车御品汽车服务</p>
-              <p>车辆：别克-凯越 红色 粤AH6688</p>
-              <p>手机号：13682293390</p>
-            </div>
-            <div class="menubtn flex-container flexEnd">
-              <text class="btn">取消订单</text>
-              <text class="btn active">付款</text>
-            </div>-->
-          </div>
-          <p
-            style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;"
-            v-if="hasData"
-          >暂无数据</p>
-          <p
-            class="ovedMsg"
-            v-if="isOved"
-            style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
-          >我也是有底线的</p>
-        </scroll-view>
-      </div>
     </div>
     <!-- 取消订单选择原因 -->
     <reasonMask
