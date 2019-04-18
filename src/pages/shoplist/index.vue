@@ -114,14 +114,15 @@ export default {
     this.longitude=wx.getStorageSync('longitude');
     this.cityName=wx.getStorageSync("cityName")
     this.getServe()
-    this.getShopList()
     this.getPlace()
+    this.getShopList()
+    
 
   },
    watch:{
     SearchKey(){
-      //console.log(this.SearchKey.length,"关键字的长度")
-      if(this.SearchKey.length.length=0){
+      //console.log(this.SearchKey,this.SearchKey.length,"关键字的长度")
+      if(this.SearchKey.length==0){
         this.phValue="请输入关键字搜索"
         this.getShopList()
       }
@@ -191,6 +192,7 @@ export default {
                 icon: "none",
                 duration: 2000
               });
+            return false
 
           }else{
               this.PageCount=result.count
