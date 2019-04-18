@@ -100,7 +100,7 @@ export default {
         // });
         var userinfo = wx.getStorageSync("userInfo");
         var openid = wx.getStorageSync("openId");
-        var token = wx.getStorageSync("token");
+        // var token = wx.getStorageSync("token");
         var unionid = wx.getStorageSync("unionid");
         wx.request({
           url: "https://carapi.wtvxin.com/api/Login/BindOrRegister", //仅为示例，并非真实的接口地址
@@ -127,7 +127,8 @@ export default {
                   //绑定手机成功之后,延时2秒跳转到会员中心
                   setTimeout(function() {
                     // 登录
-                    logins(true)
+                    logins()
+                    // wx.navigateBack()
                     // wx.switchTab({
                     //   url: "/pages/mine/main"
                     // });
