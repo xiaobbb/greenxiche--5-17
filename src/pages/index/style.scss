@@ -228,7 +228,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width:55%;
+    width:60%;
 }
 .shopname{
     font-size:28rpx;
@@ -237,6 +237,7 @@
 .addressflex{
     display: flex;
     justify-content: space-between;
+    border:1px solid red;
 }
 .time{
     font-size:20rpx;

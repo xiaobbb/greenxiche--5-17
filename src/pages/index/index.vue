@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="13" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="8" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -125,7 +125,7 @@ export default {
     if(this.userId && this.token){
       console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
         Promise.all([
-            this.getCityName(),this.getShopinfo(),this.getCoupon(),this.isNewVip()
+            this.getCityName(),this.getCoupon(),this.isNewVip()
         ]).then(
           ()=>{
             if(this.isshow==false){
@@ -143,6 +143,7 @@ export default {
   },
   onShow(){
     this.initData()
+    this.getShopinfo()
   },
   watch:{
     '$store.state':{
@@ -176,7 +177,7 @@ export default {
       address:"",
       userId:"",
       token:"",
-      markerId: "1",
+      markerId: "0",
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       shopArr:[],//商铺信息集合
       shopInfo:{}, //marker店铺信息
@@ -223,7 +224,7 @@ export default {
         this.getCityName()
     },
    
-    getCityName(){  //获取手机所在地城市经纬度
+    getCityName(){  //首次进入页面获取手机所在地城市经纬度
       wx.getLocation({
           type: 'wgs84',
           success:(data)=> {
@@ -246,7 +247,7 @@ export default {
         }
       });
     },
-    getCityinfo(){   //根据经纬度获取城市名称 反地理转码
+    getCityinfo(){   //根据经纬度获取城市名称nowPlace 反地理转码
        //console.log(this.latitude,this.longitude,"首页")
       // KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG
          wx.setStorageSync("latitude",this.latitude)
@@ -273,24 +274,23 @@ export default {
     },
     //根据手机所在地经纬度获取周围商铺信息
     async getShopinfo(){
-      console.log(this.markerId,"markerid信息")
       var res=await post("/Shop/NearbyShop",{
           Lat:this.latitude,
           Lng:this.longitude
       })
       console.log(res,"所有的商铺信息")
       if(res.code==0){
-        this.shopArr=res.data
-        this.getNearShop()
+        this.shopArr=res.data //所有店铺信息的集合
+        this.getNearShop()  //要显示的店铺信息
         let arr=[]  //保存markers数组
         for (let i=0;i<res.data.length;i++){
-          console.log(res.data[i])
+          //console.log(res.data[i])
           let latitude =res.data[i].Lat; 
           let longitude =res.data[i].Lng;
           let marker= {
             iconPath: "/static/images/cart.png",
             id:i,
-            // name:res.data[i].ShopNick || '',
+            name:res.data[i].ShopNick || '',
             latitude: latitude,
             longitude: longitude,
             width:24,
@@ -303,35 +303,33 @@ export default {
       }
     },
     getNearShop(){  //获取markers标记时的商户信息
-        console.log(this.markerId,"要显示的商铺的信息")
-        this.shopInfo=this.shopArr[this.markerId-1]
+        this.shopInfo={}
+        this.shopInfo=this.shopArr[this.markerId]
+        console.log(this.shopInfo,"要显示的商铺的信息111111111111111")
         this.shopLat=this.shopInfo.Lat*1
         this.shopLng=this.shopInfo.Lng*1
         this.address=this.shopInfo.Address
         this.name=this.shopInfo.ShopNick
         this.shopId=this.shopInfo.ShopId
-        this.$set(this.shopInfo,'Distance',this.shopInfo.Distance.toFixed(2))
-        this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
+        this.$set(this.shopInfo,'Distance',(this.shopInfo.Distance*1).toFixed(2))
+        if(this.shopInfo.BusinessHours.length>10){
+            this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
+        }
         console.log(this.shopInfo,"店铺详情")
     },
     markertap(e){  //点击标记点
         console.log(e,"正在点击标记")
         this.markerId  = e.mp.markerId;
-        if(this.markerId==0){
-            return false
-        }else{
-          this.changeMarkerColor(); //更改样式
-          this.getNearShop()
-        }
-        
+        this.changeMarkerColor(); //更改样式
+        this.getNearShop()
     },
     changeMarkerColor() { //更改用户选中的标记样式
       this.markers.forEach((item, index) => {
         item.iconPath = "/static/images/cart.png";
         if (index == this.markerId){
           item.iconPath = "/static/images/bigcar.png";
-          item.width=80;
-          item.height=95
+          item.width=48;
+          item.height=55
         }else{
           item.iconPath = "/static/images/cart.png";
           item.width=24;
@@ -422,9 +420,8 @@ export default {
         //获取最近的商家显示
         //this.getShopinfo() //获取地图上的商铺标记信息
       }else if(name=="上门"){
-        this.isXiche=true,
-        this.isGoshop=false,
-        this.markers=[]
+        this.isXiche=true
+        this.isGoshop=false
       }
     },
     choseLocation(){
@@ -473,14 +470,14 @@ export default {
                   success:(res)=>{
                       console.log(this.latitude,this.longitude,"经纬度中心")
                       //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
-                      this.markers=[{
-                          iconPath: "/static/images/person.png",
-                          id:0,
-                          latitude: this.latitude,
-                          longitude: this.longitude,
-                          width:40,
-                          height:45
-                      }]
+                      // this.markers=[{
+                      //     iconPath: "/static/images/person.png",
+                      //     id:0,
+                      //     latitude: this.latitude,
+                      //     longitude: this.longitude,
+                      //     width:40,
+                      //     height:45
+                      // }]
                   }
                 })
                 this.getCityinfo()
