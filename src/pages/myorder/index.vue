@@ -65,11 +65,15 @@
                 <text class="btn active">申请退款</text>
               </div> -->
               <!-- 已使用 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
+              <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
                 <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
+              </div> -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===13">
+                <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">申请退款</text>
+                <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
-              <!-- 已完成 、已经取消订单删除 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===13 || item.StatusId===14 || item.StatusId===4">
+              <!-- 已退款 、已经取消订单删除 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===14 || item.StatusId===17">
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
             </div>

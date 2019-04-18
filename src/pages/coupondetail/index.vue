@@ -16,10 +16,11 @@
     </div>
     <div class="slide"></div>
     <!-- 套餐 -->
-    <div v-if="product.BrandId===23">
+    <div v-if="product.BrandId===22">
       <div class="titleinfo">
         <img src="/static/images/fontborder.png" class="itemtitle">
-        <p>{{product.Name}}</p>
+        <!-- <p>{{product.Name}}</p> -->
+        <p>卡券套餐</p>
       </div>
       <div class="flex-container iteminfo" v-for="(item,index) in product.MealArr" :key="index">
         <div>{{item.Name}}</div>
@@ -70,13 +71,13 @@
         <img src="/static/images/border2.png" class="itemtitle">
         <p>购卡须知</p>
       </div>
-      <div class="tips">
+      <div class="tips" v-html="product.ContentDetail">
         <!-- <p>1.套餐卡购买成功后，可直接在APP内使用；</p>
             <p>2.使用套餐卡下单时，其他所有促销、优惠券均不可叠加；</p>
             <p>3.套餐卡已经使用后不可退款，请确认后使用；</p>
             <p>4.购卡权益会以服务卡券的形式发放至账户内；</p>
         <p>5.本套餐卡自购买之日起一年内有效，请在有效期内使用；</p>-->
-        {{product.ContentDetail}}
+        <!-- {{product.ContentDetail}} -->
       </div>
     </div>
     <div class="slide"></div>
@@ -117,7 +118,7 @@ export default {
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
-        title: "服务详情"
+        title: "详情"
       });
     },
     async getData() {
