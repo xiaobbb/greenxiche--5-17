@@ -39,13 +39,15 @@ export default function logins(check) {
                   });
                   return false;
                 }
-                if (res.data.meta.code === 0) {
-                  wx.setStorageSync("token", res.data.data.accessToken); //保存的令牌 accessToken
-                  wx.setStorageSync("userId", res.data.data.uid); //保存用户Id到本地缓存
-                  wx.setStorageSync("unionid", res.data.data.unionid);
+                wx.setStorageSync("unionid", res.data.data.unionid);
                   wx.setStorageSync("openId", res.data.data.openId);
+                
                   console.log('缓存', wx.getStorageSync("token"),
-                    wx.getStorageSync("userId"), res.data.data);
+                    wx.getStorageSync("userId"), res.data.meta);
+                  if (res.data.meta.code === 0) {
+                  
+                    wx.setStorageSync("token", res.data.meta.dic.Token); //保存的令牌 accessToken
+                    wx.setStorageSync("userId", res.data.meta.dic.UserId); //保存用户Id到本地缓存
                   wx.showToast({
                     title: "登陆成功",
                     icon: "success",
@@ -65,7 +67,7 @@ export default function logins(check) {
                   });
                 } else if (res.data.meta.code === 2) {
                   //没有绑定手机，则跳转到绑定手机的页面
-                  wx.navigateTo({
+                  wx.redirectTo({
                     url: "/pages/register/main"
                   });
                 } else {

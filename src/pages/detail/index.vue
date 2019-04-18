@@ -114,10 +114,10 @@
             <img src="/static/images/home1.png" class="bottip">
             <text>主页</text>
           </p>
-          <p class="clomn flex-container">
+          <!-- <p class="clomn flex-container">
             <img src="/static/images/mesg.png" class="bottip">
             <text>客服</text>
-          </p>
+          </p> -->
           <p class="clomn flex-container" @click="goUrl('/pages/shopcart/main')">
             <img src="/static/images/shopcar.png" class="bottip">
             <text>购物车</text>

@@ -61,9 +61,9 @@
                 <text class="btn active" @click="toPay(index,item.OrderNumber)">付款</text>
               </div>
               <!-- 待使用 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===19">
+              <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===19">
                 <text class="btn active">申请退款</text>
-              </div>
+              </div> -->
               <!-- 已使用 -->
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
                 <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
@@ -256,9 +256,11 @@ export default {
       menulist: [
         { id: 0, name: "全部" },
         { id: 1, name: "待付款" },
-        { id: 2, name: "待使用" },
-        { id: 3, name: "待评价" },
-        { id: 4, name: "已完成" }
+        // { id: 2, name: "待使用" },
+        // { id: 3, name: "待评价" },
+        { id: 4, name: "已完成" },
+        { id: 3, name: "已取消" },
+        { id: 2, name: "退款" },
       ],
       visitlist: [{ id: 1, name: "上门服务" }, { id: 2, name: "到店服务" }],
       orderList: [],
