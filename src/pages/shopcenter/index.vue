@@ -121,7 +121,7 @@ export default {
     // 获取分类列表
     getClassify() {
       const that = this;
-      post("Server/GetCarWash",{BrandList:0}).then(res => {
+      post("Server/GetShopCardSort",{BrandList:0}).then(res => {
         this.menulist=[]
         for (let i = 0; i < res.data.length; i += 1) {
           const datas = res.data[i];
@@ -151,7 +151,7 @@ export default {
           for (let i = 0; i < res.data.length; i += 1) {
             const datas = res.data[i];
             that.productlist.push({
-              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，23--套餐，22--卡券
+              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
               id: datas.Id,
               title: datas.Name,
               price: datas.Price,
