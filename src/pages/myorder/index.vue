@@ -179,7 +179,7 @@
     ></reasonMask>
     <!-- 支付 -->
     <Pay :showPay="showPay" v-if="showPay" :orderNumber="orderNo" 
-      :total="totalPrice" :navigateUrl="'/pages/myorder/main'"
+      :total="totalPrice" successUrl='/pages/myorder/main' closeUrl='/pages/myorder/main'
     ></Pay>
   </div>
 </template>
@@ -428,7 +428,7 @@ export default {
               }
               if(_this.orderBigType===2){  //预约订单
                 _this.$set(_this.bookList[_this.cancleIndex],"StatusId",14);
-                _this.$set(_this.bookList[_this.cancleIndex],"StatusName","交易关闭");
+                _this.$set(_this.bookList[_this.cancleIndex],"StatusName","订单已取消");
               }
               _this.orderNo = "";
               _this.cancleIndex = "";

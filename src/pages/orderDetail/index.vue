@@ -65,10 +65,10 @@
             <img src="/static/images/phonecall.png" class="tippics1">
             <span>拨打电话</span>
         </p>
-        <p class="flex-container">
+        <!-- <p class="flex-container">
             <img src="/static/images/kefu.png" class="tippics2">
             <span>在线客服</span>
-        </p>
+        </p> -->
     </div>
     <div class="slide"></div>
     <div class="backgray">
@@ -102,7 +102,7 @@
             <div @click="confirmDel">确认</div>
         </div>
     </div>
-    <!--拨打电话遮罩层-->
+    <!--拨打电话遮罩层--> 
     <div v-if="showCall" class="maskcall">
         <div class="title call">
           <text>400-118-5222</text>

@@ -1,46 +1,48 @@
 <template>
   <div>
-    <div class="remind" v-if="reasonList.length<=0">
-      <text>{{info.StatusName}}</text>
-    </div>
-    <!--切换显示-->
-    <!--上门订单-->
-    <div v-if="serType==1 || reasonList.length<=0">
-        <div class="flex-container orderhead white">
-            <img src="/static/images/place.png" class="place">
-            <div class="flex-container clomn personinfo">
-                <div class="orderuser">
-                    <p>{{info.ContactName}}</p>
-                    <p>{{info.TelephoneNumber}}</p>
+    <div v-if="!reasonList.length>0">
+        <div class="remind" v-if="reasonList.length<=0">
+          <text>{{info.StatusName}}</text>
+        </div>
+        <!--切换显示-->
+        <!--上门订单-->
+        <div v-if="serType==1">
+            <div class="flex-container orderhead white">
+                <img src="/static/images/place.png" class="place">
+                <div class="flex-container clomn personinfo">
+                    <div class="orderuser">
+                        <p>{{info.ContactName}}</p>
+                        <p>{{info.TelephoneNumber}}</p>
+                    </div>
+                    <div class="mysize">{{info.Address}}</div>
                 </div>
-                <div class="mysize">{{info.Address}}</div>
+            </div>
+            <div class="flex-container apointtime">
+                <img src="/static/images/time11.png" class="timelogo">
+                <text>{{info.AddTime}}</text>
             </div>
         </div>
-        <div class="flex-container apointtime">
-            <img src="/static/images/time11.png" class="timelogo">
-            <text>{{info.AddTime}}</text>
-        </div>
-    </div>
-    <!--到店订单-->
-    <div class="flex-container shoporder white" v-if="serType==2 || reasonList.length<=0">
-      <img src="/static/images/place.png" class="place">
-      <div class="shopservince">
-          <div class="shopservinitem">到店服务</div>
-          <div class="flex-container">
-              <img src="/static/images/shop5.png" class="shopbg">
-              <div class="flex-container clomn placeinfo">
-                  <p class="placename">车御品汽车服务</p>
-                  <p>深圳市龙华区梅龙大道912号</p>
+        <!--到店订单-->
+        <div class="flex-container shoporder white" v-if="serType==2">
+          <img src="/static/images/place.png" class="place">
+          <div class="shopservince">
+              <div class="shopservinitem">到店服务</div>
+              <div class="flex-container">
+                  <img src="/static/images/shop5.png" class="shopbg">
+                  <div class="flex-container clomn placeinfo">
+                      <p class="placename">车御品汽车服务</p>
+                      <p>深圳市龙华区梅龙大道912号</p>
+                  </div>
               </div>
           </div>
-      </div>
-    </div>
-    
-    <div class="flex-container prodetail" v-if="reasonList.length<=0">
-        <img src="/static/images/car22.png" class="mycardet">
-        <div class="flex-container clomn carright">
-            <p>东风本田-思域</p>
-            <p class="carnums">粤AJ6688</p>
+        </div>
+        
+        <div class="flex-container prodetail" v-if="reasonList.length<=0">
+            <img src="/static/images/car22.png" class="mycardet">
+            <div class="flex-container clomn carright">
+                <p>东风本田-思域</p>
+                <p class="carnums">粤AJ6688</p>
+            </div>
         </div>
     </div>
     <div class="slide"></div>
@@ -93,14 +95,18 @@
         <p class="pitem">订单编号：{{info.OrderNumber}}<span class="copy">复制</span></p>
         <p class="pitem">创建时间：{{info.AddTime}}</p>
         <div>
-           <p class="pitem">支付时间：{{info.PayTime}}</p>
-            <p class="pitem" v-if="serType==1&&info.FaHuoTime">上门时间：{{info.FaHuoTime}}</p>
-            <p class="pitem" v-if="serType==2&&info.FaHuoTime">到店时间：{{info.FaHuoTime}}</p>
-            <p class="pitem">成交时间：{{info.CompleteTime}}</p>
+           <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' ">支付时间：{{info.PayTime}}</p>
+            <p class="pitem" v-if="info.StatusId=='13'">上门时间：{{info.FaHuoTime}}</p>
+            <p class="pitem" v-if="info.StatusId=='13'">到店时间：{{info.FaHuoTime}}</p>
+            <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' ">成交时间：{{info.CompleteTime}}</p>
         </div>
     </div>
-    <div class="flex-container tipmenu">
-        <p class="flex-container">
+    <p class="flex-container" style="padding-right:50rpx;justify-content:flex-end">
+          <img src="/static/images/phonecall.png" class="tippics1">
+          <span>拨打电话</span>
+    </p>
+    <!-- <div class="flex-container tipmenu" style="border:1px solid red;text-align:right">
+        <p class="flex-container tipmenu" style="border:1px solid blue;width:25%;">
             <img src="/static/images/phonecall.png" class="tippics1">
             <span>拨打电话</span>
         </p>
@@ -108,7 +114,7 @@
             <img src="/static/images/kefu.png" class="tippics2">
             <span>在线客服</span>
         </p>
-    </div>
+    </div> -->
     <div class="slide"></div>
     <div class="backgray">
       <!--申请退款-->
@@ -124,13 +130,13 @@
           @closeReason="closeReason"
           @selectReason="selectReason"
         ></reasonMask>
-        <!--上门订单 重新预约-->
-        <div class="orderbottom white" v-if="showDelOrder">
-            <p class="leftbtn" @click="btnDel(index,item.OrderNumber)">删除订单</p>
-            <p class="rightbtn">重新预约</p>
+        <!--上门订单 已取消的订单 重新预约-->
+        <div class="orderbottom white" v-if="info.StatusId == '14'">
+            <p class="leftbtn" @click="btnDel">删除订单</p>
+            <p class="rightbtn" @click="appointAgain">重新预约</p>
         </div>
         <!--上门、到店交易成功-->
-        <div class="orderapybottom white " v-if="info.StatusId=='13'">
+        <div class="orderapybottom white " v-if="info.StatusId == '13'">
             <p class="rightbtn" @click="addCommont">去评价</p>
         </div>
         <!--到店申请退款-->
@@ -165,13 +171,20 @@ export default {
   },
   onShow(){
     this.reasonList = [];
-    this.orderNo = "";
+    //this.orderNo = "";
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
     this.orderNo = this.$root.$mp.query.orderNo;
     this.serType = this.$root.$mp.query.serType;
-    console.log(this.serType,"预约订单详情页")
+    //console.log(this.serType,"预约订单详情页")
     this.getOrderDetails();
+  },
+  watch:{
+    reasonShow(){
+      if(this.reasonShow==false){
+          this.reasonList=[]
+      }
+    }
   },
   data () {
     return {
@@ -191,7 +204,8 @@ export default {
       showDelOrder:false,
       showDelete:false,
       showMask:false,
-      
+      appraiseType: 0, //0:商品评价；1：上门服务评价；2：到店评价
+      orderBigType: 1, //1:商城订单；2：预约订单
     }
   },
  
@@ -214,7 +228,7 @@ export default {
       if(Object.keys(result.data).length>0){
         this.info = result.data;
         this.orderItemNum=result.data.OrderNumber
-        console.log(this.orderItemNum,"子单号")
+        //console.log(this.orderItemNum,"子单号")
         this.hasData = true;
       }
     },
@@ -222,6 +236,7 @@ export default {
     //     console.log(e.target)
     //      //wx.navigateTo({ url: "/pages/applymoney/main" });
     // },
+    //待接单的订单申请退款
     applyMoney(){
         this.reasonShow = true;
         this.getCancelReason();
@@ -262,16 +277,19 @@ export default {
         });
       }
     },
+    //已成交的订单评价
     addCommont(){
          wx.navigateTo({ url: "/pages/addcomment/main?orderNo="+this.orderItemNum+"&url=addcomment"});
     },
+    //已取消的订单删除订单
     btnDel(){
       let _this = this;
       wx.showModal({
         content: "您确定要删除该订单么？",
         success(res) {
+          console.log(res,"删除订单")
           if (res.confirm) {
-            _this.DeleteOrders();
+           _this.DeleteOrders();
           } else if (res.cancel) {
           }
         }
@@ -291,12 +309,16 @@ export default {
           duration: 1500,
           success: function() {
             setTimeout(() => {
-              wx.navigateTo({url:"/pages/addcomment/main?appraiseType=0&orderNo="+orderNo})
-            }, 1500); //去订单列表删除订单
+              wx.navigateTo({url:"/pages/addcomment/main"})
+            }, 1500); //订单列表自动删除订单了
           }
         });
       }
     },
+    //重新预约
+    appointAgain(){
+       wx.navigateTo({url:"/pages/index/main"})
+    }
   },
 
   created () {
