@@ -71,7 +71,7 @@
         <img src="/static/images/border2.png" class="itemtitle">
         <p>购卡须知</p>
       </div>
-      <div class="tips" v-html="product.ContentDetail">
+      <div class="tips" v-html="product.content">
         <!-- <p>1.套餐卡购买成功后，可直接在APP内使用；</p>
             <p>2.使用套餐卡下单时，其他所有促销、优惠券均不可叠加；</p>
             <p>3.套餐卡已经使用后不可退款，请确认后使用；</p>
@@ -132,6 +132,10 @@ export default {
       });
       // debugger;
       this.product = res.data[0];
+      // 把每个图片加上样式
+      // console.log(res.data[0].ContentDetail)
+      // console.log(res.data[0].ContentDetail.replace(/\<img/gi, '<img style="max-width:100%;height:auto" '))
+      this.product.content = res.data[0].ContentDetail.replace(/\<img/gi, '<img style="max-width:100%;height:auto" ');
       let imgs = [];
       this.product.PicData.map(img => {
         imgs.push(img.PicUrl);

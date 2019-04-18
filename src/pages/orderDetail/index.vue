@@ -36,7 +36,7 @@
                 <p>￥{{info.ExpressPrice}}</p>
             </div> -->
             <div class="flex-container">
-                <p>订单总价</p>
+                <p>订单价格</p>
                 <p>￥{{info.TotalPrice}}</p>
             </div>
             <div class="flex-container">
@@ -45,7 +45,7 @@
             </div>
         </div>
         <div class="flex-container padtop">
-              <p>需付款</p>
+              <p>总价</p>
               <p class="pricecolor">￥{{info.TotalPrice}}</p>
         </div>
     </div>
@@ -61,6 +61,7 @@
         </div> -->
     </div>
     <div class="flex-container tipmenu">
+        <p></p>
         <p class="flex-container">
             <img src="/static/images/phonecall.png" class="tippics1">
             <span>拨打电话</span>
@@ -72,37 +73,42 @@
     </div>
     <div class="slide"></div>
     <div class="backgray">
-        <div class="orderbottom white" v-if="showDefaule">
-            <p @click="cancleOrder">取消订单</p>
-            <p @click="goToPay">付款</p>
+        <!-- 未付款 -->
+        <div class="orderbottom white" v-if="info.StatusId===0">
+            <p @click="showReasonMak">取消订单</p>
+            <p @click="showPay=true">付款</p>
         </div>
-        <!--删除订单 重新购买-->
-        <div class="orderbottom white" v-if="showDelOrder">
-            <p>删除订单</p>
-            <p>重新购买</p>
+        <!--已付款、已完成-->
+        <div class="orderbottom white" v-if="info.StatusId===13">
+            <p>申请退款</p>
+            <p @click="btnDel">删除订单</p>
+        </div>
+        <!--已退款 、已经取消订单删除-->
+        <div class="orderbottom white" v-if="info.StatusId===14 || info.StatusId===17">
+            <p @click="btnDel">删除订单</p>
         </div>
         <!--买家已付款-->
-        <div class="orderapybottom white " v-if="showPay">
+        <!-- <div class="orderapybottom white " v-if="showPay">
             <p>再次购买</p>
-        </div>
+        </div> -->
         <!--交易成功-->
-        <div class="orderapybottom white " v-if="shwoSuccess">
+        <!-- <div class="orderapybottom white " v-if="shwoSuccess">
             <p @click="addCommont">去评价</p>
-        </div>
+        </div> -->
     </div>
     <!--遮罩层是否删除订单-->
     <div class="mask-modal" v-if="showMask"></div>
     <!--删除遮罩层-->
     <div v-if="showDelete" class="maskdelete">
         <div class="title">
-          <text>您的订单尚未付款成功，确 认要取消本订单吗？</text>
+          <text>您的订单尚未付款成功，确认要取消本订单吗？</text>
         </div>
         <div class="flex-container bottombtn">
             <div>取消</div>
             <div @click="confirmDel">确认</div>
         </div>
     </div>
-    <!--拨打电话遮罩层--> 
+    <!--拨打电话遮罩层-->
     <div v-if="showCall" class="maskcall">
         <div class="title call">
           <text>400-118-5222</text>
@@ -113,14 +119,34 @@
         </div>
     </div>
       
+    <!-- 取消订单选择原因 -->
+    <reasonMask
+      title="取消订单原因"
+      button="确定"
+      :show="reasonShow"
+      :data="reasonList"
+      @closeReason="closeReason"
+      @selectReason="selectReason"
+    ></reasonMask>
+    <!-- 支付 -->
+    <Pay :showPay.sync="showPay" :orderNumber="orderNo" 
+      :total="info.TotalPrice" 
+      balanceRequestUrl="Order/OrderSoldePayment"
+    ></Pay>
   </div>
 </template>
 
 <script>
-import { post } from "../../utils";
+import { post,get } from "../../utils";
+import reasonMask from "@/components/reasonMask";
+import Pay from '@/components/pay.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
+  components: {
+    reasonMask,
+    Pay
+  },
   onLoad(){
     this.setBarTitle();
   },
@@ -132,25 +158,26 @@ export default {
   },
   data () {
     return {
-      userId:"",
-      token:"",
-      orderNo:"",
       orderItemNum:"",//发表评论的订单编号
-      info:{},
       hasData:false,
       showMask:false,
       showCall:false,
       showDefaule:false,
       showCancleorder:false,
-      showPay:false,
       showDelete:false,
       showDelOrder:false,
-      shwoSuccess:true
+      shwoSuccess:true,
+
+      
+      reasonShow: false,
+      reasonList: [],
+      userId:"",
+      token:"",
+      orderNo:"",
+      info:{},
+      showPay:false,  //支付弹窗
+      totalPrice:""  //需要支付的价格
     }
-  },
- 
-  components: {
-    
   },
   methods: {
     setBarTitle() {
@@ -189,7 +216,83 @@ export default {
         console.log(this.orderItemNum,"子单号")
         this.hasData = true;
       }
-    }
+    },
+    // 关闭取消订单原因弹窗
+    closeReason() {
+      this.reasonShow = false;
+    },
+    selectReason(code, codeTxt) {
+      this.cancelOrders(codeTxt);
+    },
+    // 删除订单
+    btnDel() {
+      let _this = this;
+      wx.showModal({
+        content: "您确定要删除该订单么？",
+        success(res) {
+          if (res.confirm) {
+            _this.DeleteOrders();
+          } else if (res.cancel) {
+          }
+        }
+      });
+    },
+    // 删除订单
+    async DeleteOrders() {
+      let result = await post("Order/DeleteOrders", {
+        UserId: this.userId,
+        Token: this.token,
+        OrderNo: this.orderNo
+      });
+      if (result.code === 0) {
+        let _this = this;
+        wx.showToast({
+          title: "删除订单成功!",
+          icon: "none",
+          duration: 1500,
+          success: function() {
+            setTimeout(() => {
+              wx.navigateBack()
+            }, 1500);
+          }
+        });
+      }
+    },
+      //获取取消订单原因
+    async showReasonMak() {
+      let result = await get("Order/CancelReason");
+      if (result.data.length > 0) {
+        this.reasonList = result.data;
+      }
+      console.log(this.reasonList,'aaa')
+      this.reasonShow = true;
+    },
+    
+    async cancelOrders(reasonMark) {
+      let result = await post("Order/CancelOrders", {
+        UserId: this.userId,
+        Token: this.token,
+        OrderNo: this.orderNo,
+        ReMarks: reasonMark
+      });
+      if (result.code === 0) {
+        let _this = this;
+        wx.showToast({
+          title: "取消订单成功!",
+          icon: "none",
+          duration: 1500,
+          success: function() {
+            setTimeout(() => {
+              _this.reasonShow = false;
+              
+              //做改变订单状态
+                _this.$set(_this.info,"StatusId",14);
+                _this.$set(_this.info,"StatusName","交易关闭");
+            }, 1500);
+          }
+        });
+      }
+    },
   },
 
   created () {
