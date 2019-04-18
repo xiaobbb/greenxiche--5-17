@@ -58,7 +58,7 @@ export default {
            sourceType: ["album", "camera"],
             success: res => {
                that.imgPathArr = that.imgPathArr.concat(res.tempFilePaths);
-               if(that.imgPathArr.length==8){
+               if(that.imgPathArr.length==4){
                  that.isShowBtnUpload=false
                }
                 for(let i=0;i<that.imgPathArr.length;i++){

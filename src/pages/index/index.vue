@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="8" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+            <map id="map" :longitude="longitude" :latitude="latitude"  scale="10" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -144,6 +144,7 @@ export default {
   onShow(){
     this.initData()
     this.getShopinfo()
+    
   },
   watch:{
     '$store.state':{
@@ -177,7 +178,7 @@ export default {
       address:"",
       userId:"",
       token:"",
-      markerId: "0",
+      markerId: "1",
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       shopArr:[],//商铺信息集合
       shopInfo:{}, //marker店铺信息
@@ -281,7 +282,7 @@ export default {
       console.log(res,"所有的商铺信息")
       if(res.code==0){
         this.shopArr=res.data //所有店铺信息的集合
-        this.getNearShop()  //要显示的店铺信息
+        console.log(this.shopArr,'66666666666666666666666')
         let arr=[]  //保存markers数组
         for (let i=0;i<res.data.length;i++){
           //console.log(res.data[i])
@@ -289,7 +290,7 @@ export default {
           let longitude =res.data[i].Lng;
           let marker= {
             iconPath: "/static/images/cart.png",
-            id:i,
+            id:i+1,
             name:res.data[i].ShopNick || '',
             latitude: latitude,
             longitude: longitude,
@@ -298,14 +299,17 @@ export default {
           };
           arr.push(marker)
         }
-        this.markers=arr
-        console.log(this.markers,"markers数组")
+        //this.markers=arr
+        console.log(arr,"商铺标记集合")
+        this.markers=this.markers.concat(arr)
+        //console.log(this.markers,this.markers.length,"markers数组")
+        this.getNearShop()  //要显示的店铺信息
       }
     },
     getNearShop(){  //获取markers标记时的商户信息
         this.shopInfo={}
         this.shopInfo=this.shopArr[this.markerId]
-        console.log(this.shopInfo,"要显示的商铺的信息111111111111111")
+        //console.log(this.shopInfo,"要显示的商铺的信息111111111111111")
         this.shopLat=this.shopInfo.Lat*1
         this.shopLng=this.shopInfo.Lng*1
         this.address=this.shopInfo.Address
@@ -314,28 +318,45 @@ export default {
         this.$set(this.shopInfo,'Distance',(this.shopInfo.Distance*1).toFixed(2))
         if(this.shopInfo.BusinessHours.length>10){
             this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
+            //this.shopInfo.BusinessHours=this.shopInfo.BusinessHours.split(" ")[1]
         }
-        console.log(this.shopInfo,"店铺详情")
+        //console.log(this.shopInfo,"店铺详情")
     },
     markertap(e){  //点击标记点
         console.log(e,"正在点击标记")
-        this.markerId  = e.mp.markerId;
-        this.changeMarkerColor(); //更改样式
-        this.getNearShop()
+        if(e.mp.markerId==0){
+          return false
+        }else{
+            this.markerId  = e.mp.markerId;
+            this.changeMarkerColor(); //更改样式
+            this.getNearShop()
+        }
+        
     },
     changeMarkerColor() { //更改用户选中的标记样式
       this.markers.forEach((item, index) => {
-        item.iconPath = "/static/images/cart.png";
-        if (index == this.markerId){
+        if (index == this.markerId && this.markerId !=0){
           item.iconPath = "/static/images/bigcar.png";
           item.width=48;
           item.height=55
-        }else{
+        }else if(index != 0){
           item.iconPath = "/static/images/cart.png";
           item.width=24;
           item.height=27.5
         }
       })
+      // this.markers.map((item) => {
+      //   //console.log(item.id)
+      //   if (item.id == this.markerId){
+      //     item.iconPath = "/static/images/bigcar.png";
+      //     item.width=48;
+      //     item.height=55
+      //   }else if(item.id != 0){
+      //     item.iconPath = "/static/images/cart.png";
+      //     item.width=24;
+      //     item.height=27.5
+      //   }
+      // })
       
     },
     async getCoupon(){ //判断是否是新人  三天内
@@ -470,16 +491,25 @@ export default {
                   success:(res)=>{
                       console.log(this.latitude,this.longitude,"经纬度中心")
                       //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
-                      // this.markers=[{
-                      //     iconPath: "/static/images/person.png",
-                      //     id:0,
-                      //     latitude: this.latitude,
-                      //     longitude: this.longitude,
-                      //     width:40,
-                      //     height:45
-                      // }]
+                      let centerMarker=[]
+                      centerMarker=[{
+                          iconPath: "/static/images/person.png",
+                          id:0,
+                          latitude: this.latitude,
+                          longitude: this.longitude,
+                          width:40,
+                          height:45
+                      }]
+                      console.log(centerMarker,"中心标记")
+                      this.markers=this.markers.concat(centerMarker)
+                      function sortId(a,b){
+                          return a.id-b.id
+                      }
+                      this.markers.sort(sortId)
+                    console.log(this.markers,this.markers.length,"markers数组")
                   }
                 })
+               // console.log(this.markers,"markers数组")
                 this.getCityinfo()
               }
           }

@@ -11,7 +11,7 @@
                   <p>{{orderinfo[0].ShopData[0].Address}}</p>
               </div>
           </div>
-          <div class="ordertips">(温馨提示：请核对收货地址是否正确)</div>
+          <div class="ordertips">(温馨提示：请直接至门店进行洗车服务)</div>
       </div>
       <div class="slide"></div>
       <!--订单详情-->
