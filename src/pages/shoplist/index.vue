@@ -118,6 +118,15 @@ export default {
     this.getPlace()
 
   },
+   watch:{
+    SearchKey(){
+      //console.log(this.SearchKey.length,"关键字的长度")
+      if(this.SearchKey.length.length=0){
+        this.phValue="请输入关键字搜索"
+        this.getShopList()
+      }
+    }
+  },
   data () {
     return {
         no1:"全部服务",
@@ -155,6 +164,7 @@ export default {
         phValue:"请输入关键字搜索"
     }
   },
+ 
   computed:{
     
   },
@@ -307,8 +317,6 @@ export default {
     trimData(){
       //console.log(123)
       this.SearchKey=""
-      this.phValue="请输入关键字搜索"
-      this.getShopList()
     },
     onBlur(){
       this.phValue="请输入关键字搜索"
