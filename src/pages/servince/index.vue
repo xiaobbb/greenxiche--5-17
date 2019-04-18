@@ -105,10 +105,10 @@ export default {
           PageSize:this.PageSize,
           TypeId:this.TypeId,
           ShopId:this.shopId,
-          Lat:"1.000000",
-          Lng:"2.000000"
-          // Lat:this.latitude,
-          // Lng:this.longitude
+          // Lat:"1.000000",
+          // Lng:"2.000000"
+          Lat:this.latitude,
+          Lng:this.longitude
       })
       console.log(res,"商品列表")
       if(res.code==0){

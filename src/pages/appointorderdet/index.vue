@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="remind" v-if="reasonList.length<0">
+    <div class="remind" v-if="reasonList.length<=0">
       <text>{{info.StatusName}}</text>
     </div>
     <!--切换显示-->
     <!--上门订单-->
-    <div v-if="serType==1 || reasonList.length<0">
+    <div v-if="serType==1 || reasonList.length<=0">
         <div class="flex-container orderhead white">
             <img src="/static/images/place.png" class="place">
             <div class="flex-container clomn personinfo">
@@ -22,7 +22,7 @@
         </div>
     </div>
     <!--到店订单-->
-    <div class="flex-container shoporder white" v-if="serType==2 || reasonList.length<0">
+    <div class="flex-container shoporder white" v-if="serType==2 || reasonList.length<=0">
       <img src="/static/images/place.png" class="place">
       <div class="shopservince">
           <div class="shopservinitem">到店服务</div>
@@ -36,7 +36,7 @@
       </div>
     </div>
     
-    <div class="flex-container prodetail" v-if="reasonList.length<0">
+    <div class="flex-container prodetail" v-if="reasonList.length<=0">
         <img src="/static/images/car22.png" class="mycardet">
         <div class="flex-container clomn carright">
             <p>东风本田-思域</p>
@@ -126,7 +126,7 @@
         ></reasonMask>
         <!--上门订单 重新预约-->
         <div class="orderbottom white" v-if="showDelOrder">
-            <p class="leftbtn" >删除订单</p>
+            <p class="leftbtn" @click="btnDel(index,item.OrderNumber)">删除订单</p>
             <p class="rightbtn">重新预约</p>
         </div>
         <!--上门、到店交易成功-->
@@ -256,7 +256,7 @@ export default {
           icon: "none",
           duration: 1500,
           success: function() {
-            setTimeout(() => {
+            setTimeout(() => { //去订单列表更改状态
               _this.reasonShow = false;},1500);
           }
         });
@@ -264,7 +264,39 @@ export default {
     },
     addCommont(){
          wx.navigateTo({ url: "/pages/addcomment/main?orderNo="+this.orderItemNum+"&url=addcomment"});
-    }
+    },
+    btnDel(){
+      let _this = this;
+      wx.showModal({
+        content: "您确定要删除该订单么？",
+        success(res) {
+          if (res.confirm) {
+            _this.DeleteOrders();
+          } else if (res.cancel) {
+          }
+        }
+      });
+    },
+     async DeleteOrders() {
+      let result = await post("Order/DeleteOrders", {
+        UserId: this.userId,
+        Token: this.token,
+        OrderNo: this.orderNo
+      });
+      if (result.code === 0) {
+        let _this = this;
+        wx.showToast({
+          title: "删除订单成功!",
+          icon: "none",
+          duration: 1500,
+          success: function() {
+            setTimeout(() => {
+              wx.navigateTo({url:"/pages/addcomment/main?appraiseType=0&orderNo="+orderNo})
+            }, 1500); //去订单列表删除订单
+          }
+        });
+      }
+    },
   },
 
   created () {

@@ -109,9 +109,11 @@ export default {
       this.active=e
       // this.latitude=this.locationlist[e].location.lat
       // this.longitude=this.locationlist[e].location.lng
+      console.log(this.locationlist[e],"点击选中的位置")
       let address=this.locationlist[e].address;
       this.update({ latitude:this.locationlist[e].location.lat,
-                longitude:this.locationlist[e].location.lng
+                longitude:this.locationlist[e].location.lng,
+                nowPlace:address
           });
      // console.log(address)
       //  wx.request({

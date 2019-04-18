@@ -33,13 +33,16 @@
         <p class="hr"></p>
         <div class="item"  @click="choseMoney">
             <img src="/static/images/yellow.png" class="diandian">
-            <span class="location-self">价格 : {{total || 0 }}</span>
-            <p class="taginfo">
-              <img src="/static/images/tag.png" class="tag">
-              <span class="goods">充值有优惠</span>
-              <img src="/static/images/white.png" class="yuan">
-            </p>
-            <img src="/static/images/back.png" class="back">
+            <p class="location-self">价格 : {{total}}</p>
+            <div style="width:40%; margin-left:230rpx;text-align:right">
+                <p class="taginfo">
+                  <img src="/static/images/tag.png" class="tag">
+                  <span class="goods">充值有优惠</span>
+                  <img src="/static/images/white.png" class="yuan">
+                </p>
+                <img src="/static/images/back.png" class="back">
+            </div>
+            
         </div>
         <p class="hr"></p>
         <div class="item">

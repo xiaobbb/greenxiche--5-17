@@ -149,7 +149,7 @@ export default {
               wx.redirectTo({
                 url: this.successUrl
               });
-            }, 1500);
+            }, 1000);
           },
           fail(err) {
             // wx.showToast({

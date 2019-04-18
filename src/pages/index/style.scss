@@ -106,12 +106,14 @@
 }
 .modal-xiche{
     width:702rpx;
-    height:248rpx;
+    height:320rpx;
     background:#fff;
     position:fixed;
     bottom:36rpx;
     left:25rpx;
     z-index:20;
+    padding:30rpx 0;
+    box-sizing: border-box;
     border-radius:20rpx;
 }
 .location-self{
@@ -120,14 +122,14 @@
     margin-left:10rpx;
 }
 .line{
-    position: relative;
     border-bottom:1rpx solid #eee;
-    padding:35rpx 20rpx;
-    margin-bottom:40rpx;
+    padding:20rpx;
+    margin-bottom:20rpx;
 }
 .wash{
     width:660rpx;
     height:75rpx;
+    margin-top:150rpx;
     line-height:75rpx;
     margin:0 auto;
     background: #ff6325;
