@@ -25,16 +25,12 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onShow(){
-    this.scoreList = [];
-    this.memberInfo = {};
-    this.setBarTitle();
-    this.getMemberInfo();
-    this.getScoreList();
+    this.init();
   },
   data () {
     return {
-      userId:wx.getStorageSync('userId'),
-      token:wx.getStorageSync('token'),
+      userId:'',
+      token:'',
       page:1,
       pageSize:15,
       scoreList:[],
@@ -51,6 +47,16 @@ export default {
     
   },
   methods: {
+    init(){
+      this.userId=wx.getStorageSync('userId')
+      this.token=wx.getStorageSync('token')
+      this.scoreList = [];
+      this.memberInfo = {};
+      this.setBarTitle();
+      this.getMemberInfo();
+      this.getScoreList();
+      console.log(wx.getStorageSync('token'),'积分也')
+    },
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "我的积分"
@@ -105,8 +111,12 @@ export default {
   created () {
     // let app = getApp()
   },
-  onPullDownRefresh(){
-     
+  
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.init();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
   },
   onReachBottom(){
     if(this.isLoad){

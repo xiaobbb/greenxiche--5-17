@@ -17,7 +17,12 @@
       <div class="flex-container intitem" v-for="(item,index) in productlist" :key="item.id">
         <div class="flex-container cartdetal">
           <div>
-            <img :src="item.img" class="carpic" v-if="ispop" @click="goDetail(item.brandId,item.id)">
+            <img
+              :src="item.img"
+              class="carpic"
+              v-if="ispop"
+              @click="goDetail(item.brandId,item.id)"
+            >
             <!-- <img src="/static/images/comblo.png" class="carpic" v-else-if="comb"  @click="goDetail(2)">
             <img src="/static/images/cardshop.png" class="carpic" v-else  @click="goDetail(2)">-->
           </div>
@@ -71,18 +76,16 @@ export default {
       //普通商品
       productlist: [],
       //卡券
-      cardlist: [
-      ],
+      cardlist: [],
       //套餐
-      combolist: [
-      ],
+      combolist: [],
       activeId: Number,
       isSelectAll: "true",
-      carData:[],
-      carNum:0,
-      carPrice:0,
-      userId: '',
-      token: ''
+      carData: [],
+      carNum: 0,
+      carPrice: 0,
+      userId: "",
+      token: ""
     };
   },
   watch: {
@@ -92,7 +95,6 @@ export default {
     //       for(let i=0;i<this.productlist.length;i+=1){
     //         const data = this.productlist[i]
     //         if(data.num){
-              
     //           list.push(data)
     //         }
     //       }
@@ -103,12 +105,12 @@ export default {
     // }
   },
   onShow() {
-    this.cardlist=[]
-    this.combolist=[]
-    this.carData=[]
-      this.userId=wx.getStorageSync('userId'),
-      this.token=wx.getStorageSync('token'),
-    this.setBarTitle();
+    this.cardlist = [];
+    this.combolist = [];
+    this.carData = [];
+    (this.userId = wx.getStorageSync("userId")),
+      (this.token = wx.getStorageSync("token")),
+      this.setBarTitle();
     // 分类列表
     this.getClassify();
   },
@@ -121,8 +123,8 @@ export default {
     // 获取分类列表
     getClassify() {
       const that = this;
-      post("Server/GetShopCardSort",{BrandList:0}).then(res => {
-        this.menulist=[]
+      post("Server/GetShopCardSort", { BrandList: 0 }).then(res => {
+        this.menulist = [];
         for (let i = 0; i < res.data.length; i += 1) {
           const datas = res.data[i];
           that.menulist.push({
@@ -140,107 +142,149 @@ export default {
       that.activeId = id;
       that.productlist = [];
       const params = {
-         page: 1, 
-         pageSize: 30,
-          TypeId: id,
-        Lat:0,
-        Lng:0
-      }
-      post("/Goods/GoodsList", params).then(
-        res => {
-          for (let i = 0; i < res.data.length; i += 1) {
-            const datas = res.data[i];
-            that.productlist.push({
-              brandId:datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
-              id: datas.Id,
-              title: datas.Name,
-              price: datas.Price,
-              img: datas.ProductImg,
-              sale: datas.SalesVolume,
-              num: 0,
-              tab:datas.KeywordName?JSON.parse(datas.KeywordName):[],
-              // isAttr:datas.SpecificationValue&&datas.BrandId===21
-              isAttr:datas.SpecificationValue
-            });
-          }
-        that.getCarData()
+        page: 1,
+        pageSize: 30,
+        TypeId: id,
+        Lat: 0,
+        Lng: 0
+      };
+      post("/Goods/GoodsList", params).then(res => {
+        for (let i = 0; i < res.data.length; i += 1) {
+          const datas = res.data[i];
+          that.productlist.push({
+            brandId: datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
+            id: datas.Id,
+            title: datas.Name,
+            price: datas.Price,
+            img: datas.ProductImg,
+            sale: datas.SalesVolume,
+            num: 0,
+            stock: datas.Stock,
+            tab: datas.KeywordName ? JSON.parse(datas.KeywordName) : [],
+            // isAttr:datas.SpecificationValue&&datas.BrandId===21
+            isAttr: datas.SpecificationValue
+          });
         }
-      );
+        that.getCarData();
+      });
     },
     // 删除购物车
     async lessNumber(index) {
-
       // if (this.productlist[index].num > 0) {
       //   this.productlist[index].num -= 1;
       // }
-      const product = this.productlist[index]
-      let carId = '';
-      let num = ''
-      for(let i=0;i<this.carData.length;i+=1){
-        if(this.carData[i].ProductId === product.id ){
-          carId = this.carData[i].Id;
-          num = this.carData[i].Number-1
+      const product = this.productlist[index];
+      let carId = "";
+      let num = 0;
+      let status = true;
+      for (let i = 0; i < this.carData.length; i += 1) {
+        if (this.carData[i].ProductId == product.id) {
+            carId = this.carData[i].Id;
+            num = this.carData[i].Number - 1;
+            status = true;
+            break;
+        }else{
+            status = false;
+          }
+      }
+      // 如果数量等于0，跳出
+      if(!status){
+        return false;
+      }
+      const data = [
+        {
+          CartId: carId,
+          Total: num,
+          SpecText: ""
         }
-      }
-      const data = [{
-        "CartId":carId,
-        "Total":num,
-        "SpecText":''
-      }]
-      const params ={
-        UserId:this.userId,
-        Token:this.token,
-        data:data
-      }
+      ];
+      const params = {
+        UserId: this.userId,
+        Token: this.token,
+        data: data
+      };
       // 数量大于0，编辑购物车
       // 数量等于0，删除购物车
-      if(num!==0){
-      await post('Cart/EditCart',params)
-      }else{
-      const res = await post('Cart/DelCart',params)
-        if((res.code*1) === 0){
-          this.productlist[index].num =0
+      if (num !== 0) {
+        await post("Cart/EditCart", params);
+      } else if (num === 0) {
+        const res = await post("Cart/DelCart", params);
+        if (res.code * 1 === 0) {
+          this.productlist[index].num = 0;
         }
       }
-      this.getCarData()
+      this.getCarData();
     },
     // 添加购物车
     async addNumber(index) {
       // this.productlist[index].num += 1;
-      const product = this.productlist[index]
-      const params ={
-        UserId:this.userId,
-        Token:this.token,
+      const product = this.productlist[index];
+      const params = {
+        UserId: this.userId,
+        Token: this.token,
         ProId: product.id,
-        Count:1,
-        SpecText:''
+        Count: 1,
+        SpecText: ""
+      };
+      // 大于购物车库存，设置购物车数量为库存
+      if (product.stock <= product.num) {
+        let carId = "";
+        // let num = "";
+        for (let i = 0; i < this.carData.length; i += 1) {
+          if (this.carData[i].ProductId === product.id) {
+            carId = this.carData[i].Id;
+            // num = this.carData[i].Number - 1;
+          }
+        }
+        params.Count = product.stock;
+        wx.showToast({
+          title: "大于库存了哦！",
+          icon: "none"
+        });
+        setTimeout(()=>{
+        post("Cart/EditCart", {
+          UserId: this.userId,
+          Token: this.token,
+          data: [
+            {
+              CartId: carId,
+              Total: product.stock,
+              SpecText: ""
+            }
+          ]
+        }).then(()=>{
+      this.getCarData();
+        });
+        },1000)
+      } else {
+        await post("Cart/AddCart", params);
+      this.getCarData();
       }
-      const res = await post('Cart/AddCart',params)
-      this.getCarData()
     },
     // 获取购物车信息
-    async getCarData(){
-      const params ={
-        UserId:this.userId,
-        Token:this.token,
-      }
-      const res = await post('Cart/CartList',params)
-      this.carNum=res.data.length;
-      let carPrice =0;
-      for(let i=0;i<res.data.length;i+=1){
-        const datas = res.data[i]
+    async getCarData() {
+      const params = {
+        UserId: this.userId,
+        Token: this.token
+      };
+      const res = await post("Cart/CartList", params);
+      this.carData=[]
+      this.carNum = res.data.length;
+      let carPrice = 0;
+      for (let i = 0; i < res.data.length; i += 1) {
+        const datas = res.data[i];
         // this.carNum += datas.Number
-        carPrice += (datas.SalePrice*datas.Number)
-        this.carData.push(datas)
+        carPrice += datas.SalePrice * datas.Number;
+        this.carData.push(datas);
         const productlist = this.productlist;
-        for(let j=0;j<productlist.length;j+=1){
-          const _productlist = productlist[j]
-          if(datas.ProductId === _productlist.id){
+        for (let j = 0; j < productlist.length; j += 1) {
+          const _productlist = productlist[j];
+          if (datas.ProductId === _productlist.id) {
             this.productlist[j].num = datas.Number;
           }
         }
       }
-      this.carPrice = carPrice.toFixed(2)
+      this.carPrice = carPrice.toFixed(2);
     },
     change(e) {
       console.log(e);
@@ -259,25 +303,24 @@ export default {
       }
     },
     // 跳转
-    goDetail(type,id) {
+    goDetail(type, id) {
       //type商品分类0--全部分类，21--商品，22--套餐，23--卡券
-        console.log(type,'type-id',id)
+      console.log(type, "type-id", id);
       // wx.navigateTo({ url: "/pages/detail/main?id=" + id });
       // return false;
-      var a = type*1;
+      var a = type * 1;
       if (a === 21) {
         wx.navigateTo({ url: "/pages/detail/main?id=" + id });
       }
-      if (a === 22||a===23) {
-        wx.navigateTo({ url: "/pages/coupondetail/main?id="+id });
+      if (a === 22 || a === 23) {
+        wx.navigateTo({ url: "/pages/coupondetail/main?id=" + id });
       }
-      
     },
     toPAy() {
       wx.navigateTo({ url: "/pages/confirmorder/main" });
     },
-    goUrl(url){
-      wx.navigateTo({url})
+    goUrl(url) {
+      wx.navigateTo({ url });
     }
   }
 };

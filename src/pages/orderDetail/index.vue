@@ -1,7 +1,7 @@
 <template>
   <div v-if="hasData">
     <div class="remind">
-      <text v-if="shwoSuccess">{{info.StatusName}}</text>
+      <text>{{info.StatusName}}</text>
     </div>
     <div class="flex-container orderhead white">
         <img src="/static/images/place.png" class="place">
@@ -74,17 +74,21 @@
     <div class="slide"></div>
     <div class="backgray">
         <!-- 未付款 -->
-        <div class="orderbottom white" v-if="info.StatusId===0">
+        <div class="orderbottom white" v-if="info.StatusId==0">
             <p @click="showReasonMak">取消订单</p>
             <p @click="showPay=true">付款</p>
         </div>
         <!--已付款、已完成-->
-        <div class="orderbottom white" v-if="info.StatusId===13">
-            <p>申请退款</p>
+        <div class="orderbottom white" v-if="info.StatusId==13">
+            <p @click="goRefund">申请退款</p>
             <p @click="btnDel">删除订单</p>
         </div>
+        <!--申请退款-->
+        <div class="orderapybottom white " v-if="info.StatusId==16">
+            <p @click="closeRefund">撤销退款</p>
+        </div>
         <!--已退款 、已经取消订单删除-->
-        <div class="orderbottom white" v-if="info.StatusId===14 || info.StatusId===17">
+        <div class="orderbottom white" v-if="info.StatusId==14 || info.StatusId==17|| info.StatusId===18">
             <p @click="btnDel">删除订单</p>
         </div>
         <!--买家已付款-->
@@ -97,9 +101,9 @@
         </div> -->
     </div>
     <!--遮罩层是否删除订单-->
-    <div class="mask-modal" v-if="showMask"></div>
+    <!-- <div class="mask-modal" v-if="showMask"></div> -->
     <!--删除遮罩层-->
-    <div v-if="showDelete" class="maskdelete">
+    <!-- <div v-if="showDelete" class="maskdelete">
         <div class="title">
           <text>您的订单尚未付款成功，确认要取消本订单吗？</text>
         </div>
@@ -107,7 +111,7 @@
             <div>取消</div>
             <div @click="confirmDel">确认</div>
         </div>
-    </div>
+    </div> -->
     <!--拨打电话遮罩层-->
     <div v-if="showCall" class="maskcall">
         <div class="title call">
@@ -158,15 +162,9 @@ export default {
   },
   data () {
     return {
-      orderItemNum:"",//发表评论的订单编号
+      // orderItemNum:"",//发表评论的订单编号
       hasData:false,
-      showMask:false,
       showCall:false,
-      showDefaule:false,
-      showCancleorder:false,
-      showDelete:false,
-      showDelOrder:false,
-      shwoSuccess:true,
 
       
       reasonShow: false,
@@ -186,19 +184,13 @@ export default {
       });
     },
     cancleOrder(){
-      this.showDelete=true,
-      this.showMask=true,
-      this.showDefaule=false
+      // this.showMask=true
     },
     goToPay(){
-      this.showPay=true,
-      this.showDelete=false,
-      this.showDefaule=false
+      this.showPay=true
     },
     confirmDel(){
-      this.showMask=false,
-      this.showDelete=false,
-      this.showDelOrder=true
+      // this.showMask=false
     },
     addCommont(){
       wx.navigateTo({ url: "/pages/addcomment/main?orderNo="+this.orderItemNum+"&url=addcomment"});
@@ -212,8 +204,8 @@ export default {
       console.log(result,"订单详情")
       if(Object.keys(result.data).length>0){
         this.info = result.data;
-        this.orderItemNum=result.data.OrderNumber
-        console.log(this.orderItemNum,"子单号")
+        // this.orderItemNum=result.data.OrderNumber
+        // console.log(this.orderItemNum,"子单号")
         this.hasData = true;
       }
     },
@@ -257,6 +249,36 @@ export default {
           }
         });
       }
+    },
+    // 申请退款
+    goRefund(){
+      wx.navigateTo({
+        url:`/pages/applymoney/main?orderNo=${this.orderNo}&showShop=${true}`
+      })
+    },
+    // 撤销退款
+    closeRefund(){
+     const that = this;
+      wx.showModal({
+        title:'请确认进行退款撤销！',
+        success(res){
+          if(res.confirm){
+              post('Order/CanelRefund',{
+                UserId: that.userId,
+                Token: that.token,
+                OrderNo: that.orderNo,
+              }).then(()=>{
+              wx.showToast({
+                title:'撤销成功！'
+              })
+              setTimeout(()=>{
+                 that.getOrderDetails();
+              },1000)
+              })
+          }
+        }
+      })
+
     },
       //获取取消订单原因
     async showReasonMak() {
