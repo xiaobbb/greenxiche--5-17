@@ -127,7 +127,8 @@ export default {
   },
   methods: {
     pay() {
-      if (this.payType) {
+      console.log(this.payType)
+      if (this.payType*1) {
         this.balance();
       } else {
         this.wx();

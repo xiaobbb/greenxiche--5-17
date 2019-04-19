@@ -269,8 +269,8 @@ export default {
       const res = await post("Order/BuyNowSubmitOrder", {
         UserId: wx.getStorageSync("userId"),
         Token: wx.getStorageSync("token"),
-        // ProId: this.product.id,
-        ProId: 342,
+        ProId: this.product.id,
+        // ProId: 342,
         Number: this.buyNum,
         AddressId: this.address.id,
         // sku

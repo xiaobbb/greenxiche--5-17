@@ -300,7 +300,7 @@ export default {
       let status = false;
       this.carData.map(data => {
         if (data.isSelect) {
-          // 检查是否超出购买数量
+          // 检查是否超出购买最大值数量
           // if(!this.checked(data)){
           //   status = true;
           //    return false
@@ -308,7 +308,7 @@ export default {
           cartIds.push(data.id);
         }
       });
-      if(status){
+      if(status||cartIds.length<1){
         return false;
       }
       console.log("a", cartIds);
