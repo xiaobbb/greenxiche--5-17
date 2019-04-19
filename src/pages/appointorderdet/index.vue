@@ -229,6 +229,9 @@ export default {
     //待接单的订单申请退款
     applyMoney(){
       console.log(this.serType)
+      if(this.serType==1){
+          wx.navigateTo({ url: "/pages/applymoney/main?orderNo="+this.orderNo });
+      }
         // wx.navigateTo({url:"/pages/addcomment/main?appraiseType="})
         // this.getCancelReason();
     },
