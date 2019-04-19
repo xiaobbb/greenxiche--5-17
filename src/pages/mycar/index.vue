@@ -151,7 +151,7 @@ export default {
       console.log(this.carinfolist[e],'???')
       let CarInfo=this.carinfolist[e]
       wx.setStorageSync("CarInfo",CarInfo)
-      wx.navigateTo({ url: "/pages/"+this.params+"/main"});
+      wx.navigateBack({ url: "/pages/"+this.params+"/main"});
     }
   },
 

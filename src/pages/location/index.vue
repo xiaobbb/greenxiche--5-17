@@ -60,9 +60,9 @@
         </div>
         <div class="chase" @click="toPay">立即下单</div>
     </div>
-     <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
+     <!-- <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
     :total="total" :successUrl="'/pages/myorder/main'" :closeUrl="'/pages/myorder/main'"
-    ></Pay>
+    ></Pay> -->
   </div>
 </template>
 
@@ -75,14 +75,19 @@ import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
-    wx.setStorageSync("serItem", " ");
-    wx.setStorageSync("CarInfo", " ");
-    wx.setStorageSync("timearr", " ");
-    wx.setStorageSync("datearr", " ");
+    this.personName=""
+    this.CarInfoId=""
+    this.personPhone=""
+    this.ServiceItem=""
+    this.AppointmentStartTime=""
+    this.AppointmentEndTime=""
+    this.PicList=""
+    this.Remarks=""
     this.cartip = "请选择车辆";
     this.timetip = "请选择服务时间";
     this.serTip = "请选择服务项目";
     this.total="0.00"
+    
   },
   onShow() {
     console.log(this.latitude,this.longitude,"填写订单")
@@ -92,7 +97,6 @@ export default {
     this.token = wx.getStorageSync("token");
     this.latitude=this.$store.state.latitude
     this.longitude=this.$store.state.longitude
-    
     //转换时间
     this.changeTime();
     //服务项目
@@ -256,7 +260,7 @@ export default {
       wx.navigateTo({ url: "/pages/servince/main?shopId=" + this.shopId});
     },
     choseMoney() {
-      wx.navigateTo({ url: "/pages/sum/main" }); //充值
+      wx.navigateTo({ url: "/pages/sum/main?url=location" }); //充值
     },
     choseTime() {
       wx.navigateTo({ url: "/pages/writeorder/main" }); //时间
@@ -305,13 +309,25 @@ export default {
         AppointmentStartTime: this.AppointmentStartTime, //开始时间
         AppointmentEndTime: this.AppointmentEndTime
       };
-      var res = await post("/Order/SubmitDoorOrders", params);
-     // console.log(res);
-      //如果有订单编号跳转支付页面
-      if (res.code == 0) {
-        this.orderNumber = res.data;
-        this.showPay = true;
+      // const numsTure=this.userId && this.token && this.latitude && this.longitude && this.address && this.CarInfoId  && this.ServiceItem && this.AppointmentStartTime && this.AppointmentEndTime && this.personName && this.personPhone
+      // console.log(this.numsTure)
+      if(this.CarInfoId&&this.ServiceItem&&this.AppointmentEndTime){
+        var res = await post("/Order/SubmitDoorOrders", params);
+        // console.log(res);
+        //如果有订单编号跳转支付页面
+        if (res.code == 0) {
+          this.orderNumber = res.data;
+          //this.showPay = true; //支付组件
+          wx.navigateTo({url:"/pages/orderpay/main?price="+this.total+"&orderNo="+this.orderNumber})
+        }
+      }else{
+        wx.showToast({
+          title: "请填写相关内容！",
+          icon: "none",
+          duration: 2000
+        });
       }
+      
     }
   },
 

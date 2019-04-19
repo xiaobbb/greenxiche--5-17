@@ -81,11 +81,11 @@
         </cover-view>
         <!--到店-->
         <cover-view class="modal-goshop" v-if="isGoshop && shopArr.length>0">
-          <cover-view  @click="toShopdet(shopInfo.ShopId)">
-            <img :src="shopInfo.Logo" class="showimg">
+          <cover-view  @click="toShopdet(doorInfo.ShopId)">
+            <img :src="doorInfo.Logo" class="showimg">
           </cover-view>
-          <cover-view class="shopinfoflex"  @click="toShopdet(shopInfo.ShopId)">
-            <cover-view class="shopname">{{shopInfo.ShopNick}}</cover-view>
+          <cover-view class="shopinfoflex"  @click="toShopdet(doorInfo.ShopId)">
+            <cover-view class="shopname">{{doorInfo.ShopNick}}</cover-view>
             <cover-view class="addressflex">
               <cover-view class="flex-container">
                 <cover-image src="/static/images/xing.png" class="xing"/>
@@ -95,14 +95,14 @@
                 <cover-image src="/static/images/xing.png" class="xing"/>
               </cover-view>
               <cover-view class="start">5.0分</cover-view>
-              <cover-view class="time">{{shopInfo.BusinessHours}}</cover-view>
+              <cover-view class="time">{{doorInfo.BusinessHours}}</cover-view>
             </cover-view>
-            <cover-view class="address">{{shopInfo.Address}}</cover-view>
+            <cover-view class="address">{{doorInfo.Address}}</cover-view>
           </cover-view>
           <cover-view class="rights" style="z-index:999" @click="getMap">
             <cover-image src="/static/images/rembg.png" class="big"/>
             <cover-image src="/static/images/wei.png" class="small"/>
-            <cover-view class="span-info">{{shopInfo.Distance}}m</cover-view>
+            <cover-view class="span-info">{{doorInfo.Distance}}m</cover-view>
           </cover-view>
         </cover-view>
     </div>
@@ -119,33 +119,31 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
-    
+     
     
    
   },
   onShow(){
     this.initData()
     this.userId = wx.getStorageSync('userId');
-    this.token = wx.getStorageSync('token');
-    
-    if(this.userId && this.token){
-      console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
-        Promise.all([
-            this.getCityName(),this.getCoupon(),this.isNewVip()
-        ]).then(
-          ()=>{
-            if(this.isshow==false){
-              this.isXiche=true
-            }else{
-              this.isXiche=false
+      this.token = wx.getStorageSync('token');
+      if(this.userId && this.token){
+        console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
+          Promise.all([
+              this.judgeCityName(),this.getCoupon(),this.isNewVip(),this.getDoorShopinfo()//默认获取上门的门店信息
+              //this.getCityName(),this.getMapShow(),this.getCoupon(),this.isNewVip()
+          ]).then(
+            ()=>{
+              if(this.isshow==false){
+                this.isXiche=true
+              }else{
+                this.isXiche=false
+              }
             }
-          }
-        )
-    }else{
-      wx.navigateTo({ url :"/pages/login/main"})
-    }
-    this.getShopinfo()
-    
+          )
+      }else{
+        wx.navigateTo({ url :"/pages/login/main"})
+      }
   },
   watch:{
     '$store.state':{
@@ -174,6 +172,7 @@ export default {
     return {
       shopId:"",//展示的商户id
       name:"", //展示的商户名称
+      shopNick:"",//导航的店铺名称
       shopLat:"",
       shopLng:"",//店铺的经纬度 用户导航
       address:"",
@@ -182,7 +181,8 @@ export default {
       markerId: "1",
       points:"", //缩放视野以包含所有给定的坐标点  //bindmarkertap  点击标记点时触发，会返回marker的id  bindcallouttap 点击标记点对应的气泡时触发，会返回marker的id  bindcontroltap	点击控件时触发，会返回control的id
       shopArr:[],//商铺信息集合
-      shopInfo:{}, //marker店铺信息
+      shopInfo:{}, //上门的店铺信息
+      doorInfo:{},//到店的商铺信息
       markers: [], //不显示
       controls: [{  //控件不随着地图移动
           id: 1,
@@ -225,7 +225,14 @@ export default {
     controltap(){  //点击地图上control 回到当前定位点
         this.getCityName()
     },
-   
+    //判断是否有城市名 没有的话就定位获取城市名 有就执行getMap
+    judgeCityName(){
+      if(this.cityName=="定位中.."){
+        this.getCityName()
+      }else{
+        this.getMapShow()
+      }
+    },
     getCityName(){  //首次进入页面获取手机所在地城市经纬度
       wx.getLocation({
           type: 'wgs84',
@@ -248,6 +255,49 @@ export default {
           this.update({ cityName: "北京市" });
         }
       });
+    },
+    getMapShow(){  //根据城市名称获取地图
+       wx.request({
+            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+this.cityName+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+            header: {
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            success:(res)=>{
+              //console.log(res,"根据市获取地图")
+              if(res.data.result){
+                const _res = res.data.result.location
+                this.update({ latitude:res.data.result.location.lat,
+                              longitude:res.data.result.location.lng
+                });
+                //   //console.log(this,"选择位置页面")
+                const MapContext=wx.createMapContext("map")
+                MapContext.getCenterLocation({
+                  success:(res)=>{
+                      console.log(this.latitude,this.longitude,"经纬度中心")
+                      //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
+                      let centerMarker=[]
+                      centerMarker=[{
+                          iconPath: "/static/images/person.png",
+                          id:0,
+                          latitude: this.latitude,
+                          longitude: this.longitude,
+                          width:40,
+                          height:45
+                      }]
+                     // console.log(centerMarker,"中心标记")
+                      this.markers=this.markers.concat(centerMarker)
+                      function sortId(a,b){
+                          return a.id-b.id
+                      }
+                      this.markers.sort(sortId)
+                    //console.log(this.markers,this.markers.length,"markers数组")
+                  }
+                })
+               // console.log(this.markers,"markers数组")
+                this.getCityinfo()
+              }
+          }
+        })
     },
     getCityinfo(){   //根据经纬度获取城市名称nowPlace 反地理转码
        //console.log(this.latitude,this.longitude,"首页")
@@ -274,16 +324,35 @@ export default {
         })
         
     },
-    //根据手机所在地经纬度获取周围商铺信息
-    async getShopinfo(){
+    //根据手机所在地经纬度获取上门周围商铺信息
+    async getDoorShopinfo(){
       var res=await post("/Shop/NearbyShop",{
           Lat:this.latitude,
           Lng:this.longitude
       })
-      console.log(res,"所有的商铺信息")
-      if(res.code==0){
+      //console.log(res,"上门所有的商铺信息")
+      this.getShopArr(res)
+    },
+    //获取到店商铺信息
+    async getShopShopinfo(){
+      let res=await post("/Shop/SearchShopList",{
+          Lat:this.latitude,
+          Lng:this.longitude,
+          Page:"1"
+        })
+        //console.log(res,"到店所有的商铺信息")
+        this.getShopArr(res)
+    },
+    //店铺集合
+    getShopArr(res){
+       if(res.code==0){
         this.shopArr=res.data //所有店铺信息的集合
-        console.log(this.shopArr,'66666666666666666666666')
+        //根据上门的数组长度判断是否在服务范围之内
+        if(this.shopArr.length<=0 && this.active=="上门"){
+            this.isshow=true
+            this.showShop=true
+        }
+        //console.log(this.shopArr,'66666666666666666666666')
         let arr=[]  //保存markers数组
         for (let i=0;i<res.data.length;i++){
           //console.log(res.data[i])
@@ -301,44 +370,61 @@ export default {
           arr.push(marker)
         }
         //this.markers=arr
-        console.log(arr,"商铺标记集合")
-        this.markers=this.markers.concat(arr)
+        //console.log(arr,"商铺标记集合")
+        
+        this.markers=this.markers.slice(0,1).concat(arr)
         //console.log(this.markers,this.markers.length,"markers数组")
-        this.getNearShop()  //要显示的店铺信息
+        function sortId(a,b){
+            return a.id-b.id
+        }
+        this.markers.sort(sortId)
+        if(this.active=="上门"){
+          this.getNearShop() //要显示的店铺信息*******到店跟上门分开
+        }else{
+          this.getDoorShop()
+        }
+        
       }
     },
-    getNearShop(){  //获取markers标记时的商户信息
-        console.log(this.markerId,this.shopArr,"店铺标记id")
+    getNearShop(){  //上门获取markers标记时的商户信息
+        console.log(this.markerId,this.shopArr,"上门店铺标记id")
         this.shopInfo=this.shopArr[this.markerId-1]
-        console.log(this.shopInfo,"要显示的商铺的信息111111111111111")
-        this.shopLat=this.shopInfo.Lat*1
-        this.shopLng=this.shopInfo.Lng*1
-        this.address=this.shopInfo.Address
+        console.log(this.shopInfo,"要显示上门的商铺的信息111111111111111")
         this.name=this.shopInfo.ShopNick
         this.shopId=this.shopInfo.ShopId
-        this.$set(this.shopInfo,'Distance',(this.shopInfo.Distance*1).toFixed(2))
-        console.log(this.active,"显示上门还是到店") //如果距离大于范围提示不在服务范围 是否到店
-        ////////////////////////////////////////
-        if(this.active="上门"){
-          
+    },
+    getDoorShop(){  //到店获取markers标记时的商户信息
+        console.log(this.markerId,this.shopArr,"到店店铺标记id")
+        this.doorInfo=this.shopArr[this.markerId-1]
+        console.log(this.doorInfo,"要显示到店的商铺的信息2222222222222")
+        this.shopLat=this.doorInfo.Lat*1
+        this.shopLng=this.doorInfo.Lng*1
+        this.address=this.doorInfo.Address
+        this.shopNick=this.doorInfo.ShopNick
+        // this.name=this.doorInfo.ShopNick
+        // this.shopId=this.doorInfo.ShopId
+        this.$set(this.doorInfo,'Distance',(this.doorInfo.Distance*1).toFixed(2))
+       
+        if(this.doorInfo.BusinessHours.length>10){
+            this.$set(this.doorInfo,'BusinessHours',this.doorInfo.BusinessHours.split(" ")[1])
+            //this.doorInfo.BusinessHours=this.doorInfo.BusinessHours.split(" ")[1]
         }
-
-
-
-        if(this.shopInfo.BusinessHours.length>10){
-            this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
-            //this.shopInfo.BusinessHours=this.shopInfo.BusinessHours.split(" ")[1]
-        }
-        //console.log(this.shopInfo,"店铺详情")
+        //console.log(this.doorInfo,"店铺详情")
     },
     markertap(e){  //点击标记点
+        console.log(this.markers,"点击标记时")
         console.log(e,"正在点击标记")
         if(e.mp.markerId==0){
           return false
         }else{
             this.markerId  = e.mp.markerId;
             this.changeMarkerColor(); //更改样式
-            this.getNearShop()
+            if(this.active=="上门"){
+               this.getNearShop()
+            }else{
+              this.getDoorShop()
+            }
+           
         }
         
     },
@@ -373,9 +459,9 @@ export default {
           UserId: this.userId,
           Token:this.token
       })
-      //console.log(res,"判断是否是新人")
-      //if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
-      if(res.data.IsNewUser==1){
+      console.log(res,"判断是否是新人")
+      if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
+      //if(res.data.IsNewUser==1){
          this.isshow=true
          this.isnew=true
          this.showmember=false
@@ -448,11 +534,16 @@ export default {
         //console.log(666)
         this.isXiche=false
         this.isGoshop=true
+        this.markerId="1"
+        this.shopArr=[]
         //获取最近的商家显示
-        //this.getShopinfo() //获取地图上的商铺标记信息
+        this.getShopShopinfo() //获取到店商铺标记信息
       }else if(name=="上门"){
         this.isXiche=true
         this.isGoshop=false
+        this.markerId="1"
+        this.shopArr=[]
+        this.getDoorShopinfo() //上门
       }
     },
     choseLocation(){
@@ -480,53 +571,11 @@ export default {
         latitude:this.shopLat*1,
         longitude:this.shopLng*1,
         address:this.address,
-        name:this.name,
+        name:this.shopNick,
         scale: 18
       })
     },
-    getMapShow(){  //根据城市名称获取地图
-       wx.request({
-            url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+this.cityName+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
-            header: {
-              "content-type": "application/x-www-form-urlencoded"
-            },
-            success:(res)=>{
-              //console.log(res,"根据市获取地图")
-              if(res.data.result){
-                const _res = res.data.result.location
-                this.update({ latitude:res.data.result.location.lat,
-                              longitude:res.data.result.location.lng
-                });
-                //   //console.log(this,"选择位置页面")
-                const MapContext=wx.createMapContext("map")
-                MapContext.getCenterLocation({
-                  success:(res)=>{
-                      console.log(this.latitude,this.longitude,"经纬度中心")
-                      //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
-                      let centerMarker=[]
-                      centerMarker=[{
-                          iconPath: "/static/images/person.png",
-                          id:0,
-                          latitude: this.latitude,
-                          longitude: this.longitude,
-                          width:40,
-                          height:45
-                      }]
-                     // console.log(centerMarker,"中心标记")
-                      this.markers=this.markers.concat(centerMarker)
-                      function sortId(a,b){
-                          return a.id-b.id
-                      }
-                      this.markers.sort(sortId)
-                    console.log(this.markers,this.markers.length,"markers数组")
-                  }
-                })
-               // console.log(this.markers,"markers数组")
-                this.getCityinfo()
-              }
-          }
-        })
-    }
+    
   },
 
   created () {

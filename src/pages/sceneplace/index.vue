@@ -86,7 +86,7 @@ export default {
     },
     submit(){
       this.$store.commit("update",{"pList":this.imgBase})
-      wx.navigateTo({ url: "/pages/location/main"});
+      wx.navigateBack({ url: "/pages/location/main"});
     },
     
     

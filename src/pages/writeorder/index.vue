@@ -150,7 +150,7 @@ export default {
       const timeEnd=this.shopTime.split("-")[1].split(":")[0]
       //console.log(timeStart,timeEnd,"营业时间")
       let test=(this.time[2]*60 + this.time[3]) - (this.time[0]*60 + this.time[2])
-         if(this.time[0] >timeEnd || this.time[0] < timeStart ){
+         if(this.time[2] >timeEnd || this.time[0] < timeStart ){
          wx.showToast({
             title: '您选择的时间不在营业范围内',
             icon: 'none',
@@ -195,7 +195,7 @@ export default {
           if(this.datetip && this.time.length>0){
             wx.setStorageSync("timearr",this.time)
             wx.setStorageSync("datearr",this.datetip)
-            wx.navigateTo({ url: "/pages/location/main" });
+            wx.navigateBack({ url: "/pages/location/main" });
           }else{
                 wx.showToast({
                   title: '请选择时间',
