@@ -8,7 +8,7 @@
     <div class="paymenu">
         <div class="ordertitle">
             <p>确认支付信息</p>
-            <img src="/static/images/close.png" class="close">
+            <img src="/static/images/close.png" class="close" @click="colsePay">
         </div>
         <p class="menu">￥{{price}}</p>
         <radio-group class="radio-group" @change="radioChange">
@@ -118,6 +118,11 @@ export default {
         title: "支付订单"
       });
     },
+    colsePay(){
+        wx.navigateTo({
+            url:"/pages/myorder/main?orderBigType=2&status=1"
+        });
+    },
     payMoney(){
         //判断哪种支付方法
         for(let i=0;i<this.payitems.length;i++){
@@ -150,7 +155,7 @@ export default {
             paySign: payData.paySign,
             success(res) { 
               wx.navigateTo({
-                url:"/pages/myorder/main?orderBigType=2"
+                url:"/pages/myorder/main?orderBigType=2&status=1"
               });
             },
             fail(res) {

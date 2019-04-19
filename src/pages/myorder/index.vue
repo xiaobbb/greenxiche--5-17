@@ -211,6 +211,7 @@ export default {
   },
   onShow() {
     this.init();
+    console.log(this.orderBigType,this.status)
   },
   data() {
     return {
@@ -276,14 +277,14 @@ export default {
   
     if (this.$root.$mp.query.orderBigType) {
       //是商城订单还是预约订单;1:商城订单；2：预约订单
-      this.orderBigType = this.$root.$mp.query.orderBigType;
+      this.orderBigType = this.$root.$mp.query.orderBigType*1;
     } 
     // else {
     //   this.orderBigType = 1;
     // }
     if (this.orderBigType === 1) {
       if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
-        this.status = this.$root.$mp.query.status;
+        this.status = this.$root.$mp.query.status*1;
       } else {
         this.status = 0;
       }
@@ -292,12 +293,13 @@ export default {
     }
     if (this.orderBigType === 2) {
       if (this.$root.$mp.query.status) {
-        this.serviceMode = this.$root.$mp.query.status;
+        this.serviceMode = this.$root.$mp.query.status*1;
       } 
       // else {
       //   this.serviceMode = 1;
       // }
-      this.status = 0;
+      //this.status = 0;
+      console.log('12312312313',this.orderBigType,this.serviceMode)
       this.getReserveOrderList();
     }
     console.log("orderBigType:" + this.orderBigType);

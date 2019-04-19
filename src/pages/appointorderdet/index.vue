@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-if="!reasonList.length>0">
-        <div class="remind" v-if="reasonList.length<=0">
+    <div>
+        <div class="remind">
           <text>{{info.StatusName}}</text>
         </div>
         <!--切换显示-->
@@ -66,12 +66,6 @@
             </div>
         </div>
     </div>
-    <!--退款说明-->
-    <div class="promopt" v-if="reasonList.length>0">
-        <p>· 本品支持订单签收后的7天内退换货，商城将在2天内审核申请 </p>
-        <p>· 申请成功后奖励的积分将相应扣除，货款原支付方式退回 </p>
-        <p>· 如未与买家协商一致，请勿使用到付或平邮 </p>
-    </div>
     <div class="orderlist">
         <div class="orderitem padtop">
             <!-- <div class="flex-container">
@@ -124,15 +118,6 @@
         <div class="orderbottom white" v-if="info.StatusId=='1'">
             <p class="rightbtn" @click="applyMoney">申请退款</p>
         </div>
-        <reasonMask
-          :title="title"
-          :button="button"
-          v-if="reasonList.length>0"
-          :show="reasonShow"
-          :data="reasonList"
-          @closeReason="closeReason"
-          @selectReason="selectReason"
-        ></reasonMask>
         <!--上门订单 已取消的订单 重新预约-->
         <div class="orderbottom white" v-if="info.StatusId == '14'">
             <p class="leftbtn" @click="btnDel">删除订单</p>
@@ -243,8 +228,9 @@ export default {
     // },
     //待接单的订单申请退款
     applyMoney(){
-        this.reasonShow = true;
-        this.getCancelReason();
+      console.log(this.serType)
+        // wx.navigateTo({url:"/pages/addcomment/main?appraiseType="})
+        // this.getCancelReason();
     },
      async getCancelReason() {
       //申请退款原因
