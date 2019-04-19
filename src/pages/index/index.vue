@@ -119,8 +119,6 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
-     
-    
    
   },
   onShow(){
@@ -144,6 +142,7 @@ export default {
       }else{
         wx.navigateTo({ url :"/pages/login/main"})
       }
+    
   },
   watch:{
     '$store.state':{
@@ -209,7 +208,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["cityName","nowPlace","longitude","latitude"])
+    ...mapState(["cityName","nowPlace","longitude","latitude","showMask"])
   },
   
   methods: {
@@ -455,17 +454,21 @@ export default {
       
     },
     async getCoupon(){ //判断是否是新人  三天内
-      const res=await post("/Coupon/IsNewUser",{ 
-          UserId: this.userId,
-          Token:this.token
-      })
-      console.log(res,"判断是否是新人")
-      if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
-      //if(res.data.IsNewUser==1){
-         this.isshow=true
-         this.isnew=true
-         this.showmember=false
-      }
+          console.log(this.$store.state.showMask,"this.$store.state.showMask")
+        if(!this.$store.state.showMask){
+            const res=await post("/Coupon/IsNewUser",{ 
+              UserId: this.userId,
+              Token:this.token
+          })
+          console.log(res,"判断是否是新人")
+          if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
+          //if(res.data.IsNewUser==1){
+            this.isshow=true
+            this.isnew=true
+            this.showmember=false
+          }
+        }
+          
     },
     async getNewConpon(){  //领取新人礼券
         let res=await post("/Coupon/GetNewCoupon",{
@@ -485,7 +488,9 @@ export default {
         }
     },
     async isNewVip(){  //验证是否vip
-        let res=await post("/User/VerifyVIP",{
+          console.log(this.$store.state.showMask,"this.$store.state.showMask")
+      if(!this.$store.state.showMask){
+          let res=await post("/User/VerifyVIP",{
             UserId: this.userId,
             Token:this.token
         })
@@ -500,9 +505,13 @@ export default {
                 this.showmember=true
                 this.isnew=false
             }
-            
           }
         }
+        setTimeout(()=>{
+          this.update({'showMask':true})
+        },3000)
+      }
+        
     },
     closeNewModal(){  //关闭新人框
         this.isnew=false,

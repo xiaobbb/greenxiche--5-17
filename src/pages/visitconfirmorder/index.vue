@@ -64,7 +64,7 @@
     <orderCard :showCoupon.sync="showCardTicket" :CardTicketId.sync="CardTicketId" :couponList="couponList" :CardTicketPrice.sync="CardTicketPrice"></orderCard>
     </div>
     <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
-    :total="total" :successUrl="'/pages/myorder/main'" :closeUrl="'/pages/myorder/main'"
+    :total="total" :successUrl="'/pages/myorder/main?orderBigType=2&status=2'" :closeUrl="'/pages/myorder/main?orderBigType=2&status=2'"
     ></Pay>
     <!-- <div>  
         <div class="lasttime white">剩余支付时间  <span>{{minute}}</span> : <span>{{second}}</span></div>

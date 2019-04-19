@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    showMask:false,//首页弹出一次新人礼券之后不在弹出
     cityName: "定位中..",
     nowPlace:"正在定位中...",
     latitude:"",
