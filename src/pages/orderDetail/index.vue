@@ -52,7 +52,7 @@
     <div class="slide"></div>
     <div class="orderinfo">
         <p class="infotitle">订单信息</p>
-        <p class="pitem">订单编号：{{info.OrderNumber}} <span class="copy">复制</span></p>
+        <p class="pitem">订单编号：{{info.OrderNumber}} <span class="copy" @click="copy(info.OrderNumber)">复制</span></p>
         <p class="pitem">创建时间：{{info.AddTime}}</p>
         <p class="pitem" v-if="info.StatusId !==0&&info.PayTime">支付时间：{{info.PayTime}}</p>
         <!-- <div v-if="shwoSuccess">
@@ -62,7 +62,7 @@
     </div>
     <div class="flex-container tipmenu">
         <p></p>
-        <p class="flex-container">
+        <p class="flex-container" @click="callService">
             <img src="/static/images/phonecall.png" class="tippics1">
             <span>拨打电话</span>
         </p>
@@ -315,6 +315,23 @@ export default {
         });
       }
     },
+    // 联系客服，打电话
+    callService(){
+      wx.makePhoneCall({
+        phoneNumber:this.info.ShopMobile
+      })
+    },
+    // 复制订单号
+    copy(info){
+      wx.setClipboardData({
+        data:info,
+        success(){
+          wx.showToast({
+            title:'复制成功！'
+          })
+        }
+      })
+    }
   },
 
   created () {

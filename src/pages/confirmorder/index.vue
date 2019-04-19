@@ -94,8 +94,8 @@
       :showPay.sync="showPay"
       :orderNumber="orderNumber"
       :total="total"
-      :successUrl="'/pages/myorder/main'"
-      :closeUrl="'/pages/myorder/main'"
+      :successUrl="`/pages/orderdetail/main?orderNo=${orderNumber}`"
+      :closeUrl="`/pages/orderdetail/main?orderNo=${orderNumber}`"
     ></Pay>
   </div>
 </template>

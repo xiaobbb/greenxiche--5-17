@@ -93,16 +93,6 @@
 .tips img{
     width:100%;
 }
-.botbtn{
-    width:690rpx;
-    height:70rpx;
-    background: #ff6325;
-    border-radius:10rpx;
-    line-height:70rpx;
-    color:#fff;
-    text-align: center;
-    margin:20rpx auto;
-}
 // 添加商户店铺信息
 .shopimg{
     width:112rpx;
@@ -140,4 +130,24 @@
     padding:0 20rpx;
     line-height:50rpx;
     border-radius:30rpx;
+}
+.coupondetail{
+    padding-bottom:80rpx;
+}
+.fixed{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#fff;
+}
+.botbtn{
+    width:690rpx;
+    height:70rpx;
+    background: #ff6325;
+    border-radius:10rpx;
+    line-height:70rpx;
+    color:#fff;
+    text-align: center;
+    margin:20rpx auto;
 }

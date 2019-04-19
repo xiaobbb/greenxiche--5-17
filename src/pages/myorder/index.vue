@@ -194,7 +194,7 @@
     ></reasonMask>
     <!-- 支付 -->
     <Pay :showPay.sync="showPay" v-if="showPay" :orderNumber="orderNo" 
-      :total="totalPrice" successUrl='/pages/myorder/main' closeUrl=''
+      :total="totalPrice" :successUrl='`/pages/myorder/main?orderNo=${orderNo}`'
       balanceRequestUrl="Order/OrderSoldePayment"
     ></Pay>
   </div>
