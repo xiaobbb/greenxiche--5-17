@@ -326,6 +326,7 @@ export default {
           icon: "none",
           duration: 2000
         });
+        return false
       }
       
     }
