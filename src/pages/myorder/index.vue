@@ -64,12 +64,12 @@
               <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===19">
                 <text class="btn active">申请退款</text>
               </div> -->
-              <!-- 已使用 -->
+              <!-- 已完成 -->
               <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
                 <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
               </div> -->
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===13">
-                <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">申请退款</text>
+                <text class="btn active">申请退款</text>
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
               <!-- 已退款 、已经取消订单删除 -->
@@ -189,8 +189,9 @@
       @selectReason="selectReason"
     ></reasonMask>
     <!-- 支付 -->
-    <Pay :showPay="showPay" v-if="showPay" :orderNumber="orderNo" 
-      :total="totalPrice" successUrl='/pages/myorder/main' closeUrl='/pages/myorder/main'
+    <Pay :showPay.sync="showPay" v-if="showPay" :orderNumber="orderNo" 
+      :total="totalPrice" successUrl='/pages/myorder/main' closeUrl=''
+      balanceRequestUrl="Order/OrderSoldePayment"
     ></Pay>
   </div>
 </template>
@@ -209,46 +210,7 @@ export default {
     //
   },
   onShow() {
-    //支付的时候初始原来的值
-    this.orderNo = "";
-    this.cancleIndex="";
-    this.reasonShow= false;
-    this.showPay =false;  //支付弹窗
-    this.totalPrice ="";  //需要支付的价格
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
-    this.orderList = [];
-    this.bookList = [];
-    this.reasonList = [];
-  
-    if (this.$root.$mp.query.orderBigType) {
-      //是商城订单还是预约订单;1:商城订单；2：预约订单
-      this.orderBigType = this.$root.$mp.query.orderBigType;
-    } else {
-      this.orderBigType = 1;
-    }
-    if (this.orderBigType === 1) {
-      if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
-        this.status = this.$root.$mp.query.status;
-      } else {
-        this.status = 0;
-      }
-      this.serviceMode = 1;
-      this.getOrderList();
-    }
-    if (this.orderBigType === 2) {
-      if (this.$root.$mp.query.status) {
-        this.serviceMode = this.$root.$mp.query.status;
-      } else {
-        this.serviceMode = 1;
-      }
-      this.status = 0;
-      this.getReserveOrderList();
-    }
-    console.log("orderBigType:" + this.orderBigType);
-    console.log("status:" + this.status);
-    console.log("serviceMode:" + this.serviceMode);
-    console.log(this.orderNo,"订单列表")
+    this.init();
   },
   data() {
     return {
@@ -296,6 +258,48 @@ export default {
       wx.setNavigationBarTitle({
         title: "我的订单"
       });
+    },
+    init(){
+    //支付的时候初始原来的值
+    this.orderNo = "";
+    this.cancleIndex="";
+    this.reasonShow= false;
+    this.showPay =false;  //支付弹窗
+    this.totalPrice ="";  //需要支付的价格
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
+    this.orderList = [];
+    this.bookList = [];
+    this.reasonList = [];
+  
+    if (this.$root.$mp.query.orderBigType) {
+      //是商城订单还是预约订单;1:商城订单；2：预约订单
+      this.orderBigType = this.$root.$mp.query.orderBigType;
+    } else {
+      this.orderBigType = 1;
+    }
+    if (this.orderBigType === 1) {
+      if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
+        this.status = this.$root.$mp.query.status;
+      } else {
+        this.status = 0;
+      }
+      this.serviceMode = 1;
+      this.getOrderList();
+    }
+    if (this.orderBigType === 2) {
+      if (this.$root.$mp.query.status) {
+        this.serviceMode = this.$root.$mp.query.status;
+      } else {
+        this.serviceMode = 1;
+      }
+      this.status = 0;
+      this.getReserveOrderList();
+    }
+    console.log("orderBigType:" + this.orderBigType);
+    console.log("status:" + this.status);
+    console.log("serviceMode:" + this.serviceMode);
+    console.log(this.orderNo,"订单列表")
     },
     shiftOrderBigType(e) {
       this.initData();
@@ -542,10 +546,14 @@ export default {
       }
     }
   },
-
-  created() {
-    // let app = getApp()
+  
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.init();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
   },
+  // 上拉加载
   onReachBottom() {
     // if(this.isLoad){
     //   this.page++;

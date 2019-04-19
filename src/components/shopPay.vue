@@ -95,15 +95,7 @@ export default {
     orderNumber: {
       type: String,
       default: ""
-    },
-    wxRequestUrl:{
-      type:String,
-      default:'Order/ConfirmWeiXinSmallPay'
-    },
-    balanceRequestUrl:{
-      type:String,
-      default:'Order/PaymentOrder'
-    },
+    }
   },
   data() {
     return {
@@ -135,7 +127,7 @@ export default {
     },
     //   微信支付
     async wx() {
-      let result = await post(this.wxRequestUrl, {
+      let result = await post("Order/ConfirmWeiXinSmallPay", {
         UserId: wx.getStorageSync("userId"),
         Token: wx.getStorageSync("token"),
         WxOpenid: wx.getStorageSync("openId"),
@@ -150,17 +142,14 @@ export default {
           signType: payData.signType,
           paySign: payData.paySign,
           success(res) {
-            this.$emit("update:showPay", false);
             wx.showToast({
               title: "支付成功"
             });
-            if(this.successUrl){
-              setTimeout(() => {
-                wx.redirectTo({
-                  url: this.successUrl
-                });
-              }, 1000);
-            }
+            setTimeout(() => {
+              wx.redirectTo({
+                url: this.successUrl
+              });
+            }, 1000);
           },
           fail(err) {
             // wx.showToast({
@@ -193,26 +182,21 @@ export default {
         });
         return false;
       }
-      console.log('balanceRequestUrl',this.balanceRequestUrl)
       try {
-        let res = await post(this.balanceRequestUrl, {
+        let res = await post("Order/OrderSoldePayment", {
           UserId: wx.getStorageSync("userId"),
           Token: wx.getStorageSync("token"),
           Password: this.payPassword,
           OrderNo: this.orderNumber
         });
-        this.$emit("update:showPay", false);
         wx.showToast({
           title: "支付成功"
         });
-        if(this.successUrl){
-          
         setTimeout(() => {
           wx.redirectTo({
             url: this.successUrl
           });
         }, 1500);
-        }
       } catch (err) {
         this.payPassword = "";
       }
@@ -223,10 +207,12 @@ export default {
       console.log(e);
     },
     goUrl() {
-      this.$emit("update:showPay", false);
       if (this.closeUrl) {
         console.log("跳转");
         wx.redirectTo({ url: this.closeUrl });
+      } else {
+        console.log("关闭");
+        this.$emit("update:showPay", false);
       }
     }
   }
