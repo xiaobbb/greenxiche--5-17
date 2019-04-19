@@ -74,17 +74,21 @@
     <div class="slide"></div>
     <div class="backgray">
         <!-- 未付款 -->
-        <div class="orderbottom white" v-if="info.StatusId===0">
+        <div class="orderbottom white" v-if="info.StatusId==0">
             <p @click="showReasonMak">取消订单</p>
             <p @click="showPay=true">付款</p>
         </div>
         <!--已付款、已完成-->
-        <div class="orderbottom white" v-if="info.StatusId===13">
+        <div class="orderbottom white" v-if="info.StatusId==13">
             <p @click="goRefund">申请退款</p>
             <p @click="btnDel">删除订单</p>
         </div>
+        <!--申请退款-->
+        <div class="orderapybottom white " v-if="info.StatusId==16">
+            <p @click="closeRefund">撤销退款</p>
+        </div>
         <!--已退款 、已经取消订单删除-->
-        <div class="orderbottom white" v-if="info.StatusId===14 || info.StatusId===17">
+        <div class="orderbottom white" v-if="info.StatusId==14 || info.StatusId==17|| info.StatusId===18">
             <p @click="btnDel">删除订单</p>
         </div>
         <!--买家已付款-->
@@ -251,6 +255,30 @@ export default {
       wx.navigateTo({
         url:`/pages/applymoney/main?orderNo=${this.orderNo}&showShop=${true}`
       })
+    },
+    // 撤销退款
+    closeRefund(){
+     const that = this;
+      wx.showModal({
+        title:'请确认进行退款撤销！',
+        success(res){
+          if(res.confirm){
+              post('Order/CanelRefund',{
+                UserId: that.userId,
+                Token: that.token,
+                OrderNo: that.orderNo,
+              }).then(()=>{
+              wx.showToast({
+                title:'撤销成功！'
+              })
+              setTimeout(()=>{
+                 that.getOrderDetails();
+              },1000)
+              })
+          }
+        }
+      })
+
     },
       //获取取消订单原因
     async showReasonMak() {

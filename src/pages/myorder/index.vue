@@ -68,12 +68,16 @@
               <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
                 <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
               </div> -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===16">
+                <text class="btn active" @click="closeRefund(index,item.OrderNumber)">撤销退款</text>
+              </div>
+
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===13">
                 <text class="btn active" @click="goRefund(index,item.OrderNumber)">申请退款</text>
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
               <!-- 已退款 、已经取消订单删除 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===14 || item.StatusId===17">
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===14 || item.StatusId===17 || item.StatusId===18">
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
             </div>
@@ -463,6 +467,30 @@ export default {
       wx.navigateTo({
         url:`/pages/applymoney/main?orderNo=${orderNo}&showShop=${true}`
       })
+    },
+    // 撤销退款
+    closeRefund(index,orderNo){
+     const that = this;
+      wx.showModal({
+        title:'请确认进行退款撤销！',
+        success(res){
+          if(res.confirm){
+              post('Order/CanelRefund',{
+                UserId: that.userId,
+                Token: that.token,
+                OrderNo: orderNo,
+              }).then(()=>{
+                wx.showToast({
+                  title:'撤销成功！'
+                })
+              setTimeout(()=>{
+                 that.init();
+              },1000)
+              })
+          }
+        }
+      })
+
     },
     btnDel(index, orderNo) {
       let _this = this;
