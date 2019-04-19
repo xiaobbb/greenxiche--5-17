@@ -119,6 +119,12 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onLoad() {
+    
+    
+   
+  },
+  onShow(){
+    this.initData()
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     
@@ -138,11 +144,6 @@ export default {
     }else{
       wx.navigateTo({ url :"/pages/login/main"})
     }
-    
-   
-  },
-  onShow(){
-    this.initData()
     this.getShopinfo()
     
   },
@@ -307,15 +308,23 @@ export default {
       }
     },
     getNearShop(){  //获取markers标记时的商户信息
-        this.shopInfo={}
-        this.shopInfo=this.shopArr[this.markerId]
-        //console.log(this.shopInfo,"要显示的商铺的信息111111111111111")
+        console.log(this.markerId,this.shopArr,"店铺标记id")
+        this.shopInfo=this.shopArr[this.markerId-1]
+        console.log(this.shopInfo,"要显示的商铺的信息111111111111111")
         this.shopLat=this.shopInfo.Lat*1
         this.shopLng=this.shopInfo.Lng*1
         this.address=this.shopInfo.Address
         this.name=this.shopInfo.ShopNick
         this.shopId=this.shopInfo.ShopId
         this.$set(this.shopInfo,'Distance',(this.shopInfo.Distance*1).toFixed(2))
+        console.log(this.active,"显示上门还是到店") //如果距离大于范围提示不在服务范围 是否到店
+        ////////////////////////////////////////
+        if(this.active="上门"){
+          
+        }
+
+
+
         if(this.shopInfo.BusinessHours.length>10){
             this.$set(this.shopInfo,'BusinessHours',this.shopInfo.BusinessHours.split(" ")[1])
             //this.shopInfo.BusinessHours=this.shopInfo.BusinessHours.split(" ")[1]
@@ -365,7 +374,8 @@ export default {
           Token:this.token
       })
       //console.log(res,"判断是否是新人")
-      if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
+      //if(res.data.IsNewUser==1 && res.data.IsNewCoupon==1){
+      if(res.data.IsNewUser==1){
          this.isshow=true
          this.isnew=true
          this.showmember=false
@@ -450,6 +460,8 @@ export default {
     },
     washCar(){
       //console.log(this.shopId)
+      wx.setStorageSync("shopInfo",this.shopInfo)
+      console.log(this.shopInfo,this.shopId,"跳转我要洗车")
        wx.navigateTo({ url: "/pages/location/main?shopId="+this.shopId });
     },
     goTo(e){
@@ -500,7 +512,7 @@ export default {
                           width:40,
                           height:45
                       }]
-                      console.log(centerMarker,"中心标记")
+                     // console.log(centerMarker,"中心标记")
                       this.markers=this.markers.concat(centerMarker)
                       function sortId(a,b){
                           return a.id-b.id

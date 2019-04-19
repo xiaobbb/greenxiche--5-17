@@ -73,6 +73,17 @@ import "../../css/global.css";
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
+  onLoad(){
+    this.setBarTitle();
+    wx.setStorageSync("serItem", " ");
+    wx.setStorageSync("CarInfo", " ");
+    wx.setStorageSync("timearr", " ");
+    wx.setStorageSync("datearr", " ");
+    this.cartip = "请选择车辆";
+    this.timetip = "请选择服务时间";
+    this.serTip = "请选择服务项目";
+    this.total="0.00"
+  },
   onShow() {
     console.log(this.latitude,this.longitude,"填写订单")
     this.showPay = false;
@@ -81,11 +92,7 @@ export default {
     this.token = wx.getStorageSync("token");
     this.latitude=this.$store.state.latitude
     this.longitude=this.$store.state.longitude
-    this.setBarTitle();
-    this.cartip = "请选择车辆";
-    this.timetip = "请选择服务时间";
-    this.serTip = "请选择服务项目";
-    this.total="0.00"
+    
     //转换时间
     this.changeTime();
     //服务项目

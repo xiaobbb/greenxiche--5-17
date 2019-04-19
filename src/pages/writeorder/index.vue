@@ -59,12 +59,17 @@ export default {
     this.datetip=this.datelist[this.active]
     
   },
+  onShow(){
+    this.shopTime=wx.getStorageSync("shopInfo").BusinessHours
+    console.log(this.shopTime,"营业时间")
+  },
   data () {
     return {
       datelist:[],
       active:'0',
       hourses:[],
       minutes:[],
+      shopTime:"",//商铺的营业时间
       datetip:"",//选中的日期
       time:[],//时间
       nowhour:"",//当前的时间
@@ -122,7 +127,7 @@ export default {
       }
     },
     getMinutes(){
-      for (let i =0; i <= 60; i++) {
+      for (let i =0; i < 60; i++) {
           if(i.toString().length<2){
             i="0"+i
           }
@@ -139,9 +144,13 @@ export default {
           // 滚动时再动态 通过年和月获取 这个月下对应有多少天
     },
     choseTime(){
-      console.log(this.datetip)
-      console.log(this.time)
-         if(this.time[0] >23 || this.time[0] < 7 ){
+      //console.log(this.datetip,"日期")
+      //console.log(this.time,"时间")
+      const timeStart=this.shopTime.split("-")[0].split(":")[0]
+      const timeEnd=this.shopTime.split("-")[1].split(":")[0]
+      //console.log(timeStart,timeEnd,"营业时间")
+      let test=(this.time[2]*60 + this.time[3]) - (this.time[0]*60 + this.time[2])
+         if(this.time[0] >timeEnd || this.time[0] < timeStart ){
          wx.showToast({
             title: '您选择的时间不在营业范围内',
             icon: 'none',
@@ -151,7 +160,8 @@ export default {
             }
         });
         return false
-       }else if(this.time[2] - this.time[0] > 2 ){
+        }else if(test >120){
+          console.log(test)
          wx.showToast({
             title: '服务时间不超过两个小时哦。。。',
             icon: 'none',
@@ -185,7 +195,7 @@ export default {
           if(this.datetip && this.time.length>0){
             wx.setStorageSync("timearr",this.time)
             wx.setStorageSync("datearr",this.datetip)
-              wx.navigateTo({ url: "/pages/location/main" });
+            wx.navigateTo({ url: "/pages/location/main" });
           }else{
                 wx.showToast({
                   title: '请选择时间',
