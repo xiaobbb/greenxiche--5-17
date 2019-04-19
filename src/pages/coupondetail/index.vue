@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="coupondetail">
     <div class="top flex-container">
       <div class="tophead">
         <img :src="product.img" class="cardbg">
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div class="slide"></div>
-    <div class>
+    <div class="fixed">
       <div class="botbtn" @click="confirm">立即购买</div>
     </div>
   </div>
