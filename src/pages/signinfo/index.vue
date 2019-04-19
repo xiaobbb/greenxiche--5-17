@@ -33,7 +33,7 @@ export default {
     },
     orderpay(){
       //console.log(this.textInfo)
-      wx.navigateTo({ url: "/pages/location/main?textinfo="+this.textInfo });
+      wx.navigateBack({ url: "/pages/location/main?textinfo="+this.textInfo });
       
     },
     fotrim(){

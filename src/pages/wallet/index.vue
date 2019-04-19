@@ -49,7 +49,7 @@ export default {
       });
     },
     toSum(){
-      wx.navigateTo({ url: "/pages/sum/main" });
+      wx.navigateTo({ url: "/pages/sum/main?url=wallet" });
     },
     toMoneyDetail(){
       wx.navigateTo({ url: "/pages/moneydetail/main" });

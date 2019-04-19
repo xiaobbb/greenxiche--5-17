@@ -28,7 +28,7 @@
         
         <!--底部按钮-->
         <div class="btn">
-          <div class="btn-close">
+          <div class="btn-close" style="background:#fff">
             <input type="checkbox" class="checkbox-cart" @click="selectProduct()" :checked="isSelectAll"/>
             <text>全选</text>
           </div>
@@ -165,7 +165,7 @@ export default {
       console.log(serItem)
       wx.setStorageSync("serItem",serItem)
       if(serItem.length>0){
-        wx.navigateTo({ url: "/pages/location/main" })
+        wx.navigateBack({ url: "/pages/location/main" })
       }else{
         wx.showToast({
           title: "请选择要服务项目",

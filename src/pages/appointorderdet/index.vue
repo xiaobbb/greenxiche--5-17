@@ -30,8 +30,8 @@
               <div class="flex-container">
                   <img src="/static/images/shop5.png" class="shopbg">
                   <div class="flex-container clomn placeinfo">
-                      <p class="placename">车御品汽车服务</p>
-                      <p>深圳市龙华区梅龙大道912号</p>
+                      <p class="placename">{{info.ShopName}}</p>
+                      <p>{{info.Address}}</p>
                   </div>
               </div>
           </div>
@@ -40,8 +40,11 @@
         <div class="flex-container prodetail" v-if="reasonList.length<=0">
             <img src="/static/images/car22.png" class="mycardet">
             <div class="flex-container clomn carright">
-                <p>东风本田-思域</p>
-                <p class="carnums">粤AJ6688</p>
+                <p>
+                   <span>{{info.CarBrand}}</span>
+                   <span v-if="info.CarType">-{{info.CarType}}</span>
+                </p>
+                <p class="carnums">{{info.CarMumber}}</p>
             </div>
         </div>
     </div>
@@ -219,6 +222,7 @@ export default {
       });
     },
     async getOrderDetails(){
+      console.log(this.orderNo)
       let result = await post("Order/OrderDetails",{
         UserId:this.userId,
         Token:this.token,

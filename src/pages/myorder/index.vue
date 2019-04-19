@@ -245,7 +245,8 @@ export default {
       cancleIndex:"",
       reasonShow: false,
       showPay:false,  //支付弹窗
-      totalPrice:""  //需要支付的价格
+      totalPrice:"",  //需要支付的价格
+      carinfo:""
     };
   },
 
@@ -262,6 +263,7 @@ export default {
     init(){
     //支付的时候初始原来的值
     this.orderNo = "";
+    this.carinfo= ""
     this.cancleIndex="";
     this.reasonShow= false;
     this.showPay =false;  //支付弹窗
@@ -275,9 +277,10 @@ export default {
     if (this.$root.$mp.query.orderBigType) {
       //是商城订单还是预约订单;1:商城订单；2：预约订单
       this.orderBigType = this.$root.$mp.query.orderBigType;
-    } else {
-      this.orderBigType = 1;
-    }
+    } 
+    // else {
+    //   this.orderBigType = 1;
+    // }
     if (this.orderBigType === 1) {
       if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
         this.status = this.$root.$mp.query.status;
@@ -290,9 +293,10 @@ export default {
     if (this.orderBigType === 2) {
       if (this.$root.$mp.query.status) {
         this.serviceMode = this.$root.$mp.query.status;
-      } else {
-        this.serviceMode = 1;
-      }
+      } 
+      // else {
+      //   this.serviceMode = 1;
+      // }
       this.status = 0;
       this.getReserveOrderList();
     }

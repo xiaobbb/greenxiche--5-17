@@ -44,6 +44,7 @@ export default {
     this.list = [];
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
+    this.pramas=this.$root.$mp.query.url
     this.setBarTitle();
     this.getMemberInfo();
     this.getRechargeList();
@@ -51,6 +52,7 @@ export default {
   },
   data() {
     return {
+      pramas:"",//跳转过来的url
       userId: "",
       token: "",
       page: 1,
@@ -122,8 +124,8 @@ export default {
           signType: payData.signType,
           paySign: payData.paySign,
           success(res) { 
-             wx.navigateTo({
-              url:"/pages/wallet/main"
+             wx.navigateBack({
+              url:"/pages/"+this.pramas+"/main"
              });
           },
           fail(res) {
