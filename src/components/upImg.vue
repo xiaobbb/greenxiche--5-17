@@ -23,10 +23,10 @@ export default {
     //title--上传图片标题
     //imgLenght--上传图片的最大数量 
     //addImgUrl -- 上传图片按钮的本地路径；默认不显示 addImgUrl='/static/images/camera.png'
-    //返回upImgs事件---数组
+    //返回upImgs事件---全部图片的数组
     //  [
     //      {
-    //         PicUrl:'base64:img' 
+    //         PicUrl:'base64:img1' 
     //      },{
     //         PicUrl:'base64:img2' 
     //      }
@@ -50,13 +50,13 @@ export default {
     return {
       imgBase: [],
       imgPathArr: [],
-      isShowBtnUpload: true,
-      imgLenght: 4 //图片最大数量
+      isShowBtnUpload: true,//显示上传按钮的状态
     };
   },
-  onShow() {
+  onLoad() {
       this.imgBase= []
       this.imgPathArr= []
+      this.isShowBtnUpload= true
   },
   methods: {
     // 修改图片

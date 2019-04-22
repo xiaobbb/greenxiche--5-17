@@ -6,13 +6,17 @@
       <p>不添加现场照片也可以提交订单</p> 
     </div>
     <!--图片列表-->
+    <div class="flex-container comtitile">
+      <p>上传图片</p>
+      <p class="nums">{{imgBase.length}}/{{imgLenght}}</p>
+    </div>
     <div class="flex" style="justify-content:flex-start">
-        <div class="flexitem" style="margin-right:10rpx;" v-for="(img,index) in imgPathArr" :key="index">
-            <img :src="img" class="pic">
+        <div class="flexitem" style="margin-right:10rpx;" v-for="(img,index) in imgBase" :key="index">
+            <img :src="img.PicUrl" class="pic">
             <img src="/static/images/close5.png" class="close"  @click="deleteImg(index)">
         </div>
         <div>
-            <img src="/static/images/bg1.png" class="pic"  v-show="isShowBtnUpload" @click="chosseImg">
+            <img src="/static/images/bg20.png" class="pic"  v-show="isShowBtnUpload" @click="chosseImg">
         </div>
     </div>
     <div class="paybtn" @click="submit">确定</div>
@@ -23,22 +27,25 @@
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad(){
-    this.setBarTitle();
-  },
   data () {
     return {
       isShowBtnUpload:true,
-      imgLenght:4,
-      imgPathArr:[],
+      imgLenght:8,
+      // imgPathArr:[],
       imgBase:[],
-      userid: wx.getStorageSync("userId"),
-      token: wx.getStorageSync("token"),
     }
   },
  
   components: {
     
+  },
+  onLoad(){
+    this.setBarTitle();
+  },
+  onShow(){
+      if(this.$store.state.pList.length>0){
+        this.imgBase = this.$store.state.pList
+      }
   },
   methods: {
     setBarTitle() {
@@ -50,25 +57,25 @@ export default {
     chosseImg() {
       const that = this;
       let num = 0;
-      if(that.imgPathArr.length<this.imgLenght){
-        num=this.imgLenght-that.imgPathArr.length;
+      if(that.imgBase.length<this.imgLenght){
+        num=this.imgLenght-that.imgBase.length;
          wx.chooseImage({
            count:num,
            sizeType:["compressed"],
            sourceType: ["album", "camera"],
             success: res => {
-               that.imgPathArr = that.imgPathArr.concat(res.tempFilePaths);
-               if(that.imgPathArr.length==4){
-                 that.isShowBtnUpload=false
-               }
-                for(let i=0;i<that.imgPathArr.length;i++){
+               const imgPathArr = res.tempFilePaths;
+                for(let i=0;i<imgPathArr.length;i+=1){
                     wx.getFileSystemManager().readFile({
-                    filePath: that.imgPathArr[i], //选择图片返回的相对路径
+                    filePath: imgPathArr[i], //选择图片返回的相对路径
                     encoding: 'base64', //编码格式
-                    success: res => { //成功的回调
+                    success: ress => { //成功的回调
                       that.imgBase.push({
-                        PicUrl: "data:image/png;base64," + res.data.toString()
+                        PicUrl: "data:image/png;base64," + ress.data.toString()
                       });
+                      if(that.imgBase.length==that.imgLenght){
+                        that.isShowBtnUpload=false
+                      }
                     }
                   })
                 }
@@ -79,8 +86,8 @@ export default {
     },
     deleteImg(i){
         this.imgBase.splice(i,1)
-        this.imgPathArr.splice(i,1);
-        if(this.imgPathArr.length<8){
+        // this.imgPathArr.splice(i,1);
+        if(this.imgBase.length<this.imgLenght){
           this.isShowBtnUpload = true;
         }
     },
@@ -101,4 +108,11 @@ export default {
 <style lang="scss" scoped>
   @import "./style";
   @import "../../css/common.css";
+.comtitile {
+  margin:0 20rpx 20rpx;
+
+}
+.comtitile p:first-child {
+  font-weight: bold;
+}
 </style>

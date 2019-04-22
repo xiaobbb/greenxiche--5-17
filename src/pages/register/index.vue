@@ -4,7 +4,7 @@
       <div class="regLoginBox">
         <div class="logo">
           <div class="img">
-            <img src="/static/images/shop5.png">
+            <img src="/static/images/logo.png">
           </div>
         </div>
         <div class="from pd10">
@@ -55,6 +55,12 @@ import "../../css/global.css";
 export default {
   created() {},
   onShow() {
+      this.btnText= "获取验证码";
+      this.phoneNumber= "";
+      this.verifyCode= "";
+      this.password= "";
+      this.password2= "";
+      this.disabled=false
     this.setBarTitle();
   },
   data() {
@@ -63,7 +69,8 @@ export default {
       phoneNumber: "",
       verifyCode: "",
       password: "",
-      password2: ""
+      password2: "",
+      disabled:false
     };
   },
   components: {},
@@ -82,7 +89,7 @@ export default {
         this.password2 == ""
       ) {
         wx.showToast({
-          title: "字段不能为空",
+          title: "请填写完整注册信息",
           icon: "none",
           duration: 2000
         });
@@ -150,15 +157,19 @@ export default {
       }
     },
     getVerifyCode(that) {
+      if(this.disabled){
+        return false;
+      }
       const TIME_COUNT = 60; // 60s后重新获取验证码
       var codeNum = this.verificationCode;
       var phoneNum = this.phoneNumber;
       if (!(/^1(3|4|5|7|8)\d{9}$/.test(phoneNum))) {
         wx.showToast({
-          title: "手机号不能为空",
+          title: "请输入正确的手机号",
           icon: "none",
-          duration: 2000
+          duration: 1500
         });
+        return false;
       } else {
         //发送绑定手机验证码：http://scapi.wtvxin.com/api/services/app/Account/SendBindingSecurityCode
         this.sendbindcode(this.phoneNumber);
@@ -170,13 +181,13 @@ export default {
         if (!this.timer) {
           this.count = TIME_COUNT;
 
-          that.disabled = "disabled";
+          that.disabled = true;
           this.timer = setInterval(() => {
             if (this.count > 0 && this.count <= TIME_COUNT) {
               this.count--;
               this.btnText = this.count + "s后重新获取";
             } else {
-              that.disabled = "";
+              that.disabled = false;
               clearInterval(this.timer);
               this.timer = null;
               this.btnText = "获取验证码";

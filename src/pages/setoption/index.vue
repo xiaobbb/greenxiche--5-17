@@ -19,9 +19,11 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onShow() {
-    this.setBarTitle();
       this.userid=wx.getStorageSync("userId")
       this.token=wx.getStorageSync("token")
+  },
+  onLoad(){
+    this.setBarTitle();
   },
   data() {
     return {
@@ -43,7 +45,7 @@ export default {
     },
     // 上传图片
     upImgs(imgs){
-      this.imgBase = imgs;
+      this.imgBase=imgs;
     },
     async submit() {
       const that= this;

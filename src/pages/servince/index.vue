@@ -15,7 +15,7 @@
               <div class="flex-container clomn iteminfo" style="width:70%">
                   <p class="itemtitle">{{item.Name}}</p>
                   <p class="progress">
-                    <text style="margin-top:10rpx" v-for="(itemtip,tindex) in item.KeywordName" :key="tindex">{{itemtip}}</text>
+                    <text style="margin-top:10rpx" v-for="(itemtip,tindex) in item.KeywordName" :key="tindex">{{itemtip?itemtip:''}}</text>
                   </p>
                   <p class="sales">销量: {{item.SalesVolume}}</p>
                   <p class="price">￥{{item.Price}}</p>

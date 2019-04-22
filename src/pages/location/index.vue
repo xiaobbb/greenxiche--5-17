@@ -51,7 +51,7 @@
         <p class="hr"></p>
         <div class="item">
              <img src="/static/images/yellow.png" class="diandian">
-             <p class="location-self">手机 <input  placeholder="请输入您的手机号码" v-model="personPhone" @blur="checkPhone"/></p>
+             <p class="location-self">手机 <input  placeholder="请输入您的手机号码" v-model="personPhone"/></p>
         </div>
         <p class="hr"></p>
         <div class="item sign">
@@ -74,6 +74,7 @@ import { mapState, mapMutations } from "vuex"; //vuex辅助函数
 export default {
   onLoad(){
     this.setBarTitle();
+    this.initSubmitInfo();
     this.personName=""
     this.personPhone=""
     this.ServiceItem=""
@@ -81,18 +82,18 @@ export default {
     this.AppointmentEndTime=""
     this.PicList=""
     this.Remarks=""
-    //this.cartip = "请选择车辆";
+    this.cartip = "请选择车辆";
     this.timetip = "请选择服务时间";
     this.serTip = "请选择服务项目";
     this.total="0.00"
     
   },
   onShow() {
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
     console.log(this.latitude,this.longitude,"填写订单")
     this.showPay = false;
     this.shopId=this.$root.$mp.query.shopId
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
     this.latitude=this.$store.state.latitude
     this.longitude=this.$store.state.longitude
     
@@ -295,58 +296,69 @@ export default {
     checkPhone() {
       //验证手机号
       const phoneNum = this.personPhone;
-      if (!/^1[3|4|5|6|7|8][0-9]\d{4,8}$/.test(phoneNum)) {
+      if (!/^1[3|4|5|6|7|8][0-9]\d{8}$/.test(phoneNum)) {
         wx.showToast({
           title: "请输入正确的手机号码！",
           icon: "none",
           duration: 2000
         });
-        this.personPhone = "";
+        // this.personPhone = "";
         return false;
       }
+      return true;
     },
     async toPay() {
-      wx.setStorageSync("serItem", " ");
-      wx.setStorageSync("CarInfo", " ");
-      wx.setStorageSync("timearr", " ");
-      wx.setStorageSync("datearr", " ");
-      const _picList = JSON.stringify(this.PicList);
+        console.log(this.PicList,'this.PicList')
+        // return false
+      if(this.CarInfoId&&this.ServiceItem&&this.AppointmentEndTime&&this.personName){
+      // const _picList = JSON.stringify(this.PicList);
       //console.log(this.latitude, this.address, "经度信息");
       const params = {
         UserId: this.userId,
         Token: this.token,
         Lat: this.latitude,
         Lng: this.longitude,
-        Addr: this.address,
-        CarInfoId: this.CarInfoId,
-        Remarks: this.Remarks,
-        ServiceItem: this.ServiceItem,
-        ContactName: this.personName,
-        Tel: this.personPhone,
-        //pList:_picList,
+        Addr: this.address, //地址
+        CarInfoId: this.CarInfoId, //车辆信息
+        Remarks: this.Remarks, //备注
+        ServiceItem: this.ServiceItem,//服务项目
+        ContactName: this.personName, //名字
+        Tel: this.personPhone,//手机号
+        pList: JSON.stringify(this.PicList),
         AppointmentStartTime: this.AppointmentStartTime, //开始时间
-        AppointmentEndTime: this.AppointmentEndTime
+        AppointmentEndTime: this.AppointmentEndTime//结束时间
       };
       // const numsTure=this.userId && this.token && this.latitude && this.longitude && this.address && this.CarInfoId  && this.ServiceItem && this.AppointmentStartTime && this.AppointmentEndTime && this.personName && this.personPhone
-      // console.log(this.numsTure)
-      if(this.CarInfoId&&this.ServiceItem&&this.AppointmentEndTime){
-        var res = await post("/Order/SubmitDoorOrders", params);
-        // console.log(res);
+      
+        // 判断手机号
+        if(!(this.checkPhone())){
+          return false;
+        }
+        const res = await post("Order/SubmitDoorOrders", params);
         //如果有订单编号跳转支付页面
         if (res.code == 0) {
           this.orderNumber = res.data;
+        //  下单成功， 清空缓存数据，
+        this.initSubmitInfo()
           //this.showPay = true; //支付组件
           wx.navigateTo({url:"/pages/orderpay/main?price="+this.total+"&orderNo="+this.orderNumber})
         }
       }else{
         wx.showToast({
-          title: "请填写相关内容！",
-          icon: "none",
-          duration: 2000
+          title: "带红点为必填内容！",
+          icon: "none"
         });
         return false
       }
       
+    },
+    // 初始化下单缓存和vuex
+    initSubmitInfo(){
+        wx.setStorageSync("serItem", "");
+        wx.setStorageSync("CarInfo", "");
+        wx.setStorageSync("timearr", "");
+        wx.setStorageSync("datearr", "");
+        this.$store.commit("update",{"pList":[]})
     }
   },
 

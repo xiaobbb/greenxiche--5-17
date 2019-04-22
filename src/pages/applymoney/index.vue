@@ -40,7 +40,7 @@
         <img src="/static/images/back.png" class="right arrowpic">
       </div>
       <div class="flex-container applyitem">
-        <p>退款原因:</p>
+        <p>退款备注:</p>
         <input type="text" v-model="text" placeholder="选填">
       </div>
       <div class="applyitem lastap flex-container money w70">
