@@ -145,6 +145,9 @@ export default {
       }
     },
     async getCouponList(){
+      if(this.isOved){
+        return false;
+      }
       let result = await post("User/CouponList",{
         UserId:this.userId,
         Token:this.token,
@@ -153,12 +156,13 @@ export default {
         pageSize:this.pageSize,
         Type:this.couponType
       });
-      this.count = result.count;
-      if (parseInt(this.count) % this.pageSize === 0) {
-        this.allPage = this.count / this.pageSize;
-      } else {
-        this.allPage = parseInt(this.count / this.pageSize) + 1;
-      }
+      // this.count = result.count;
+      // if (parseInt(this.count) % this.pageSize === 0) {
+      //   this.allPage = this.count / this.pageSize;
+      // } else {
+      //   this.allPage = parseInt(this.count / this.pageSize) + 1;
+      // }
+      
       if(result.data.length>0){
         for(let i=0;i<result.data.length;i++){
           result.data[i].EndTime = result.data[i].EndTime.split(" ")[0].split("/").join("-");
@@ -169,14 +173,17 @@ export default {
             }
           }
         }
+        if(this.page===1){
+          this.couptlist =result.data;
+        }
         this.couptlist = this.couptlist.concat(result.data);
       }
-      console.log(this.couptlist);
-      if(this.allPage > this.page){
-        this.isLoad = true;
-      }else{
-        this.isLoad = false;
+        console.log(result.data.length,this.pageSize===result.data.length)
+        if(result.data.length!==this.pageSize){
+          this.isOved = true;
+          return false;
       }
+      console.log(this.couptlist,this.isOved,'this.isOved');
     },
     gotoShopcenter(id){
       wx.switchTab({
@@ -184,26 +191,37 @@ export default {
       })
     },
     loadMore(){
-      console.log(this.isLoad);
-      if(this.isLoad){
-        this.page++;
-        this.getCouponList();
-      }else{
-        if (this.page > 1) {
-          this.isOved = true;
-        } else {
-          this.isOved = false;
-        }
-      }
+      this.page+=1;
+      console.log(this.isOved,this.page,'page');
+      this.getCouponList();
+      // if(this.isLoad){
+      //   this.page++;
+      //   this.getCouponList();
+      // }else{
+      //   if (this.page > 1) {
+      //     this.isOved = true;
+      //   } else {
+      //     this.isOved = false;
+      //   }
+      // }
     }
   },
-
+  // 下拉刷新
+  onPullDownRefresh(){
+    console.log(this.page,'pageon')
+    this.page=1;
+    // this.isLoad=false;
+    this.getCouponList();
+    // 关闭下拉刷新
+    wx.stopPullDownRefresh()
+  },
+  onReachBottom(){
+      // this.page+=1;
+      // this.getCouponList();
+  },
   created () {
     // let app = getApp()
   },
-  onReachBottom(){
-    
-  }
 }
 </script>
 

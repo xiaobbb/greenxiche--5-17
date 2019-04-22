@@ -164,7 +164,12 @@ export default {
     }
     
   },
-
+  // 下拉刷新
+  onPullDownRefresh(){
+    this.getMemberInfo()
+    // 关闭下拉刷新
+    wx.stopPullDownRefresh()
+  },
   created () {
     // let app = getApp()
   }

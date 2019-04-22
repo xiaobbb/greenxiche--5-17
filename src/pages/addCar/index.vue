@@ -78,8 +78,6 @@ import "../../css/global.css";
 export default {
   onLoad() {
     this.setBarTitle();
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
 
     
     // this.params = this.$root.$mp.query.url;
@@ -92,10 +90,12 @@ export default {
     // }
   },
   onShow() {
+    this.userId = wx.getStorageSync("userId");
+    this.token = wx.getStorageSync("token");
     this.initData();
     console.log('123')
-    this.carNumber = this.$root.$mp.query.carNumber;
-    if(this.carNumber!=0){
+    this.Id = this.$root.$mp.query.Id;
+    if(this.Id*1!=0){
       this.getAllcar();
     }
   },
@@ -103,7 +103,7 @@ export default {
     return {
       isDefault: false,
       eaditId: "",
-      carNumber:"",
+      Id:"",
       selectType:"",
       isShow:false,
       city: "粤",
@@ -212,7 +212,7 @@ export default {
       this.isShow = false;
       this.isDefault = false;
       this.eaditId = "";
-      this.carNumber= "";
+      this.Id= "";
       this.selectType = "";
       // this.data=0;
       this.city = "粤";
@@ -256,23 +256,22 @@ export default {
       const params={
         UserId: this.userId,
         Token: this.token,
-        SearchKey:this.carNumber
+        CarId:this.Id
       } 
-      let res=await post("/User/GetCarInfo",params);
-      if(res.data.length>0){
-        this.eaditId = res.data[0].Id;
-        this.city = res.data[0].CarMumber.substring(0,1);
-        this.num = res.data[0].CarMumber.substring(1,2);
-        this.carNum = res.data[0].CarMumber.substring(2);
-        this.carBrand = res.data[0].CarBrand;//车系
-        this.carSize= res.data[0].CarType;//车型
-        this.carColor=res.data[0].CarColor;
-        if(res.data[0].IsDefault===1){
+      let res=await post("User/GetCarIdInfo",params);
+      const _res = res.data
+        this.eaditId = _res.Id;
+        this.city = _res.CarMumber.substring(0,1);
+        this.num = _res.CarMumber.substring(1,2);
+        this.carNum = _res.CarMumber.substring(2);
+        this.carBrand = _res.CarBrand;//车系
+        this.carSize= _res.CarType;//车型
+        this.carColor=_res.CarColor;
+        if(_res.IsDefault===1){
           this.isDefault = true;
         }else{
           this.isDefault = false;
         }
-      }
     },
     async editCarInfo() {
       let type = 0;
@@ -312,8 +311,8 @@ export default {
     btnSave() {
       if (this.valOther()) {
         console.log("传进来的车牌号：");
-        console.log(this.carNumber);
-        if (this.carNumber!=0) {
+        console.log(this.Id);
+        if (this.Id!=0) {
           //编辑地址
           this.editCarInfo();
         } else {

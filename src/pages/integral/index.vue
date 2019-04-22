@@ -118,6 +118,7 @@ export default {
     // 停止下拉刷新
     wx.stopPullDownRefresh();
   },
+  // 上拉加载
   onReachBottom(){
     if(this.isLoad){
       this.page++;

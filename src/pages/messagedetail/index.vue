@@ -136,6 +136,8 @@ export default {
   onPullDownRefresh(){
     this.initData();
     this.getNewsInfo();
+    // 关闭下拉刷新
+    wx.stopPullDownRefresh()
   },
    onShareAppMessage(res) {
     if (res.from === 'button') {

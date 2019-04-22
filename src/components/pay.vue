@@ -125,6 +125,12 @@ export default {
       }
     }
   },
+  onShow(){
+      this.payType=0;
+      this.showPayType=true;
+      this.total="";
+      this.payPassword=Number
+  },
   methods: {
     pay() {
       console.log(this.payType)

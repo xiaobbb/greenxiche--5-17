@@ -96,6 +96,7 @@
       :total="total"
       :successUrl="`/pages/orderdetail/main?orderNo=${orderNumber}`"
       :closeUrl="`/pages/orderdetail/main?orderNo=${orderNumber}`"
+      balanceRequestUrl="Order/OrderSoldePayment"
     ></Pay>
   </div>
 </template>

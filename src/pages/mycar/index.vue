@@ -26,7 +26,7 @@
                           </label>
                       </div>
                       <div class="flex-container edit">
-                          <p @click="btnEaditCar(item.CarMumber)">
+                          <p @click="btnEaditCar(item.Id)">
                               <img src="/static/images/edit.png" class="menu">
                               <text>编辑</text>
                           </p>
@@ -143,9 +143,9 @@ export default {
         }
       }
     },
-    btnEaditCar(carNumber){
-      console.log('编辑',carNumber)
-      wx.navigateTo({ url: "/pages/addCar/main?carNumber="+carNumber });
+    btnEaditCar(Id){
+      console.log('编辑',Id)
+      wx.navigateTo({ url: "/pages/addCar/main?Id="+Id });
     },
     choseCar(e){
       //console.log(e)

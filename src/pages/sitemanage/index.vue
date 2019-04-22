@@ -15,8 +15,8 @@
                 <span class="chosetitle" v-if="!item.checked">默认地址</span>
                 <span class="chosetitle2" v-else>设为默认地址</span>
               </label>
-              <div class="flex-container edit"  @click="editAddress(item.id)" >
-                <p>
+              <div class="flex-container edit"  >
+                <p  @click="editAddress(item.id)">
                   <img src="/static/images/edit.png" class="menu">
                   <text>编辑</text>
                 </p>
@@ -63,30 +63,38 @@ export default {
       isshow: false,
       data: 0,
       carinfolist: [],
+      page:1,
+      pageSize:10
     };
   },
 
   components: {},
-  onLoad() {
-      this.userid=wx.getStorageSync("userId"),
-      this.token=wx.getStorageSync("token"),
+  onShow() {
     wx.setNavigationBarTitle({
       title: "地址管理"
     });
+    this.initData();
     this.getData();
   },
   methods: {
+    initData(){
+      this.page=1;
+      this.carinfolist=[]
+      this.userid=wx.getStorageSync("userId")
+      this.token=wx.getStorageSync("token")
+    },
     async getData() {
       console.log(this.userid,this.token)
       const params = {
         UserId: this.userid,
         Token: this.token,
-        Page: 1,
-        PageSize: 20
+        Page: this.page,
+        PageSize: this.pageSize
       };
       const res = await post("Address/AddressList", params);
-      
-      this.carinfolist= []
+      if(this.page===1){
+       this.carinfolist= []
+      }
       for (let i = 0; i < res.data.length; i += 1) {
         const list = res.data[i];
         this.carinfolist.push({
@@ -161,7 +169,17 @@ export default {
 
     }
   },
+  // 下拉刷新
+  onPullDownRefresh(){
+    this.page=1;
+    this.getData()
+    // 关闭下拉刷新
+    wx.stopPullDownRefresh()
+  },
+  // 上拉加载
+  onReachBottom(){
 
+  },
   created() {
     // let app = getApp()
   }
