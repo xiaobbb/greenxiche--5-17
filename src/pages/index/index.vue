@@ -486,6 +486,8 @@ export default {
             }
           });
         }
+        this.isshow=false
+        this.isnew=false
     },
     async isNewVip(){  //验证是否vip
           console.log(this.$store.state.showMask,"this.$store.state.showMask")
