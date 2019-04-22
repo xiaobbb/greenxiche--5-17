@@ -12,14 +12,14 @@
     <scroll-view scroll-y @scrolltolower="loadMore" class="recordlistBox">
       <div class="recordlist" v-if="list.length>0">
         <div class="recorditem commonpad flex-container" v-for="(item,index) in list" :key="index">
-          <div>
+          <div class="left">
             <p>{{item.Remark}}</p>
             <p class="minisize">{{item.AddTime}}</p>
           </div>
-          <div>
+          <div class="right">
             <p class="addshort add" :class="{'add':item.Type==11}">
               <span v-if="item.Type==11">＋</span>
-              <span v-else>-</span>
+              <!-- <span v-else>-</span> -->
               {{item.Change}}
             </p>
             <p class="minisize">余额：{{item.After}}</p>

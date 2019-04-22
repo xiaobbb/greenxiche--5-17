@@ -46,6 +46,7 @@ export default {
       this.imgBase = imgs;
     },
     async submit() {
+      const that= this;
       console.log(JSON.stringify(this.imgBase));
       if (!this.text) {
         wx.showToast({
@@ -67,9 +68,12 @@ export default {
         icon: "success",
         duration: 2000,
         success: function() {
+          // 成功后清空数据
+          that.text= ""
+          that.imgBase= []
           setTimeout(function() {
             wx.navigateBack();
-          }, 2000);
+          }, 1500);
         }
       });
     },

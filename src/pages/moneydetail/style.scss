@@ -12,6 +12,7 @@
 }
 .recorditem{
     border-bottom:1rpx solid #f4f4f4;
+    align-items:flex-start;
 }
 .add,.short{
     font-size:32rpx;
@@ -26,4 +27,10 @@
     font-size:24rpx;
     color:#999;
     margin-top:10rpx;
+}
+.left{
+    width:78%;
+}
+.right{
+    width:20%;
 }
