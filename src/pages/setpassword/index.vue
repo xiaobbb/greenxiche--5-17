@@ -6,10 +6,14 @@
     </div>
     <div class="setitem flex-container white">
       <input type="text" placeholder="请输入验证码" v-model="verifyCode">
-      <text class="getpass" :class="btnText !== '获取验证码'?'noactive':''" @click="getVerifyCode">{{btnText}}</text>
+      <text
+        class="getpass"
+        :class="btnText !== '获取验证码'?'noactive':''"
+        @click="getVerifyCode"
+      >{{btnText}}</text>
     </div>
     <div class="setitem white">
-      <input type="password" placeholder="请输入6位数字支付密码"  v-model="passwords">
+      <input type="password" placeholder="请输入6位数字支付密码" v-model="passwords">
     </div>
     <div class="setitem white">
       <input type="password" placeholder="确认密码" v-model="confirmPassword">
@@ -23,8 +27,16 @@ import { post } from "../../utils";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad() {
+  onShow() {
     this.setBarTitle();
+
+    this.btnText = "获取验证码";
+    this.phoneNumber = "";
+    this.verifyCode = "";
+    this.passwords = "";
+    this.confirmPassword = "";
+      this.token= wx.getStorageSync("token")
+      this.userid= wx.getStorageSync("userId")
   },
   data() {
     return {
@@ -33,8 +45,8 @@ export default {
       verifyCode: "",
       passwords: "",
       confirmPassword: "",
-      token: wx.getStorageSync("token"),
-      userid: wx.getStorageSync("userId")
+      token:'',
+      userid: ''
     };
   },
 
@@ -55,8 +67,8 @@ export default {
         });
         return false;
       }
-      console.log(this.passwords,this.passwords.toString().length)
-      if (String(this.passwords).length!==6) {
+      console.log(this.passwords, this.passwords.toString().length);
+      if (String(this.passwords).length !== 6) {
         wx.showToast({
           title: "请输入正确的6位数密码",
           icon: "none",
@@ -83,9 +95,9 @@ export default {
         icon: "success",
         duration: 2000
       });
-      setTimeout(()=> {
-      wx.navigateBack();
-      },1500)
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
     },
     // 获取验证码
     async getVerifyCode() {
@@ -108,16 +120,16 @@ export default {
           icon: "success"
         });
         this.count = TIME_COUNT;
-        const timer = setInterval(() => {
-          if (this.count > 0 && this.count <= TIME_COUNT) {
-            this.count -= 1;
-            this.btnText = this.count + "s后重新获取";
-            console.log(this.count, this.btnText);
-          } else {
-            clearInterval(timer);
-            this.btnText = "获取验证码";
-          }
-        }, 1000);
+          const timer = setInterval(() => {
+            if (this.count > 0 && this.count <= TIME_COUNT) {
+              this.count -= 1;
+              this.btnText = this.count + "s后重新获取";
+              console.log(this.count, this.btnText);
+            } else {
+              clearInterval(timer);
+              this.btnText = "获取验证码";
+            }
+          }, 1000);
       }
     }
   },
@@ -131,8 +143,7 @@ export default {
 <style lang="scss" scoped>
 @import "./style";
 @import "../../css/common.css";
-.noactive{
-  background:#aaa!important;
-
-} 
+.noactive {
+  background: #aaa !important;
+}
 </style>

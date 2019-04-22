@@ -153,7 +153,7 @@ export default {
       const TIME_COUNT = 60; // 60s后重新获取验证码
       var codeNum = this.verificationCode;
       var phoneNum = this.phoneNumber;
-      if (phoneNum === "") {
+      if (!(/^1(3|4|5|7|8)\d{9}$/.test(phoneNum))) {
         wx.showToast({
           title: "手机号不能为空",
           icon: "none",

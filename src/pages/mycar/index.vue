@@ -26,7 +26,7 @@
                           </label>
                       </div>
                       <div class="flex-container edit">
-                          <p @click.stop="btnEaditCar(item.CarMumber)">
+                          <p @click="btnEaditCar(item.CarMumber)">
                               <img src="/static/images/edit.png" class="menu">
                               <text>编辑</text>
                           </p>
@@ -152,15 +152,18 @@ export default {
       }
     },
     btnEaditCar(carNumber){
-      console.log(carNumber)
+      console.log('编辑',carNumber)
       wx.navigateTo({ url: "/pages/addCar/main?carNumber="+carNumber });
     },
     choseCar(e){
       //console.log(e)
+      if(this.params){
+        
       console.log(this.carinfolist[e],'???')
       let CarInfo=this.carinfolist[e]
       wx.setStorageSync("CarInfo",CarInfo)
       wx.navigateBack({ url: "/pages/"+this.params+"/main"});
+      }
     }
   },
 

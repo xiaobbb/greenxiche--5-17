@@ -93,6 +93,7 @@ export default {
   },
   onShow() {
     this.initData();
+    console.log('123')
     this.carNumber = this.$root.$mp.query.carNumber;
     if(this.carNumber!=0){
       this.getAllcar();

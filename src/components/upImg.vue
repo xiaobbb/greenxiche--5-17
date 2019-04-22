@@ -54,7 +54,10 @@ export default {
       imgLenght: 4 //图片最大数量
     };
   },
-  onShow() {},
+  onShow() {
+      this.imgBase= []
+      this.imgPathArr= []
+  },
   methods: {
     // 修改图片
     chosseImg() {
