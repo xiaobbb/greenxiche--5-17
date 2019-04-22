@@ -66,20 +66,23 @@
       <!--购买须知-->
       <div class="point pointnow" style="margin-bottom:100rpx;">
           <div class="main">购买需知</div>
-          <div class="pmenu">
+          <div v-html="detailinfo.ContentDetail">
+
+          </div>
+          <!-- <div class="pmenu">
               <img src="/static/images/time.png" class="tippic">
               <div>
-                <p  class="fsize">适用车型</p>
+                <p class="fsize">适用车型</p>
                 <p class="carcor">五座轿车</p>
               </div>
           </div>
           <div class="pmenu">
               <img src="/static/images/time.png" class="tippic">
               <div>
-                <p  class="fsize">适用车型</p>
-                <p class="carcor">五座轿车</p>
+                <p  class="fsize">有效期</p>
+                <p class="carcor">付款成功后7天</p>
               </div>
-          </div>
+          </div> -->
       </div>
       <!--支付-->
       <div class="btn"> 
@@ -106,7 +109,7 @@ export default {
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
     this.getSerdetail()
-    console.log(this.shopLng,this.shopLat,"商铺经纬度")
+    //console.log(this.shopLng,this.shopLat,"商铺经纬度")
   },
   data () {
     return {
@@ -151,6 +154,8 @@ export default {
             console.log(this.detailinfo,"服务详情");
             this.address=result.data[0].ShopData[0].Address
             this.name=result.data[0].ShopData[0].ShopNick 
+            const tt=result.data[0].ContentDetail.split("><")
+            console.log(tt.indexOf("</p>"))
             //console.log("数据长度："+this.commentlist.length);
         }
     },

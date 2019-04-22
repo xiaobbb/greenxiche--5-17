@@ -38,7 +38,6 @@
                 <p class="taginfo">
                   <img src="/static/images/tag.png" class="tag">
                   <span class="goods">充值有优惠</span>
-                  <img src="/static/images/white.png" class="yuan">
                 </p>
                 <img src="/static/images/back.png" class="back">
             </div>
@@ -76,14 +75,13 @@ export default {
   onLoad(){
     this.setBarTitle();
     this.personName=""
-    this.CarInfoId=""
     this.personPhone=""
     this.ServiceItem=""
     this.AppointmentStartTime=""
     this.AppointmentEndTime=""
     this.PicList=""
     this.Remarks=""
-    this.cartip = "请选择车辆";
+    //this.cartip = "请选择车辆";
     this.timetip = "请选择服务时间";
     this.serTip = "请选择服务项目";
     this.total="0.00"
@@ -97,6 +95,15 @@ export default {
     this.token = wx.getStorageSync("token");
     this.latitude=this.$store.state.latitude
     this.longitude=this.$store.state.longitude
+    
+    if(wx.getStorageSync("CarInfo").length>0){
+         //获取车辆信息
+          this.getCar();
+    }else{
+        this.CarInfoId=wx.getStorageSync("carId")
+        //获取默认车辆的信息
+        this.getDefaultCar()
+    }
     //转换时间
     this.changeTime();
     //服务项目
@@ -107,8 +114,7 @@ export default {
       this.Remarks = textinfo;
       //console.log(this.Remarks,"接收的备注")
     }
-    //获取车辆信息
-    this.getCar();
+   
     //获取上门服务的地址
     this.address = this.$store.state.nowPlace;
     //console.log(this.latitude);
@@ -189,6 +195,18 @@ export default {
       wx.setNavigationBarTitle({
         title: "填写订单"
       });
+    },
+    async getDefaultCar(){
+      console.log(this.CarInfoId,"默认车辆id")
+      let res=await post("/User/GetCarIdInfo",{
+        UserId:this.userId,
+        Token:this.token,
+        CarId:this.CarInfoId
+      })
+      console.log(res,"获取默认车辆")
+      if(res.code==0){
+          this.cartip=res.data.CarBrand+res.data.CarType+res.data.CarMumber
+      }
     },
     getCar() {
       //获取车辆

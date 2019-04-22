@@ -5,9 +5,9 @@
         <!--车辆列表-->
         <div class="carlist" v-if="carinfolist.length>0">
             <radio-group class="radio-group" @change="changeIsDefault($event)">
-               <div class="radio"  v-for="(item,index) in carinfolist" :key="index" @click="choseCar(index)">
-                    <div class="caritem">
-                    <div class="flex-container infostyle">
+               <div class="radio"  v-for="(item,index) in carinfolist" :key="index">
+                  <div class="caritem">
+                    <div class="flex-container infostyle"  @click="choseCar(index)">
                       <div class="carlogo">
                           <img src="/static/images/bg6.png" class="cloth">
                           <img src="/static/images/car3.png" class="car">
@@ -96,6 +96,12 @@ export default {
       let res=await post("/User/GetCarInfo",params);
       if(res.data.length>0){
         this.carinfolist = this.carinfolist.concat(res.data);
+        for(let i=0;i<this.carinfolist.length;i++){
+          if(this.carinfolist[i].IsDefault*1==1){
+            wx.setStorageSync("carId",this.carinfolist[i].Id)
+            console.log(this.carinfolist[i].Id,"默认车辆的信息1111111111111")
+          }
+        }
       }
     },
     async setCarDefault(index,carId){  //设置默认车辆
@@ -110,6 +116,8 @@ export default {
       for(let i=0;i<this.carinfolist.length;i++){
         if(index===i){
           this.$set(this.carinfolist[i],"IsDefault",1);
+          console.log(this.carinfolist[i].Id,"默认车辆的信息222222222")
+          wx.setStorageSync("carId",this.carinfolist[i].Id)
         }else{
           this.$set(this.carinfolist[i],"IsDefault",0);
         }

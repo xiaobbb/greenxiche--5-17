@@ -101,9 +101,13 @@ import orderCard from '@/components/orderCard.vue'
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
+  onLoad(){
+    this.setBarTitle();
+    //首次获取默认车辆的信息
+    
+  },
   onShow(){
     this.showPay = false
-    this.setBarTitle();
     //获取vuex商品信息
     this.proid=this.$store.state.visitconfirmorder.ProductId
     this.lat=wx.getStorageSync('latitude');
@@ -112,11 +116,19 @@ export default {
     this.UserId=wx.getStorageSync('userId');
     this.Password=wx.getStorageSync('password');
     const carInfo=wx.getStorageSync('CarInfo');
-    this.CarInfoId=carInfo.Id
-    this.CarInfo=carInfo.CarBrand+carInfo.CarType+carInfo.CarColor
+    // console.log(carInfo.length)
+    if(carInfo>0){
+        this.CarInfoId=carInfo.Id
+        this.CarInfo=carInfo.CarBrand+carInfo.CarType+carInfo.CarColor
+    }else{
+        this.CarInfoId=wx.getStorageSync("carId")
+        this.getDefaultCar()
+    }
+    
+   
     this.getOrderInfo()
     console.log(this.proid,this.Token,this.UserId,this.CarInfoId)
-    this.changeTime()
+    //this.changeTime()
     if(this.CarInfoId){
       this.getTotal()//获取订单总金额
     }
@@ -169,6 +181,18 @@ export default {
       wx.setNavigationBarTitle({
         title: "确认订单"
       });
+    },
+    async getDefaultCar(){
+      console.log(this.CarInfoId,"默认车辆id")
+      let res=await post("/User/GetCarIdInfo",{
+        UserId:this.UserId,
+        Token:this.Token,
+        CarId:this.CarInfoId
+      })
+      console.log(res,"获取默认车辆")
+      if(res.code==0){
+          this.CarInfo=res.data.CarBrand+res.data.CarType+res.data.CarMumber
+      }
     },
     async getOrderInfo(){ //获取订单信息
       var result=await post("/Order/ServiceProductsFirmOrder",{
@@ -320,25 +344,25 @@ export default {
     //     }
     // },
     //定时器支付时间变化
-    changeTime(){
-      this.timer=setInterval(
-        ()=>{
-        if(this.second==='00'){
-          this.second=59
-          this.minute--
-        }
-        this.second--
-        if(!this.second.toString()[1]){
-          this.second=`0${this.second}`
-        }
-        if(!this.minute.toString()[1]){
-          this.minute=`0${this.minute}`
-        }
-        if(this.minute==="00"){
-          clearInterval(this.timer)
-        }
-      },2000)
-    },
+    // changeTime(){
+    //   this.timer=setInterval(
+    //     ()=>{
+    //     if(this.second==='00'){
+    //       this.second=59
+    //       this.minute--
+    //     }
+    //     this.second--
+    //     if(!this.second.toString()[1]){
+    //       this.second=`0${this.second}`
+    //     }
+    //     if(!this.minute.toString()[1]){
+    //       this.minute=`0${this.minute}`
+    //     }
+    //     if(this.minute==="00"){
+    //       clearInterval(this.timer)
+    //     }
+    //   },2000)
+    // },
   },
 
   created () {
