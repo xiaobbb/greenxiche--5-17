@@ -1,5 +1,5 @@
 <template>
-  <div v-show="showCoupon" @touchmove.stop="dialog">
+  <div v-show="showCoupon" >
       <!--遮罩层-->
     <div class="mask-modal" @click="closeMask"></div>
     <div class="paymask white" >
@@ -9,11 +9,11 @@
       <div>
         <radio-group class="radio-group" @change="selectCoupon">
           <label class="flex-container couponItem" v-for="(item,index) in couponList" :key="index">
-            {{item.Title}}
-            <input type="radio" name="coupon" :value="item.CardTicketId" :checked="couponId==item.CardTicketId" >
+            {{item.Title}}{{item.Denomination}}
+            <input type="radio" name="coupon" :value="item.CardTicketId" :checked="CardTicketId==item.CardTicketId" >
           </label>
           <label class="flex-container couponItem">
-            不使用优惠券
+            不使用卡券
              <input type="radio" name="coupon" :checked="CardTicketId==0" value="0">
           </label>
         </radio-group>
@@ -30,34 +30,32 @@ export default {
           type:Boolean,
           default:false
         },
-        couponList: [ ],
-        couponId:"",
-        CardTicketId:""
+        couponList: [],
+        // couponId:0,
+        CardTicketId:0
     },
     watch:{
      
     },
   data() {
     return {
-      couponList: [ ]
     };
   },
   methods: {
-    dialog(){
-      return
-    },
     selectCoupon(e){
-      console.log(e.mp.detail.value)
       const id = e.mp.detail.value
-      let cardprice = 0
+      // this.CardTicketId = id;
+      // console.log(e.mp.detail.value,this.CardTicketId,this.CardTicketId)
+      let cardName = 0
       for(let i=0;i<this.couponList.length;i++){
           const _res = this.couponList[i]
           if(_res.CardTicketId == id){
-            cardprice = _res.Denomination
+            cardName = _res.Denomination*1
           }
       }
         this.$emit('update:CardTicketId',id)
-        this.$emit('update:CardTicketPrice',cardprice)
+        this.$emit('update:CardTicketName',cardName)
+        this.closeMask();
       
   },
   closeMask(){ 

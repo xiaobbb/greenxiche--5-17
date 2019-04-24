@@ -115,6 +115,7 @@ export default {
                 longitude:this.locationlist[e].location.lng,
                 nowPlace:address
           });
+      wx.navigateBack();
      // console.log(address)
       //  wx.request({
       //       url:"https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address="+address+"&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",

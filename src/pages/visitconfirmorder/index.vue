@@ -4,11 +4,11 @@
       <!---->
       <div class="flex-container clomn  ordershophead white">
           <div class="orderserve">服务商家</div>
-          <div class="flex-container ordermain" v-if="orderinfo.length>0">
-              <img :src="orderinfo[0].ShopData[0].Logo" class="ordershopimg" >
+          <div class="flex-container ordermain" v-if="orderinfo.ShopData">
+              <img :src="orderinfo.ShopData.Logo" class="ordershopimg" >
               <div class="flex-container clomn orderplace">
-                  <p class="placename">{{orderinfo[0].ShopData[0].ShopNick}}</p>
-                  <p>{{orderinfo[0].ShopData[0].Address}}</p>
+                  <p class="placename">{{orderinfo.ShopData.ShopNick}}</p>
+                  <p>{{orderinfo.ShopData.Address}}</p>
               </div>
           </div>
           <div class="ordertips">(温馨提示：请直接至门店进行洗车服务)</div>
@@ -18,10 +18,10 @@
       <div class="white proinfo">
           <div class="orderserve">服务项目</div>
           <div class="flex-container ordermain">
-              <img :src="orderinfo[0].PicNo" class="ordershopimg">
+              <img :src="orderinfo.PicNo" class="ordershopimg">
               <div class="flex-container clomn orderplace">
-                  <p class="placename detailright">{{orderinfo[0].Name}}</p>
-                  <p>￥{{orderinfo[0].Price}}</p>
+                  <p class="placename detailright">{{orderinfo.Name}}</p>
+                  <p>￥{{orderinfo.Price}}</p>
               </div>
           </div>
           <div class="flex-container infoslide white pad" @click="choseItem(1)">
@@ -44,7 +44,7 @@
           <div class="flex-container infoslide white pad" @click="choseItem(5)">
               <div>服务卡券</div>
               <div>
-                  <span v-if="CardTicketName">-{{CardTicketName}}</span>
+                  <span v-if="CardTicketName">{{CardTicketName}}</span>
                   <img src="/static/images/back.png" class="right" v-else>
               </div>
           </div>
@@ -60,8 +60,19 @@
           <div class="btnconfir" @click="goPay">提交订单</div>
       </div>
       <!--遮罩层-->
-    <orderCount :showCoupon.sync="showCoupon" :couponId.sync = "CouponId" :couponList="couponList" :couponPrice.sync="couponPrice" ></orderCount>
-    <orderCard :showCoupon.sync="showCardTicket" :CardTicketId.sync="CardTicketId" :couponList="couponList" :CardTicketPrice.sync="CardTicketPrice"></orderCard>
+      <!-- 优惠券 -->
+    <orderCount 
+      :showCoupon.sync="showCoupon" 
+      :couponId.sync="CouponId" 
+      :couponList="couponList" 
+      :couponPrice.sync="couponPrice" >
+    </orderCount>
+    <!-- 卡券 -->
+    <orderCard 
+    :showCoupon.sync="showCardTicket" 
+    :CardTicketId.sync="CardTicketId" 
+    :couponList="couponList" 
+    :CardTicketName.sync="CardTicketName"></orderCard>
     </div>
     <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
     :total="total" :successUrl="'/pages/myorder/main?orderBigType=2&status=2'" :closeUrl="'/pages/myorder/main?orderBigType=2&status=2'"
@@ -107,21 +118,24 @@ export default {
     
   },
   onShow(){
+    this.Token=wx.getStorageSync('token');
+    this.UserId=wx.getStorageSync('userId');
     this.showPay = false
     //获取vuex商品信息
     this.proid=this.$store.state.visitconfirmorder.ProductId
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
-    this.Token=wx.getStorageSync('token');
-    this.UserId=wx.getStorageSync('userId');
     this.Password=wx.getStorageSync('password');
     const carInfo=wx.getStorageSync('CarInfo');
     // console.log(carInfo.length)
-    if(carInfo>0){
+    if(carInfo){
         this.CarInfoId=carInfo.Id
         this.CarInfo=carInfo.CarBrand+carInfo.CarType+carInfo.CarColor
+        
+      this.getTotal()//获取订单总金额
     }else{
-        this.CarInfoId=wx.getStorageSync("carId")
+
+        // this.CarInfoId=wx.getStorageSync("carId")
         this.getDefaultCar()
     }
     
@@ -129,7 +143,12 @@ export default {
     this.getOrderInfo()
     console.log(this.proid,this.Token,this.UserId,this.CarInfoId)
     //this.changeTime()
-    if(this.CarInfoId){
+    // if(this.CarInfoId){
+    //   this.getTotal()//获取订单总金额
+    // }
+  },
+  watch:{
+    CardTicketId(){
       this.getTotal()//获取订单总金额
     }
   },
@@ -147,12 +166,13 @@ export default {
       CardTicketId:"0",//服务卡券id
       couponPrice:"0.00",
       CardTicketPrice:"0.00",
+      CardTicketName:'',
       Token:"",
       UserId:"",
       orderNumber:"",//订单编号
       Password:"",
       Remarks:"",
-      orderinfo:[],
+      orderinfo:{},
       orderParmar:"", ////////////
       minute:10,
       second:'00',
@@ -182,29 +202,34 @@ export default {
         title: "确认订单"
       });
     },
+    // 查询默认车辆
     async getDefaultCar(){
-      console.log(this.CarInfoId,"默认车辆id")
-      let res=await post("/User/GetCarIdInfo",{
+      // console.log(this.CarInfoId,"默认车辆id")
+      let res=await post("/User/GetCarInfo",{
         UserId:this.UserId,
         Token:this.Token,
-        CarId:this.CarInfoId
+        // CarId:this.CarInfoId
+        IsDefault:1
       })
       console.log(res,"获取默认车辆")
-      if(res.code==0){
-          this.CarInfo=res.data.CarBrand+res.data.CarType+res.data.CarMumber
-      }
+      const _res = res.data[0]
+      this.CarInfoId = _res.Id
+      this.CarInfo=_res.CarBrand+_res.CarType+_res.CarMumber
+      this.getTotal()//获取订单总金额
     },
-    async getOrderInfo(){ //获取订单信息
+     //获取订单信息
+    async getOrderInfo(){
       var result=await post("/Order/ServiceProductsFirmOrder",{
         UserId:this.UserId,
         Token:this.Token,
         ProductId:this.proid
       })
       if(result.code==0){
-        this.orderinfo=result.data
+        this.orderinfo=result.data[0]
+        this.orderinfo.ShopData = result.data[0].ShopData[0]
         this.CouponData=result.data[0].CouponData
         this.CardTicketData=result.data[0].CardTicketData
-        console.log(result.data,"确认页面详情")
+        console.log(this.orderinfo.ShopData,"确认页面详情")
       }
     },
     choseItem(e){
@@ -232,6 +257,7 @@ export default {
     },
     //获取订单总金额
     async getTotal(){
+      console.log(this.CardTicketId,"获取卡券信息")
         wx.setStorageSync('CarInfo',"");
         var result=await post("/Order/ServiceProductsPlaceOrderVerifyAmount",{
           UserId:this.UserId,

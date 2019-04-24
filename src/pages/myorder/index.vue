@@ -351,7 +351,7 @@ export default {
       this.totalPrice = "";
     },
     shiftStatus(status) {
-      this.status = status;
+      this.status = status*1;
       this.initData();
       this.getOrderList();
     },
@@ -397,7 +397,7 @@ export default {
       }
     },
     async getReserveOrderList() {
-      let result = await post("Order/ReserveOrderList", {
+      let result = await post("Order/MakeOrderList", {
         UserId: this.userId,
         Token: this.token,
         page: this.page,

@@ -4,56 +4,58 @@
     <div class="glo-relative">
         <map id="map"  :longitude="longitude" :latitude="latitude"  scale="15" :controls="controls"  :markers="markers"   @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 100%; height:610rpx;"></map>
     </div>
-    <!--item-->
-    <div class="paymenu">
-        <div class="ordertitle">
-            <p>确认支付信息</p>
-            <img src="/static/images/close.png" class="close" @click="colsePay">
-        </div>
-        <p class="menu">￥{{price}}</p>
-        <radio-group class="radio-group" @change="radioChange">
-            <label class="radio" v-for="item in payitems" :key="item.id">
-              <div class="flex-container payitem commonpad">
-                  <div class="flex-container">
-                      <img src="/static/images/wx.png" class="payimg" v-if="item.id==1">
-                      <img src="/static/images/rmbbg.png" class="payimg" v-if="item.id==2">
-                      <text style="margin-left:20rpx;"> {{item.value}}</text>
-                  </div>
-                  <radio :value="item.id" :checked="item.checked"/>
-              </div>
-            </label>
-          </radio-group>
-        <div class="paybtn" style="margin-top:50rpx;" @click="payMoney">立即支付</div>
-    </div>
-    <!--密码输入框-->
-    <div class="mypopup" v-if="showPass">
-      <div class="content">
-          <div class="close_btn" @click="closePop">X</div>
-          <div class="main">
-              <div>请输入支付密码验证</div>
-              <div class="pwipt">
-                  <input type="password" @input="judgePassword" v-model="password" autofocus maxlength='6'>
-                  <div class="border-right">
-                      <span v-if="show1"></span>
-                  </div>
-                  <div class="border-right">
-                      <span v-if="show2"></span>
-                  </div>
-                  <div class="border-right">
-                      <span v-if="show3"></span>
-                  </div>
-                  <div class="border-right">
-                      <span v-if="show4"></span>
-                  </div>
-                  <div class="border-right">
-                      <span v-if="show5"></span>
-                  </div>
-                  <div>
-                      <span v-if="show6"></span>
-                  </div>
-              </div>
-              <div class="forgetpw" @click="findPass">忘记密码？</div>
+    <div class="orderPay">
+      <!--item-->
+      <div class="paymenu">
+          <div class="ordertitle">
+              <p>确认支付信息</p>
+              <img src="/static/images/close.png" class="close" @click="colsePay">
           </div>
+          <p class="menu">￥{{price}}</p>
+          <radio-group class="radio-group" @change="radioChange">
+              <label class="radio" v-for="item in payitems" :key="item.id">
+                <div class="flex-container payitem commonpad">
+                    <div class="flex-container">
+                        <img src="/static/images/wx.png" class="payimg" v-if="item.id==1">
+                        <img src="/static/images/rmbbg.png" class="payimg" v-if="item.id==2">
+                        <text style="margin-left:20rpx;"> {{item.value}}</text>
+                    </div>
+                    <radio :value="item.id" :checked="item.checked"/>
+                </div>
+              </label>
+            </radio-group>
+          <div class="paybtn" style="margin-top:50rpx;" @click="payMoney">立即支付</div>
+      </div>
+      <!--密码输入框-->
+      <div class="mypopup" v-if="showPass">
+        <div class="content">
+            <div class="close_btn" @click="closePop">X</div>
+            <div class="main">
+                <div>请输入支付密码验证</div>
+                <div class="pwipt">
+                    <input type="password" @input="judgePassword" v-model="password" autofocus maxlength='6'>
+                    <div class="border-right">
+                        <span v-if="show1"></span>
+                    </div>
+                    <div class="border-right">
+                        <span v-if="show2"></span>
+                    </div>
+                    <div class="border-right">
+                        <span v-if="show3"></span>
+                    </div>
+                    <div class="border-right">
+                        <span v-if="show4"></span>
+                    </div>
+                    <div class="border-right">
+                        <span v-if="show5"></span>
+                    </div>
+                    <div>
+                        <span v-if="show6"></span>
+                    </div>
+                </div>
+                <div class="forgetpw" @click="findPass">忘记密码？</div>
+            </div>
+        </div>
       </div>
     </div>
   </div>
@@ -119,9 +121,10 @@ export default {
       });
     },
     colsePay(){
-        wx.navigateTo({
-            url:"/pages/myorder/main?orderBigType=2&status=1"
-        });
+        // wx.navigateTo({
+        //     url:"/pages/myorder/main?orderBigType=2&status=1"
+        // });
+        wx.navigateBack();
     },
     payMoney(){
         //判断哪种支付方法
@@ -132,7 +135,7 @@ export default {
               this.wxPay()
             }else{
               this.showPass=true
-              //this.otherPay()
+              this.otherPay()
             }
           }
         }

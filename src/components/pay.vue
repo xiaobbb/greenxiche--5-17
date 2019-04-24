@@ -142,6 +142,7 @@ export default {
     },
     //   微信支付
     async wx() {
+      const that = this;
       let result = await post(this.wxRequestUrl, {
         UserId: wx.getStorageSync("userId"),
         Token: wx.getStorageSync("token"),
@@ -157,14 +158,14 @@ export default {
           signType: payData.signType,
           paySign: payData.paySign,
           success(res) {
-            this.$emit("update:showPay", false);
+            that.$emit("update:showPay", false);
             wx.showToast({
               title: "支付成功"
             });
-            if(this.successUrl){
+            if(that.successUrl){
               setTimeout(() => {
                 wx.redirectTo({
-                  url: this.successUrl
+                  url: that.successUrl
                 });
               }, 1000);
             }
@@ -174,11 +175,11 @@ export default {
             //   title: "支付失败",
             //   icon: "none"
             // });
-            // setTimeout(() => {
-            //   wx.redirectTo({
-            //     url: "/pages/myorder/main"
-            //   });
-            // }, 1500);
+              setTimeout(() => {
+                wx.redirectTo({
+                  url: that.successUrl
+                });
+              }, 1000);
           }
         });
       } else {

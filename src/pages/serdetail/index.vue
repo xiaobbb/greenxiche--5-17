@@ -106,10 +106,12 @@ export default {
     this.shopLng=this.$root.$mp.query.shopLng;
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
-    this.Token=wx.getStorageSync('token');
-    this.UserId=wx.getStorageSync('userId');
     this.getSerdetail()
     //console.log(this.shopLng,this.shopLat,"商铺经纬度")
+  },
+  onShow(){
+    this.Token=wx.getStorageSync('token');
+    this.UserId=wx.getStorageSync('userId');
   },
   data () {
     return {
@@ -139,11 +141,16 @@ export default {
     },
     async getSerdetail(){
         var result=await post("/Server/ServiceProductsDetails",{
-            UserId:this.UserId,
-            Token:this.Token,
-            ProductId:this.proid,
-            Lat:this.lat,
-            Lng:this.lng
+            // UserId:this.UserId,
+            // Token:this.Token,
+            // ProductId:this.proid,
+            // Lat:this.lat,
+            // Lng:this.lng
+            UserId:"91DC2AD9ED2B2C1C",
+            Token:"6CB02D88A51F637467FC0CAD02681D71",
+            ProductId:"341",
+            Lat:22.548456637984177,
+            Lng:114.06455183658751
         })
         if(result.code==0){
             this.detailinfo=result.data[0];

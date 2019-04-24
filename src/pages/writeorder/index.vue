@@ -40,7 +40,7 @@
     <!--底部按钮组-->
     <div class="tagflex bottomstyle">
         <div class="btn-cancle" @click="cancle">取消</div>
-        <div class="btn-order" @click="choseTime">立即下单</div>
+        <div class="btn-order" @click="choseTime">确认</div>
     </div>
   </div>
 </template>

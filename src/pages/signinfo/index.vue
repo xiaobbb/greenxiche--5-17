@@ -16,6 +16,9 @@ export default {
   onLoad(){
     this.setBarTitle();
   },
+  onShow(){
+      this.textInfo = wx.getStorageSync('remarks') ||''
+  },
   data () {
     return {
       textInfo:""
@@ -33,6 +36,7 @@ export default {
     },
     orderpay(){
       //console.log(this.textInfo)
+      wx.setStorageSync('remarks',this.textInfo)
       wx.navigateBack({ url: "/pages/location/main?textinfo="+this.textInfo });
       
     },

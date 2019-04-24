@@ -14,12 +14,12 @@
                         <p>{{info.ContactName}}</p>
                         <p>{{info.TelephoneNumber}}</p>
                     </div>
-                    <div class="mysize">{{info.Address}}</div>
+                    <div class="mysize">{{info.ServiceAddr}}</div>
                 </div>
             </div>
             <div class="flex-container apointtime">
                 <img src="/static/images/time11.png" class="timelogo">
-                <text>{{info.AddTime}}</text>
+                <text>{{info.AppointmentStartTime}} - {{info.AppointmentEndTime}}</text>
             </div>
         </div>
         <!--到店订单-->
@@ -216,6 +216,7 @@ export default {
       console.log(result,"预约订单详情")
       if(Object.keys(result.data).length>0){
         this.info = result.data;
+        // this.info.AppointmentEndTime = this.info.AppointmentEndTime
         this.orderItemNum=result.data.OrderNumber
         this.phoneNumber=result.data.ShopMobile
         //console.log(this.orderItemNum,"子单号")

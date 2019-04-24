@@ -1,76 +1,414 @@
+.item {
+  position: relative;
+  padding: 25rpx 20rpx;
+  margin-bottom: 0rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
 
-.item{
-    position: relative;
-    padding:25rpx 20rpx;
-    margin-bottom:0rpx;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
+.location-self {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+  display: inline-flex;
+  align-items: center;
 }
-.location-self{
-    margin-left:10rpx;
-    font-size:28rpx;
-    display: inline-flex;
-    align-items: center;
+
+.location-self input {
+  font-size: 24rpx;
+  border: 0;
+  outline: none;
+  margin-left: 30rpx;
 }
-.location-self input{
-   font-size:24rpx;
-   border:0;
-   outline: none;
-   margin-left:30rpx;
+
+.hr {
+  width: 750rpx;
+  height: 3rpx;
+  margin-left: 45rpx;
+  background: #eee;
 }
-.hr{
-    width:750rpx;
-    height:3rpx;
-    margin-left:45rpx;
-    background:#eee;
+
+.sign {
+  display: flex;
+  justify-content: space-around;
 }
-.sign{
-    display: flex;
-    justify-content: space-around;
+
+.sign span {
+  width: 50%;
+  color: #ccc;
+  text-align: center;
 }
-.sign span{
-    width:50%;
-    color:#ccc;
-    text-align: center;
+
+.sign span:first-child {
+  border-right: 1rpx solid #ccc;
 }
-.sign span:first-child{
-    border-right:1rpx solid #ccc;
+
+.chase {
+  width: 660rpx;
+  height: 90rpx;
+  margin: 0 auto;
+  background: #ff6325;
+  border-radius: 10rpx;
+  line-height: 96rpx;
+  text-align: center;
+  color: #fff;
 }
-.chase{
-    width:660rpx;
-    height:90rpx;
-    margin:0 auto;
-    background: #ff6325;
-    border-radius:10rpx;
-    line-height:96rpx;
-    text-align: center;
-    color:#fff;
+
+.list {
+  padding-bottom: 30rpx;
+}
+
+.tag {
+  width: 144rpx;
+  height: 40rpx;
+  vertical-align: center;
+}
+
+.yuan {
+  width: 8rpx;
+  height: 8rpx;
+  position: absolute;
+  top: 18rpx;
+  left: 20rpx;
+}
+
+.taginfo {
+  display: inline;
+  position: relative;
+
+}
+
+.goods {
+  font-size: 20rpx;
+  color: #fff;
+  position: absolute;
+  bottom: 15rpx;
+  right: 10rpx;
+}
+
+//   ***************新增支付弹窗**************
+.orderPay {
+  .shopbg {
+    width: 750rpx;
+    height: 610rpx;
   }
-  .list{
-      padding-bottom:30rpx;
+
+  .close {
+    width: 28rpx;
+    height: 28rpx;
   }
-  .tag{
-      width:144rpx;
-      height:40rpx;
-      vertical-align: center;
+
+  .wx,
+  .yuebg {
+    width: 56rpx;
+    height: 56rpx;
   }
-  .yuan{
-      width:8rpx;
-      height:8rpx;
-      position:absolute;
-      top:18rpx;
-      left:20rpx;
-  }
-  .taginfo{
-      display: inline;
-      position:relative;
-     
-  }
-  .goods{
-    font-size:20rpx;
-    color: #fff;
+
+  .rmb {
+    width: 22rpx;
+    height: 31rpx;
     position: absolute;
-    bottom:15rpx;
-    right:10rpx;
+    left: 15rpx;
   }
+
+  .check {
+    width: 40rpx;
+    height: 40rpx;
+  }
+
+  .ordertitle {
+    position: relative;
+    padding: 20rpx;
+    border-bottom: 1rpx solid #eee;
+  }
+
+  .ordertitle p {
+    font-weight: bold;
+    font-size: 32rpx;
+    display: flex;
+    justify-content: center;
+  }
+
+  .ordertitle img {
+    position: absolute;
+    top: 30rpx;
+    right: 20rpx;
+  }
+
+  .menu {
+    display: flex;
+    font-size: 56rpx;
+    justify-content: center;
+    font-weight: bolder;
+    padding: 30rpx 0 20rpx 0;
+  }
+
+  .flex {
+    display: flex;
+    justify-content: space-between;
+    padding: 30rpx;
+  }
+
+  .flexitem {
+    display: flex;
+    align-items: center;
+  }
+
+  .flexitem span {
+    margin-left: 20rpx;
+  }
+
+  .border {
+    border-top: 1rpx solid #eee;
+  }
+
+  .rmbpos {
+    position: relative;
+  }
+
+  .paymenu {
+    padding-bottom: 40rpx;
+  }
+
+  .pic-center {
+    top: 300rpx;
+  }
+
+  .payimg {
+    width: 56rpx;
+    height: 56rpx;
+  }
+
+  .mypopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+  }
+
+  .mypopup .content {
+    position: relative;
+    background: #fff;
+    width: 75%;
+    height: 300rpx;
+    border-radius: 10rpx;
+  }
+
+  .mypopup .content .main {
+    padding: 40rpx 30rpx;
+    font-size: 32rpx;
+    text-align: center;
+  }
+
+  .mypopup .content .main h3 {
+    font-size: 18rpx;
+    line-height: 32rpx;
+    font-weight: 700;
+  }
+
+  .mypopup .content .main .tip {
+    color: #EE4A4A;
+    margin-bottom: 10rpx;
+    font-size: 20rpx;
+  }
+
+  .mypopup .content .main .pwipt {
+    font-size: 0;
+    height: 80rpx;
+    line-height: 80rpx;
+    width: 95%;
+    margin: 0 auto;
+    border: 1rpx solid #ccc;
+  }
+
+  .mypopup .content .main .pwipt div {
+    display: inline-block;
+    width: 16.2%;
+    height: 80rpx;
+    position: relative;
+  }
+
+  .mypopup .content .main .pwipt .border-right {
+    border-right: 1rpx solid #ccc;
+  }
+
+  .mypopup .content .main .pwipt div>span {
+    position: absolute;
+    width: 20rpx;
+    height: 20rpx;
+    background: #000;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-top: -10rpx;
+    margin-left: -10rpx;
+  }
+
+  .mypopup .content .main .pwipt input {
+    outline: none;
+    border: 0;
+    background: none;
+    width: 700rpx;
+    height: 0;
+    padding: 22rpx 0;
+    text-align: center;
+    position: absolute;
+    left: -500rpx;
+    right: 0;
+    z-index: 1000;
+    color: transparent;
+    text-indent: -999em;
+  }
+
+  .mypopup .content .close_btn {
+    position: absolute;
+    top: 14rpx;
+    right: 14rpx;
+    width: 14rpx;
+    height: 14rpx;
+    z-index: 1000;
+  }
+
+  .forgetpw {
+    font-size: 14px;
+    color: #008AFF;
+    margin-top: 10rpx;
+    text-align: right;
+  }
+}
+
+// 选择时间
+.selectTime {
+  .shopbg {
+    width: 750rpx;
+    height: 500rpx;
+  }
+
+  .bg-cart {
+    width: 750rpx;
+    height: 520rpx;
+    overflow: hidden;
+  }
+
+  .pic-center {
+    top: 300rpx !important;
+  }
+
+  .appoint {
+    font-size: 32rpx;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .timeflex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15rpx;
+    font-size: 22rpx;
+    color: #999;
+    border-bottom: 1rpx solid #eee;
+  }
+
+  .active {
+    background: #ff6325;
+    color: #fff;
+    padding: 8rpx 25rpx;
+    border-radius: 25rpx;
+  }
+
+  .tagflex {
+    display: flex;
+    justify-content: space-between;
+    color: #999;
+    font-size: 28rpx;
+  }
+
+  .tagflex div {
+    width: 50%;
+    box-sizing: border-box;
+    padding: 25rpx 0;
+    text-align: center;
+  }
+
+  .choosetime {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 30rpx;
+  }
+
+  .chooseitem {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    width: 25%;
+    text-align: center;
+    font-size: 28rpx;
+    color: #999;
+  }
+
+  .chooseitem div {
+    padding: 15rpx;
+  }
+
+  .itemshow {
+    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
+    box-sizing: border-box;
+    color: #1e1e1e
+  }
+
+  .btn-cancle {
+    border: 1px solid #eee;
+    box-sizing: border-box;
+    font-size: 32rpx;
+    color: #1e1e1e
+  }
+
+  .btn-order {
+    background: #ff6325;
+    color: #fff;
+    font-size: 32rpx;
+  }
+
+  .bottomstyle {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+  .freeRoom{
+        .timeText{
+            text-align: center;
+        }
+        .pickerView{
+            width:100%;
+            height: 300rpx;
+            .pickerColumn{
+                .pickerItem{
+                    line-height:68rpx;
+                    height:34rpx;
+                    overflow:hidden;
+                    text-align: center;
+                }
+            }
+        }
+    }
+}
