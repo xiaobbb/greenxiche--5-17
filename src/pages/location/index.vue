@@ -305,6 +305,8 @@ export default {
     this.setBarTitle();
     // 初始化缓存---用于提交订单数据
     this.initSubmitInfo();
+    this.orderInfoStatus=0;
+    this.showPass = false;
     this.personName = "";
     this.personPhone = "";
     this.ServiceItem = "";
@@ -621,6 +623,9 @@ export default {
         Password: this.password, //会员支付密码
         OrderNo: this.orderNo
       });
+      // 初始化密码框
+      this.password = "";
+      this.judgePassword();
       console.log(res, "余额支付");
       if (res.code == 0) {
         //余额支付成功

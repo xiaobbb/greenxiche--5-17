@@ -3,7 +3,7 @@
     <!--头部切换-->
     <div v-if="hasData">
       <!--预约上门订单-->
-      <div class="border" v-if="appraiseType==1">
+      <div class="border">
         <div class="flex-container head white">
           <img :src="info.order.ArtificerPic" class="avatar" v-if="info.order.ArtificerPic">
           <img src="/static/images/default.png" class="avatar" v-else>
@@ -23,7 +23,7 @@
         </div>
       </div>
       <!--商城订单-->
-      <div class="border" v-if="appraiseType==0">
+      <!-- <div class="border" v-if="appraiseType==0">
         <div class="flex-container head white">
           <img src="/static/images/shop22.png" class="product">
           <div class="prodetail">
@@ -41,9 +41,9 @@
             </span>
           </p>
         </div>
-      </div>
+      </div> -->
       <!--预约到店订单-->
-      <div class="border" v-if="appraiseType==2">
+      <!-- <div class="border" v-if="appraiseType==2">
         <div class="flex-container head white">
           <img src="/static/images/shop22.png" class="shopimg">
           <div>
@@ -60,7 +60,7 @@
             </span>
           </p>
         </div>
-      </div>
+      </div> -->
     </div>
     <!--图片展示-->
     <div class="comment white">
@@ -97,6 +97,10 @@ import "../../css/global.css";
 export default {
   onLoad() {
     this.setBarTitle();
+      this.imgBase= []
+      this.imgPathArr=[]
+      this.contentText=''
+      this.rank=5
   },
   onShow() {
     this.userId = wx.getStorageSync("userId");
@@ -106,6 +110,7 @@ export default {
     this.appraiseType = this.$root.$mp.query.appraiseType;
     this.appraiseId = this.$root.$mp.query.appraiseId;
     console.log( this.orderNo,"发表评论的订单编号")
+    
     this.getOrderComment();
   },
   data() {
@@ -125,7 +130,7 @@ export default {
       isanonymous: 1, //1:匿名；0：不匿名
       title:"",  //评价标题（目前为空）
       contentText: "",
-      imgLenght:8,
+      imgLenght:4,
       isShowBtnUpload:true    //是否显示图片上传按钮
     };
   },
@@ -185,7 +190,7 @@ export default {
           sourceType: ["album", "camera"],
           success: res => {
             that.imgPathArr = that.imgPathArr.concat(res.tempFilePaths);
-            if (that.imgPathArr.length === 8) {
+            if (that.imgPathArr.length === 4) {
               that.isShowBtnUpload = false;
             }
             for(let i=0;i<that.imgPathArr.length;i++){
@@ -206,7 +211,7 @@ export default {
     deleteImg(i) {
       this.imgBase.splice(i, 1);
       this.imgPathArr.splice(i,1);
-      if(this.imgPathArr.length<8){
+      if(this.imgPathArr.length<4){
         this.isShowBtnUpload = true;
       }
     },
@@ -224,6 +229,7 @@ export default {
         // this.appraiseId = 
       }
     },
+    // 提交评论
     async orderComment() {
       let obj = {
         id:this.appraiseId,
@@ -241,20 +247,26 @@ export default {
       });
       if(result.code===0){
         //0:商品评价；1：上门服务评价；2：到店评价
-        let pageUrl = ''
-        if(this.appraiseType*1===0){
-          pageUrl = '/pages/myorder/main?orderBigType=1&status=4';
-        }
-        if(this.appraiseType*1===1){
-          pageUrl = '/pages/myorder/main?orderBigType=2&status=1';
-        }
-        if(this.appraiseType*1===2){
-          pageUrl = '/pages/myorder/main?orderBigType=2&status=2';
-        }
-        console.log(pageUrl,"要去的页面")
-        wx.redirectTo({
-          url:pageUrl
+        wx.showToast({
+          title:'评论成功！'
         })
+        setTimeout(()=>{
+           wx.navigateBack()
+        },1500)
+        // let pageUrl = ''
+        // if(this.appraiseType*1===0){
+        //   pageUrl = '/pages/myorder/main?orderBigType=1&status=4';
+        // }
+        // if(this.appraiseType*1===1){
+        //   pageUrl = '/pages/myorder/main?orderBigType=2&status=1';
+        // }
+        // if(this.appraiseType*1===2){
+        //   pageUrl = '/pages/myorder/main?orderBigType=2&status=2';
+        // }
+        // console.log(pageUrl,"要去的页面")
+        // wx.redirectTo({
+        //   url:pageUrl
+        // })
       }
     },
     submitAppraise() {

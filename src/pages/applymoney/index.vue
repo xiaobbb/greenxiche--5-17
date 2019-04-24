@@ -2,7 +2,7 @@
   <div>
     <div>
       <!--商城订单申请退款-->
-      <div v-if="showShop">
+      <div>
         <div class="flex-container pad" v-for="(item,index) in info.orderDetails" :key="index">
           <div>
             <img :src="item.ProductImg" class="applyimg">
@@ -15,7 +15,7 @@
         </div>
       </div>
       <!--预约订单申请退款-->
-      <div class="flex-container pad" v-else>
+      <!-- <div class="flex-container pad" v-else>
         <div>
           <img src="/static/images/shop5.png" class="applyimg">
         </div>
@@ -23,7 +23,7 @@
           <p class="protitle">普教洗车</p>
           <p class="proprice">¥ 30</p>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="promopt">
       <p>· 本品支持订单签收后的7天内退换货，商城将在2天内审核申请</p>
@@ -108,7 +108,7 @@ export default {
         {id:5,name:"同城交易",status:false},
         {id:6,name:"其他原因(请备注说明)",status:false},
       ],
-      orderNo: '201904191145053918411',
+      orderNo: '',
       info:{},
       money:'',
       content:'不想买了',
@@ -128,6 +128,7 @@ export default {
       this.orderNo = this.$root.$mp.query.orderNo;
     }
     this.init();
+    this.getOrderDetails();
   },
   methods: {
     init(){
@@ -138,7 +139,6 @@ export default {
       this.contentId=1;
       this.text='';
       // this.imgs=[];
-    this.getOrderDetails();
     },
     setBarTitle() {
       wx.setNavigationBarTitle({

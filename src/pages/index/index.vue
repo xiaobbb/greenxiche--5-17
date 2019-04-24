@@ -82,7 +82,7 @@
         <!--到店-->
         <cover-view class="modal-goshop" v-if="isGoshop && shopArr.length>0">
           <cover-view  @click="toShopdet(doorInfo.ShopId)">
-            <img :src="doorInfo.Logo" class="showimg">
+            <cover-image :src="doorInfo.Logo" class="showimg" />
           </cover-view>
           <cover-view class="shopinfoflex"  @click="toShopdet(doorInfo.ShopId)">
             <cover-view class="shopname">{{doorInfo.ShopNick}}</cover-view>

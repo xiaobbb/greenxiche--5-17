@@ -86,6 +86,11 @@ export default {
   onShow(){
     // Enables:0:不可以使用；1：可使用；2：已使用；3：为已过期
     this.couptlist= [];
+      this.page=1;
+      this.pageSize=12;
+      this.status=2;
+      this.isOved = false;
+      this.active='2';
     this.userId = wx.getStorageSync('userId');
     this.token = wx.getStorageSync('token');
     this.setBarTitle();
@@ -95,8 +100,8 @@ export default {
   data () {
     return {
       active:"2",
-      isalive:true,
-      isused:true,
+      // isalive:true,
+      // isused:true,
       titlelist:[
         {id:2,name:"未使用"},{id:3,name:"已使用"},{id:1,name:"已过期"}
       ],

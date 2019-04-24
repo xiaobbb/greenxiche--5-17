@@ -9,11 +9,11 @@
       <div>
         <radio-group class="radio-group" @change="selectCoupon">
           <label class="flex-container couponItem" v-for="(item,index) in couponList" :key="index">
-            {{item.Title}}{{item.Denomination}}
+            {{item.Title}}
             <input type="radio" name="coupon" :value="item.CardTicketId" :checked="CardTicketId==item.CardTicketId" >
           </label>
           <label class="flex-container couponItem">
-            不使用卡券
+            不使用服务卡券
              <input type="radio" name="coupon" :checked="CardTicketId==0" value="0">
           </label>
         </radio-group>
@@ -46,11 +46,12 @@ export default {
       const id = e.mp.detail.value
       // this.CardTicketId = id;
       // console.log(e.mp.detail.value,this.CardTicketId,this.CardTicketId)
-      let cardName = 0
+      let cardName = ''
       for(let i=0;i<this.couponList.length;i++){
           const _res = this.couponList[i]
           if(_res.CardTicketId == id){
-            cardName = _res.Denomination*1
+            // cardName = _res.Denomination*1
+            cardName = _res.Title
           }
       }
         this.$emit('update:CardTicketId',id)

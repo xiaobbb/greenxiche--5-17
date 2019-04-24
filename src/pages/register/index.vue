@@ -30,12 +30,12 @@
             <span class="icon icon_pwd"></span>
             <input type="password" class="ipt" placeholder="请输入密码" v-model="password2">
           </div>
-          <div class="from-line from-txt inlineflex">
+          <label class="from-line from-txt inlineflex" @click="onCheckedStatus">
             <!-- <div class="IconsCK IconsCK-radio checked" style="margin-right:12rpx;vertical-align:top;"></div> -->
-            <input type="checkbox" checked class="checkbox-cart">
-            <text style="font-size:28rpx">我已阅读并同意</text>
+            <input type="checkbox" class="checkbox-cart" :checked="checkedStatus" v-model="checkedStatus" >
+            <text style="font-size:28rpx">我已阅读并同意{{checkedStatus}}</text>
             <text style="color:#ff5c29;font-size:28rpx">《用户协议》</text>
-          </div>
+          </label>
         </div>
         <div class="ftbtn pd10">
           <a class="btn" @click="Register()">确认注册</a>
@@ -60,7 +60,8 @@ export default {
       this.verifyCode= "";
       this.password= "";
       this.password2= "";
-      this.disabled=false
+      this.disabled=false;
+      this.checkedStatus = false;
     this.setBarTitle();
   },
   data() {
@@ -70,7 +71,8 @@ export default {
       verifyCode: "",
       password: "",
       password2: "",
-      disabled:false
+      disabled:false,
+      checkedStatus:false
     };
   },
   components: {},
@@ -79,6 +81,10 @@ export default {
       wx.setNavigationBarTitle({
         title: "注册"
       });
+    },
+    // 用户协议
+    onCheckedStatus(e){
+      this.checkedStatus = !this.checkedStatus
     },
     //注册账号 访问接口:BindOrRegister
     async Register() {

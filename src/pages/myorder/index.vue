@@ -63,11 +63,11 @@
               <!-- 待使用 -->
               <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===19">
                 <text class="btn active">申请退款</text>
-              </div> -->
+              </div>-->
               <!-- 已完成 -->
               <!-- <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
                 <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
-              </div> -->
+              </div>-->
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===16">
                 <text class="btn active" @click="closeRefund(index,item.OrderNumber)">撤销退款</text>
               </div>
@@ -77,7 +77,10 @@
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
               <!-- 已退款 、已经取消订单删除 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===14 || item.StatusId===17 || item.StatusId===18">
+              <div
+                class="menubtn flex-container flexEnd"
+                v-if="item.StatusId===14 || item.StatusId===17 || item.StatusId===18"
+              >
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
             </div>
@@ -94,93 +97,143 @@
         </scroll-view>
       </div>
       <!--预约订单-->
-      <div  v-if="orderBigType===2">
+      <div v-if="orderBigType===2">
         <div class="menuhead flex-container white visit">
-            <div class="item flex1 center" v-for="item in visitlist" :key="item.id" @click="change(item.id)" >
-              <p class="inline-block" :class="{active:serviceMode==item.id}">{{item.name}}</p>
-            </div>
-            <!-- <p
+          <div
+            class="item flex1 center"
+            v-for="item in visitlist"
+            :key="item.id"
+            @click="change(item.id)"
+          >
+            <p class="inline-block" :class="{active:serviceMode==item.id}">{{item.name}}</p>
+          </div>
+          <!-- <p
               v-for="item in visitlist"
               :key="item.id"
               :class="{active:active==item.id}"
               @click="change(item.id)"
-            >{{item.name}}</p>-->
-          </div>
-          <scroll-view scroll-y class="shoplist" @scrolltolower="loadMoreOrder">
-            <div class="shopitem white" v-for="(item,index) in bookList" :key="index">
-              <!--切换上门服务-->
-              <div  v-if="serviceMode===1">
-                  <div class="flex-container commonpad">
-                    <p class="number">订单编号：{{item.OrderNumber}}</p>
-                    <p class="tips">{{item.StatusName}}</p>
-                  </div>
-                  <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
-                    <p>项目：{{item.ProductName}}</p>
-                    <p>地址：{{item.ServiceAddr}}</p>
-                    <p>
-                      车辆：
-                      <span style="margin-right:10rpx;">
-                        {{item.CarBrand}}
-                        <span v-if="item.CarType">-{{item.CarType}}</span>
-                      </span>
-                      <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
-                      <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
-                    </p>
-                    <p>时间：{{item.StartTime}}</p>
-                    <p>手机号：{{item.TelephoneNumber}}</p>
-                  </div>
+          >{{item.name}}</p>-->
+        </div>
+        <scroll-view scroll-y class="shoplist" @scrolltolower="loadMoreOrder">
+          <div class="shopitem white" v-for="(item,index) in bookList" :key="index">
+            <!--*********************切换上门服务-->
+            <div v-if="serviceMode===1">
+              <div class="flex-container commonpad">
+                <p class="number">订单编号：{{item.OrderNumber}}</p>
+                <p class="tips">{{item.StatusName}}</p>
               </div>
-              <!--切换到店服务-->
-              <div  v-if="serviceMode===2">
-                  <div class="flex-container commonpad">
-                        <p class="number">订单编号：{{item.OrderNumber}}</p>
-                        <p class="tips">{{item.StatusName}}</p>
-                    </div>
-                  <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
-                    <p>项目：{{item.ProductName}}</p>
-                    <p>门店：{{item.ShopName}}</p>
-                    <p>
-                      车辆：
-                      <span style="margin-right:10rpx;">
-                        {{item.CarBrand}}
-                        <span v-if="item.CarType">-{{item.CarType}}</span>
-                      </span>
-                      <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
-                      <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
-                    </p>
-                    <p>手机号： {{item.TelephoneNumber}}</p>
-                  </div>
+              <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
+                <p>项目：{{item.ProductName}}</p>
+                <p>地址：{{item.ServiceAddr}}</p>
+                <p>
+                  车辆：
+                  <span style="margin-right:10rpx;">
+                    {{item.CarBrand}}
+                    <span v-if="item.CarType">-{{item.CarType}}</span>
+                  </span>
+                  <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
+                  <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
+                </p>
+                <p>时间：{{item.StartTime}}</p>
+                <p>手机号：{{item.TelephoneNumber}}</p>
               </div>
-              <!-- 未付款的 -->
+            </div>
+            <!--********************切换到店服务-->
+            <div v-if="serviceMode===2">
+              <div class="flex-container commonpad">
+                <p class="number">订单编号：{{item.OrderNumber}}</p>
+                <p class="tips">{{item.StatusName}}</p>
+              </div>
+              <div class="seritem" @click="toOrderDetail(2,item.OrderNumber)">
+                <p>项目：{{item.ProductName}}</p>
+                <p>门店：{{item.ShopName}}</p>
+                <p>
+                  车辆：
+                  <span style="margin-right:10rpx;">
+                    {{item.CarBrand}}
+                    <span v-if="item.CarType">-{{item.CarType}}</span>
+                  </span>
+                  <span style="margin-right:10rpx;" v-if="item.CarColor">{{item.CarColor}}</span>
+                  <span style="margin-right:10rpx;">{{item.CarMumber}}</span>
+                </p>
+                <!-- <p>手机号： {{item.TelephoneNumber}}</p> -->
+              </div>
+            </div>
+            <!-- 已经取消订单、已完成订单删除 -->
+            <!-- <div
+              class="menubtn flex-container flexEnd"
+              v-if="item.StatusId===4 || item.StatusId===13 || item.StatusId===14"
+            >
+              <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
+            </div> -->
+            <!-- ****************************************************** -->
+            <!-- 待付款=0
+              接单中=待发货=1
+              已派发=已发货=2
+              已服务=已收货=3
+              已评价=4
+              申请退货=5
+              申请换货=6
+              拒绝退货=7
+              拒绝换货=8
+              退货中=9
+              换货中=10
+              已退货=11
+              已换货=12
+              已完成=13
+              交易关闭=14
+              已取消退货退款=15
+              申请退款=16
+              已退款=17
+              拒绝退款=18 -->
+            <!-- 待付款 -->
               <div class="menubtn flex-container flexEnd" v-if="item.StatusId===0">
                 <text class="btn" @click="showReasonMak(index,item.OrderNumber)">取消订单</text>
-                <text class="btn active" @click="toPay(index,item.OrderNumber)">支付</text>
+                <text class="btn active" @click="toPay(index,item.OrderNumber)">付款</text>
               </div>
-              <!-- 已使用 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3 || item.StatusId===20">
+              <!-- 申请退款中 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===16">
+                <text class="btn active" @click="closeRefund(index,item.OrderNumber)">撤销退款</text>
+              </div>
+              <!-- 接单中,已派发 -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===1">
+                <text class="btn active" @click="goRefund(index,item.OrderNumber)">申请退款</text>
+                <!-- <text class="btn active" @click="confirmService(index,item.OrderNumber)">已服务</text> -->
+              </div>
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===2">
+                <text class="btn active" @click="goRefund(index,item.OrderNumber)">申请退款</text>
+                <text class="btn active" @click="confirmService(index,item.OrderNumber)">已服务</text>
+              </div>
+              <!-- 已收货，已服务** -->
+              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===3">
+                <!-- <text class="btn active" @click="goRefund(index,item.OrderNumber)">申请退款</text> -->
                 <text class="btn active" @click="gotoAddComent(index,item.OrderNumber)">去评价</text>
-              </div>
-              <!-- 已经取消订单、已完成订单删除 -->
-              <div class="menubtn flex-container flexEnd" v-if="item.StatusId===4 || item.StatusId===13 || item.StatusId===14">
                 <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
               </div>
-              
-              <!-- <div class="menubtn flex-container flexEnd">
+              <!-- 已退款 、已经取消订单删除 -->
+              <div
+                class="menubtn flex-container flexEnd"
+                v-if="item.StatusId===14 || item.StatusId===17 || item.StatusId===18||item.StatusId===13||item.StatusId===4"
+              >
+                <text class="btn" @click="btnDel(index,item.OrderNumber)">删除订单</text>
+              </div>
+            <!-- ****************************************************** -->
+            <!-- <div class="menubtn flex-container flexEnd">
                 <text class="btn">取消订单</text>
                 <text class="btn active">付款</text>
-              </div> -->
-            </div>
-            <p
-              style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;"
-              v-if="hasData"
-            >暂无数据</p>
-            <p
-              class="ovedMsg"
-              v-if="isOved"
-              style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
-            >我也是有底线的</p>
-          </scroll-view>
-        </div>
+            </div>-->
+          </div>
+          <p
+            style="text-align:center;font-size:30rpx;color:#666;padding:120rpx 20rpx 80rpx;"
+            v-if="hasData"
+          >暂无数据</p>
+          <p
+            class="ovedMsg"
+            v-if="isOved"
+            style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
+          >我也是有底线的</p>
+        </scroll-view>
+      </div>
     </div>
     <!-- 取消订单选择原因 -->
     <reasonMask
@@ -193,9 +246,13 @@
       @selectReason="selectReason"
     ></reasonMask>
     <!-- 支付 -->
-    <Pay :showPay.sync="showPay" v-if="showPay" :orderNumber="orderNo" 
-      :total="totalPrice" :successUrl='`/pages/myorder/main?orderNo=${orderNo}`'
-      balanceRequestUrl="Order/OrderSoldePayment"
+    <Pay
+      :showPay.sync="showPay"
+      v-if="showPay"
+      :orderNumber="orderNo"
+      :total="totalPrice"
+      :successUrl="`/pages/myorder/main?orderNo=${orderNo}`"
+      :balanceRequestUrl="balanceRequestUrl"
     ></Pay>
   </div>
 </template>
@@ -203,7 +260,7 @@
 <script>
 import { post, get } from "../../utils";
 import reasonMask from "@/components/reasonMask";
-import Pay from '@/components/pay.vue'
+import Pay from "@/components/pay.vue";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -215,7 +272,7 @@ export default {
   },
   onShow() {
     this.init();
-    console.log(this.orderBigType,this.status)
+    console.log(this.orderBigType, this.status);
   },
   data() {
     return {
@@ -231,6 +288,7 @@ export default {
       hasData: false,
       orderBigType: 1, //1:商城订单；2：预约订单
       serviceMode: 1,
+      balanceRequestUrl: "", //余额支付接口
       menulist: [
         { id: 0, name: "全部" },
         { id: 1, name: "待付款" },
@@ -238,20 +296,22 @@ export default {
         // { id: 3, name: "待评价" },
         { id: 4, name: "已完成" },
         { id: 3, name: "已取消" },
-        { id: 2, name: "退款" },
+        { id: 2, name: "退款" }
       ],
       visitlist: [{ id: 1, name: "上门服务" }, { id: 2, name: "到店服务" }],
       orderList: [],
       bookList: [],
+      // 取消订单
       title: "取消订单原因",
       button: "确定",
       reasonList: [],
       orderNo: "",
-      cancleIndex:"",
+      cancleIndex: "",
       reasonShow: false,
-      showPay:false,  //支付弹窗
-      totalPrice:"",  //需要支付的价格
-      carinfo:""
+
+      showPay: false, //支付弹窗
+      totalPrice: "", //需要支付的价格
+      carinfo: ""
     };
   },
 
@@ -265,51 +325,51 @@ export default {
         title: "我的订单"
       });
     },
-    init(){
-    //支付的时候初始原来的值
-    this.orderNo = "";
-    this.carinfo= ""
-    this.cancleIndex="";
-    this.reasonShow= false;
-    this.showPay =false;  //支付弹窗
-    this.totalPrice ="";  //需要支付的价格
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
-    this.orderList = [];
-    this.bookList = [];
-    this.reasonList = [];
-  
-    if (this.$root.$mp.query.orderBigType) {
-      //是商城订单还是预约订单;1:商城订单；2：预约订单
-      this.orderBigType = this.$root.$mp.query.orderBigType*1;
-    } 
-    // else {
-    //   this.orderBigType = 1;
-    // }
-    if (this.orderBigType === 1) {
-      if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
-        this.status = this.$root.$mp.query.status*1;
-      } else {
-        this.status = 0;
+    init() {
+      //支付的时候初始原来的值
+      this.orderNo = "";
+      this.carinfo = "";
+      this.cancleIndex = "";
+      this.reasonShow = false;
+      this.showPay = false; //支付弹窗
+      this.totalPrice = ""; //需要支付的价格
+      this.userId = wx.getStorageSync("userId");
+      this.token = wx.getStorageSync("token");
+      this.orderList = [];
+      this.bookList = [];
+      this.reasonList = [];
+
+      if (this.$root.$mp.query.orderBigType) {
+        //是商城订单还是预约订单;1:商城订单；2：预约订单
+        this.orderBigType = this.$root.$mp.query.orderBigType * 1;
       }
-      this.serviceMode = 1;
-      this.getOrderList();
-    }
-    if (this.orderBigType === 2) {
-      if (this.$root.$mp.query.status) {
-        this.serviceMode = this.$root.$mp.query.status*1;
-      } 
       // else {
-      //   this.serviceMode = 1;
+      //   this.orderBigType = 1;
       // }
-      //this.status = 0;
-      console.log('12312312313',this.orderBigType,this.serviceMode)
-      this.getReserveOrderList();
-    }
-    console.log("orderBigType:" + this.orderBigType);
-    console.log("status:" + this.status);
-    console.log("serviceMode:" + this.serviceMode);
-    console.log(this.orderNo,"订单列表")
+      if (this.orderBigType === 1) {
+        if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
+          this.status = this.$root.$mp.query.status * 1;
+        } else {
+          this.status = 0;
+        }
+        this.serviceMode = 1;
+        this.getOrderList();
+      }
+      if (this.orderBigType === 2) {
+        if (this.$root.$mp.query.status) {
+          this.serviceMode = this.$root.$mp.query.status * 1;
+        }
+        // else {
+        //   this.serviceMode = 1;
+        // }
+        //this.status = 0;
+        console.log("12312312313", this.orderBigType, this.serviceMode);
+        this.getReserveOrderList();
+      }
+      console.log("orderBigType:" + this.orderBigType);
+      console.log("status:" + this.status);
+      console.log("serviceMode:" + this.serviceMode);
+      console.log(this.orderNo, "订单列表");
     },
     shiftOrderBigType(e) {
       this.initData();
@@ -332,7 +392,13 @@ export default {
         wx.navigateTo({ url: "/pages/orderdetail/main?orderNo=" + orderNo });
       }
       if (e == 2) {
-        wx.navigateTo({ url: "/pages/appointorderdet/main?orderNo=" + orderNo+"&serType=" + this.serviceMode  });
+        wx.navigateTo({
+          url:
+            "/pages/appointorderdet/main?orderNo=" +
+            orderNo +
+            "&serType=" +
+            this.serviceMode
+        });
       }
     },
     initData() {
@@ -351,7 +417,7 @@ export default {
       this.totalPrice = "";
     },
     shiftStatus(status) {
-      this.status = status*1;
+      this.status = status * 1;
       this.initData();
       this.getOrderList();
     },
@@ -393,7 +459,7 @@ export default {
         } else {
           this.isLoad = false;
         }
-        console.log(this.orderList,"订单列表");
+        console.log(this.orderList, "订单列表");
       }
     },
     async getReserveOrderList() {
@@ -409,7 +475,7 @@ export default {
       }
       if (result.data.length > 0) {
         this.bookList = this.bookList.concat(result.data);
-        console.log(this.bookList,"上门订单")
+        console.log(this.bookList, "上门订单");
       }
     },
     showReasonMak(index, orderNo) {
@@ -418,18 +484,18 @@ export default {
       this.reasonShow = true;
       this.getCancelReason();
     },
-    closeReason() {
-      this.reasonShow = false;
-    },
-    selectReason(code, codeTxt) {
-      this.cancelOrders(codeTxt);
-    },
     async getCancelReason() {
       //获取取消订单原因
       let result = await get("Order/CancelReason");
       if (result.data.length > 0) {
         this.reasonList = result.data;
       }
+    },
+    closeReason() {
+      this.reasonShow = false;
+    },
+    selectReason(code, codeTxt) {
+      this.cancelOrders(codeTxt);
     },
     async cancelOrders(reasonMark) {
       let result = await post("Order/CancelOrders", {
@@ -442,20 +508,29 @@ export default {
         let _this = this;
         wx.showToast({
           title: "取消订单成功!",
-          icon: "none",
           duration: 1500,
           success: function() {
             setTimeout(() => {
               _this.reasonShow = false;
-              
+
               //做改变订单状态
-              if(_this.orderBigType===1){  //商城订单
-                _this.$set(_this.orderList[_this.cancleIndex],"StatusId",14);
-                _this.$set(_this.orderList[_this.cancleIndex],"StatusName","交易关闭");
+              if (_this.orderBigType === 1) {
+                //商城订单
+                _this.$set(_this.orderList[_this.cancleIndex], "StatusId", 14);
+                _this.$set(
+                  _this.orderList[_this.cancleIndex],
+                  "StatusName",
+                  "交易关闭"
+                );
               }
-              if(_this.orderBigType===2){  //预约订单
-                _this.$set(_this.bookList[_this.cancleIndex],"StatusId",14);
-                _this.$set(_this.bookList[_this.cancleIndex],"StatusName","订单已取消");
+              if (_this.orderBigType === 2) {
+                //预约订单
+                _this.$set(_this.bookList[_this.cancleIndex], "StatusId", 14);
+                _this.$set(
+                  _this.bookList[_this.cancleIndex],
+                  "StatusName",
+                  "订单已取消"
+                );
               }
               _this.orderNo = "";
               _this.cancleIndex = "";
@@ -464,35 +539,57 @@ export default {
         });
       }
     },
-    // 申请退款
-    goRefund(index, orderNo){
-      wx.navigateTo({
-        url:`/pages/applymoney/main?orderNo=${orderNo}&showShop=${true}`
-      })
-    },
-    // 撤销退款
-    closeRefund(index,orderNo){
-     const that = this;
+    // 已服务
+    confirmService(index, orderNo){
+      const that = this;
       wx.showModal({
-        title:'请确认进行退款撤销！',
-        success(res){
-          if(res.confirm){
-              post('Order/CanelRefund',{
-                UserId: that.userId,
-                Token: that.token,
-                OrderNo: orderNo,
-              }).then(()=>{
-                wx.showToast({
-                  title:'撤销成功！'
-                })
-              setTimeout(()=>{
-                 that.init();
-              },1000)
-              })
+        title: "请确认已完成服务！",
+        success(res) {
+          if (res.confirm) {
+            post("Order/ConfirmService", {
+              UserId: that.userId,
+              Token: that.token,
+              OrderNo: orderNo
+            }).then(() => {
+              wx.showToast({
+                title: "已服务！"
+              });
+              setTimeout(() => {
+                that.init();
+              }, 1000);
+            });
           }
         }
-      })
-
+      });
+    },
+    // 申请退款
+    goRefund(index, orderNo) {
+      wx.navigateTo({
+        url: `/pages/applymoney/main?orderNo=${orderNo}&showShop=${true}`
+      });
+    },
+    // 撤销退款
+    closeRefund(index, orderNo) {
+      const that = this;
+      wx.showModal({
+        title: "请确认进行退款撤销！",
+        success(res) {
+          if (res.confirm) {
+            post("Order/CanelRefund", {
+              UserId: that.userId,
+              Token: that.token,
+              OrderNo: orderNo
+            }).then(() => {
+              wx.showToast({
+                title: "撤销成功！"
+              });
+              setTimeout(() => {
+                that.init();
+              }, 1000);
+            });
+          }
+        }
+      });
     },
     btnDel(index, orderNo) {
       let _this = this;
@@ -520,10 +617,10 @@ export default {
           duration: 1500,
           success: function() {
             setTimeout(() => {
-              if(_this.orderBigType===1){
+              if (_this.orderBigType === 1) {
                 _this.orderList.splice(index, 1);
               }
-              if(_this.orderBigType===2){
+              if (_this.orderBigType === 2) {
                 _this.bookList.splice(index, 1);
               }
             }, 1500);
@@ -531,37 +628,47 @@ export default {
         });
       }
     },
-    gotoAddComent(index,orderNo){
-      if(this.orderBigType===1){  //商城订单
-        if(this.orderList[index].orderDetails.length>1){  //跳到评价列表页面
-           
-        }else{  //跳到评价页面
-        
-           wx.navigateTo({
-             url:"/pages/addcomment/main?appraiseType=0&orderNo="+orderNo
-           })
-        }
+    gotoAddComent(index, orderNo) {
+      if (this.orderBigType === 1) {
+        //商城订单
+        // if (this.orderList[index].orderDetails.length > 1) {
+          //跳到评价列表页面
+        // } else {
+          //跳到评价页面
+
+          wx.navigateTo({
+            url: "/pages/addcomment/main?appraiseType=0&orderNo=" + orderNo
+          });
+        // }
       }
-      if(this.orderBigType===2){  //预约订单
-        if(this.bookList[index].orderDetails.length>1){  //跳到评价列表页面
-           
-        }else{  //跳到评价页面
-           wx.navigateTo({
-             url:"/pages/addcomment/main?appraiseType="+ this.serviceMode +"&orderNo="+orderNo
-           })
+      if (this.orderBigType === 2) {
+        //预约订单
+        if (this.bookList[index].orderDetails.length > 1) {
+          //跳到评价列表页面
+        } else {
+          //跳到评价页面
+          wx.navigateTo({
+            url:
+              "/pages/addcomment/main?appraiseType=" +
+              this.serviceMode +
+              "&orderNo=" +
+              orderNo
+          });
         }
       }
     },
-    toPay(index,orderNo){
-      console.log(index,this.orderBigType)
-      if(this.orderBigType*1===1){
-        this.totalPrice =this.orderList[index].TotalPrice;
-        
+    toPay(index, orderNo) {
+      console.log(index, this.orderBigType);
+      if (this.orderBigType * 1 === 1) {
+        // 余额支付接口
+        this.balanceRequestUrl = 'Order/OrderSoldePayment'
+        this.totalPrice = this.orderList[index].TotalPrice;
       }
-      if(this.orderBigType*1===2){
-        this.totalPrice =this.bookList[index].TotalPrice;
+      if (this.orderBigType * 1 === 2) {
+        this.balanceRequestUrl = 'Order/PaymentOrder'
+        this.totalPrice = this.bookList[index].TotalPrice;
       }
-      console.log(this.totalPrice)
+      console.log(this.totalPrice);
       this.orderNo = orderNo;
       this.showPay = true;
     },
@@ -586,7 +693,7 @@ export default {
       }
     }
   },
-  
+
   // 下拉刷新
   onPullDownRefresh() {
     this.init();

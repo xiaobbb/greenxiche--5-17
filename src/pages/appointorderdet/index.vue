@@ -114,19 +114,39 @@
     </div> -->
     <div class="slide"></div>
     <div class="backgray">
+      
+        <div class="orderbottom white" v-if="info.StatusId==0">
+            <p class="leftbtn" @click="showReasonMak">取消订单</p>
+            <p class="rightbtn" @click="toPay">付款</p>
+        </div>
+        <div class="orderbottom white" v-if="info.StatusId==16">
+            <p class="rightbtn" @click="closeRefund">撤销退款</p>
+        </div>
       <!--申请退款-->
-        <div class="orderbottom white" v-if="info.StatusId=='1'">
-            <p class="rightbtn" @click="applyMoney">申请退款</p>
+        <div class="orderbottom white" v-if="info.StatusId==1">
+            <p class="rightbtn" @click="goRefund">申请退款</p>
+        </div>
+        <div class="orderbottom white" v-if="info.StatusId==2">
+            <p class="leftbtn" @click="goRefund">申请退款</p>
+            <p class="rightbtn" @click="confirmService">已服务</p>
+        </div>
+        <div class="orderbottom white" v-if="info.StatusId==3">
+            <p class="leftbtn" @click="btnDel">删除订单</p>
+            <p class="rightbtn" @click="gotoAddComent">去评价</p>
+        </div>
+        <div class="orderapybottom white "
+        v-if="info.StatusId===14 || info.StatusId===17 || info.StatusId===18||info.StatusId===13||info.StatusId===4">
+          <p class="leftbtn" @click="btnDel">删除订单</p>
         </div>
         <!--上门订单 已取消的订单 重新预约-->
-        <div class="orderbottom white" v-if="info.StatusId == '14'">
+        <!-- <div class="orderbottom white" v-if="info.StatusId == '14'">
             <p class="leftbtn" @click="btnDel">删除订单</p>
             <p class="rightbtn" @click="appointAgain">重新预约</p>
-        </div>
+        </div> -->
         <!--上门、到店交易成功-->
-        <div class="orderapybottom white " v-if="info.StatusId == '13' || info.StatusId == '3'" >
+        <!-- <div class="orderapybottom white " v-if="info.StatusId == '13' || info.StatusId == '3'" >
             <p class="rightbtn" @click="addCommont">去评价</p>
-        </div>
+        </div> -->
         <!--到店申请退款-->
         <!-- <div class="orderapybottom white " >
             <p class="rightbtn" @click="addCommont">申请退款</p>
@@ -145,6 +165,16 @@
         </div>
     </div> -->
       
+    <!-- 取消订单选择原因 -->
+    <reasonMask
+      title="是否取消订单"
+      button="确定"
+      v-if="reasonList.length>0"
+      :show="reasonShow"
+      :data="reasonList"
+      @closeReason="reasonShow= false"
+      @selectReason="selectReason"
+    ></reasonMask>
   </div>
 </template>
 
@@ -194,6 +224,11 @@ export default {
       showMask:false,
       appraiseType: 0, //0:商品评价；1：上门服务评价；2：到店评价
       orderBigType: 1, //1:商城订单；2：预约订单
+      // 取消订单
+      // reasonList: [],
+      // orderNo: "",
+      // cancleIndex: "",
+      // reasonShow: false,
     }
   },
  
@@ -236,8 +271,8 @@ export default {
         // wx.navigateTo({url:"/pages/addcomment/main?appraiseType="})
         // this.getCancelReason();
     },
-     async getCancelReason() {
       //申请退款原因
+     async getCancelReason() {
       let result = await get("/Order/CancelReason");
       if (result.data.length > 0) {
         this.reasonList = result.data;
@@ -276,6 +311,7 @@ export default {
     addCommont(){
          wx.navigateTo({ url: "/pages/addcomment/main?orderNo="+this.orderItemNum+"&url=addcomment"});
     },
+
     //已取消的订单删除订单
     btnDel(){
       let _this = this;
@@ -300,12 +336,12 @@ export default {
         let _this = this;
         wx.showToast({
           title: "删除订单成功!",
-          icon: "none",
           duration: 1500,
           success: function() {
             setTimeout(() => {
-              wx.navigateTo({url:"/pages/addcomment/main"})
-            }, 1500); //订单列表自动删除订单了
+              // _this.getOrderDetails()
+              wx.navigateBack()
+              }, 1500); //订单列表自动删除订单了
           }
         });
       }
@@ -319,7 +355,108 @@ export default {
       wx.makePhoneCall({
         phoneNumber: this.phoneNumber // 仅为示例，并非真实的电话号码
       })
-    }
+    },
+    // 取消订单1
+    showReasonMak() {
+      this.reasonShow = true;
+      this.getCancelReason();
+    },
+    // 取消订单2
+    //获取取消订单原因
+    async getCancelReason() {
+      //获取取消订单原因
+      let result = await get("Order/CancelReason");
+      if (result.data.length > 0) {
+        this.reasonList = result.data;
+      }
+    },
+    selectReason(code, codeTxt) {
+      this.cancelOrders(codeTxt);
+    },
+    async cancelOrders(reasonMark) {
+      let result = await post("Order/CancelOrders", {
+        UserId: this.userId,
+        Token: this.token,
+        OrderNo: this.orderNo,
+        ReMarks: reasonMark
+      });
+      if (result.code === 0) {
+        let _this = this;
+        this.reasonShow = false;
+        wx.showToast({
+          title: "取消订单成功!",
+          duration: 1500,
+          success: function() {
+            setTimeout(() => {
+              _this.getOrderDetails()
+            }, 1500);
+          }
+        });
+      }
+    },
+    // 申请退款
+    goRefund() {
+      wx.navigateTo({
+        url: `/pages/applymoney/main?orderNo=${this.orderNo}&showShop=${true}`
+      });
+    },
+    // 撤销退款
+    closeRefund() {
+      const that = this;
+      wx.showModal({
+        title: "请确认进行退款撤销！",
+        success(res) {
+          if (res.confirm) {
+            post("Order/CanelRefund", {
+              UserId: that.userId,
+              Token: that.token,
+              OrderNo: that.orderNo
+            }).then(() => {
+              wx.showToast({
+                title: "撤销成功！"
+              });
+              setTimeout(() => {
+                that.getOrderDetails();
+              }, 1000);
+            });
+          }
+        }
+      });
+    },
+    // 已服务
+    confirmService(){
+      const that = this;
+      wx.showModal({
+        title: "请确认已完成服务！",
+        success(res) {
+          if (res.confirm) {
+            post("Order/ConfirmService", {
+              UserId: that.userId,
+              Token: that.token,
+              OrderNo: that.orderNo
+            }).then(() => {
+              wx.showToast({
+                title: "已服务！"
+              });
+              setTimeout(() => {
+                that.getOrderDetails();
+              }, 1000);
+            });
+          }
+        }
+      });
+    },
+    // 评价
+    gotoAddComent() {
+       wx.navigateTo({
+            url:"/pages/addcomment/main?appraiseType=" +
+             ' this.serviceMode' +
+              "&orderNo=" +
+              this.orderNo
+          });
+
+    },
+
   },
 
   created () {
