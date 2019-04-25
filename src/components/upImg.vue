@@ -2,7 +2,7 @@
   <div class="relate white commonpad">
     <div class="flex-container comtitile">
       <p>{{title}}</p>
-      <p class="nums">{{imgBase.length}}/{{imgLenght}}</p>
+      <p class="nums">{{imgPathArr.length}}/{{imgLenght}}</p>
     </div>
     <div class="imgs">
       <div class="imgItem" v-for="(img,index) in imgPathArr" :key="index">
@@ -70,24 +70,35 @@ export default {
           sizeType: ["compressed"], //图片尺寸 original--原图；compressed--压缩图
           sourceType: ["album", "camera"], //选择图片的位置 album--相册选择, 'camera--使用相机
           success: res => {
-            that.imgPathArr = that.imgPathArr.concat(res.tempFilePaths);
+            const imgPathArr = this.imgPathArr
+            this.imgPathArr = []
+            this.imgPathArr = imgPathArr.concat(res.tempFilePaths);
                     console.log(res.tempFilePaths,'base')
+              that.updateImg()
+          }
+        });
+      }
+    },
+    // 更新图片数据
+    updateImg(){
             // 判断是否大于图片最大数量
-            if (that.imgPathArr.length === this.imgLenght) {
-              that.isShowBtnUpload = false;
+            if (this.imgPathArr.length === this.imgLenght*1) {
+              this.isShowBtnUpload = false;
+            }else{
+              this.isShowBtnUpload = true;
             }
-            that.imgBase=[]
+            this.imgBase=[]
             // 根据临时路径数组imgPathArr获取base64图片
-            for (let i = 0; i < that.imgPathArr.length; i++) {
+            for (let i = 0; i < this.imgPathArr.length; i++) {
               wx.getFileSystemManager().readFile({
-                filePath: that.imgPathArr[i], //选择图片返回的相对路径
+                filePath: this.imgPathArr[i], //选择图片返回的相对路径
                 encoding: "base64", //编码格式
                 success: res => {
                   //成功的回调
-                  that.imgBase.push({
+                  this.imgBase.push({
                     PicUrl: "data:image/png;base64," + res.data.toString()
                   });
-                  that.$emit('upImgs',that.imgBase)
+                  this.$emit('upImgs',this.imgBase)
                 }
               });
             }
@@ -106,17 +117,30 @@ export default {
             // that.imgBase = wx .getFileSystemManager().readFileSync(res.tempFilePaths[0], "base64");
             // console.log("that.imgBase" + that.imgBase);
             // this.updateimg();
-          }
-        });
-      }
     },
     // 删除图片
     deleteImg(i) {
       this.imgBase.splice(i, 1);
       this.imgPathArr.splice(i, 1);
-      if (this.imgPathArr.length < this.imgLenght) {
+      if (this.imgPathArr.length < this.imgLenght*1) {
+        this.isShowBtnUpload = null;
         this.isShowBtnUpload = true;
       }
+      this.updateImg()
+      // console.log('点击了删除',i)
+      // const imgBase = this.imgBase
+      // imgBase.splice(i, 1);
+      // this.imgBase = null;
+      // this.imgBase = imgBase;
+      // const imgPathArr = this.imgPathArr
+      // imgPathArr.splice(i, 1);
+      // this.imgPathArr = null;
+      // this.imgPathArr = imgPathArr;
+      // if (this.imgPathArr.length < this.imgLenght*1) {
+      //   this.isShowBtnUpload = null;
+      //   this.isShowBtnUpload = true;
+      // }
+      // console.log('删除成功',i,this.isShowBtnUpload,this.imgPathArr)
     }
   }
 };
@@ -141,27 +165,31 @@ export default {
   display: flex;
   align-items: center;
   flex-flow: row wrap;
+    margin-right:-20rpx;
+    width:710rpx;
+    overflow:hidden;
+    padding-top:20rpx;
   .imgItem {
     position: relative;
   }
   img {
     width: 156rpx;
     height: 156rpx;
-    margin-right: 10rpx;
+    margin-right: 20rpx;
     margin-bottom: 20rpx;
   }
   .delete {
-    width: 36rpx;
-    height: 36rpx;
-    line-height: 30rpx;
+    width: 45rpx;
+    height: 45rpx;
+    line-height: 43rpx;
     background: rgba(0, 0, 0, 0.6);
     color: #fff;
-    font-size: 34rpx;
+    font-size: 38rpx;
     text-align: center;
     border-radius: 50%;
     position: absolute;
     top: -15rpx;
-    right: 0;
+    right: 5rpx;
   }
 }
 </style>
