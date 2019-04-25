@@ -27,14 +27,19 @@
             <img src="/static/images/orange.png" v-else-if="(index+1)%2===0" class="bgcolor">
             <img src="/static/images/yellow1.png" v-else class="bgcolor">
           </div>
+          <div v-else>
+           <img src="/static/images/graybg.png" class="bgcolor">
+          </div>
           <div class="itemain flex-container">
             <div>
               <p class="certitle">{{item.TypeName}}</p>
-              <p class="small">{{item.Title}}</p>
-              <p class="small">凭此券免费兑换{{item.TypeName}}一次</p>
+              <p class="small" :style="status!==1?'color:#fff':''">{{item.Title}}</p>
+              <p class="small" :style="status!==1?'color:#fff':''">凭此券免费兑换{{item.ScopeOfUse}}一次</p>
               <p class="inite">{{item.EndTime}} 前有效</p>
             </div>
-            <div @click="gotoShopcenter(item.Id)" v-if="item.Enables===1">立即使用</div>
+            <div @click="gotoShopcenter(item.Id)" v-if="status===2">立即使用</div>
+              <img src="/static/images/used.png" class="frazz" v-if="status===3">
+              <img src="/static/images/pass.png" class="frazz" v-if="status===1">
           </div>
         </div>
       <!-- </div> -->
@@ -171,7 +176,7 @@ export default {
       if(result.data.length>0){
         for(let i=0;i<result.data.length;i++){
           result.data[i].EndTime = result.data[i].EndTime.split(" ")[0].split("/").join("-");
-          // this.$set(result.data[i],"TypeName","");
+          // this.$set(result.data[i],"TypeName",result.data[i].ScopeOfUse);
           for(let j=0;j<this.serverType.length;j++){
             if(result.data[i].ProTypeId===this.serverType[j].Id){
               this.$set(result.data[i],"TypeName",this.serverType[j].TypeName);
@@ -180,15 +185,15 @@ export default {
         }
         if(this.page===1){
           this.couptlist =result.data;
-        }
+        }else{
         this.couptlist = this.couptlist.concat(result.data);
+        }
       }
         console.log(result.data.length,this.pageSize===result.data.length)
         if(result.data.length!==this.pageSize){
           this.isOved = true;
           return false;
       }
-      console.log(this.couptlist,this.isOved,'this.isOved');
     },
     gotoShopcenter(id){
       wx.switchTab({

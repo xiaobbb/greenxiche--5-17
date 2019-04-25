@@ -85,8 +85,8 @@
       :showPay.sync="showPay"
       :orderNumber="orderNumber"
       :total="total"
-      :successUrl="'/pages/myorder/main?orderBigType=2&status=2'"
-      :closeUrl="'/pages/myorder/main?orderBigType=2&status=2'"
+      :successUrl="`/pages/appointorderdet/main?orderNo=${orderNumber}`"
+      :closeUrl="`/pages/appointorderdet/main?orderNo=${orderNumber}`"
     ></Pay>
     <!-- <div>  
         <div class="lasttime white">剩余支付时间  <span>{{minute}}</span> : <span>{{second}}</span></div>
@@ -327,12 +327,16 @@ export default {
           Remarks: this.Remarks
         });
         console.log(result, "发起支付请求");
-        if (result.code == 0) {
           this.orderNumber = result.data;
+          if(result.code*1==200){
+            wx.redirectTo({
+              url:'/pages/appointorderdet/main?orderNo='+result.data
+            })
+            return false;
+          }
           setTimeout(() => {
             this.showPay = true;
           }, 500);
-        }
       } else {
         wx.showToast({
           title: "请选择服务车辆",

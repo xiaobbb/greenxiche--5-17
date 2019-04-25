@@ -89,7 +89,7 @@
     <div class="slide"></div>
     <div class="orderinfo">
         <p class="infotitle">订单信息</p>
-        <p class="pitem">订单编号：{{info.OrderNumber}}<span class="copy">复制</span></p>
+        <p class="pitem">订单编号：{{info.OrderNumber}}<span class="copy" @click="copy(info.OrderNumber)">复制</span></p>
         <p class="pitem">创建时间：{{info.AddTime}}</p>
         <div>
            <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' ">支付时间：{{info.PayTime}}</p>
@@ -175,12 +175,21 @@
       @closeReason="reasonShow= false"
       @selectReason="selectReason"
     ></reasonMask>
+    <!-- 支付 -->
+    <Pay
+      :showPay.sync="showPay"
+      v-if="showPay"
+      :orderNumber="orderNo"
+      :total="info.TotalPrice"
+      :balanceRequestUrl="balanceRequestUrl"
+    ></Pay>
   </div>
 </template>
 
 <script>
 import { post, get } from "../../utils";
 import reasonMask from "@/components/reasonMask.vue";
+import Pay from "@/components/pay.vue";
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
@@ -224,16 +233,15 @@ export default {
       showMask:false,
       appraiseType: 0, //0:商品评价；1：上门服务评价；2：到店评价
       orderBigType: 1, //1:商城订单；2：预约订单
-      // 取消订单
-      // reasonList: [],
-      // orderNo: "",
-      // cancleIndex: "",
-      // reasonShow: false,
+      
+      
+      balanceRequestUrl: "Order/PaymentOrder", //余额支付接口
+      showPay: false, //支付弹窗
     }
   },
  
   components: {
-    reasonMask
+    reasonMask,Pay
   },
   methods: {
     setBarTitle() {
@@ -456,9 +464,30 @@ export default {
           });
 
     },
+    // 支付
+    toPay(){
+      this.showPay = true;
+    },
+    // 复制订单号
+    copy(info){
+      wx.setClipboardData({
+        data:info,
+        success(){
+          wx.showToast({
+            title:'复制成功！'
+          })
+        }
+      })
+    }
 
   },
 
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.getOrderDetails();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
+  },
   created () {
     // let app = getApp()
   }

@@ -48,6 +48,10 @@ function request(url, method, data, header = {}) {
                     case 0:
                         resolve(res.data);
                         break;
+                        
+                    case 200:
+                    resolve(res.data);
+                    break;
                     case 2:
                         wx.showToast({
                             title: '需要重新登录!',

@@ -226,7 +226,7 @@ export default {
         this.hasData = true;
         this.info = result.data;
         this.$set(this.info.order,"Fahuodate",this.info.order.Fahuodate.split("T").join(" "))
-        // this.appraiseId = 
+        this.appraiseId = result.data.detaillist[0].Id
       }
     },
     // 提交评论
