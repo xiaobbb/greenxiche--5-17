@@ -282,10 +282,12 @@ export default {
   watch: {
     //图片
     "$store.state.pList": {
+    // "$store.state.upImgPathArr": {
+      
       handler: function() {
         const state = this.$store.state;
         this.PicList = state.pList;
-        //console.log(this.PicList,"添加图片")
+        console.log(this.PicList,"添加图片")
       },
       deep: true
     },
@@ -327,6 +329,10 @@ export default {
     this.shopId = this.$root.$mp.query.shopId;
     this.latitude = this.$store.state.latitude;
     this.longitude = this.$store.state.longitude;
+    // 图片
+        // const state = this.$store.state;
+        this.PicList = this.$store.state.upImgPathArr;
+        console.log(this.PicList.length,'展示的图片数量')
     if (wx.getStorageSync("CarInfo").Id) {
       //获取车辆信息
       this.getCar();
@@ -361,16 +367,18 @@ export default {
       });
     },
     async getDefaultCar() {
-      console.log(this.CarInfoId, "默认车辆id");
-      let res = await post("/User/GetCarIdInfo", {
+      let res = await post("/User/GetCarInfo", {
         UserId: this.userId,
         Token: this.token,
-        CarId: this.CarInfoId
+        IsDefault: 1
       });
       console.log(res, "获取默认车辆");
       if (res.code == 0) {
-        this.cartip = res.data.CarBrand + res.data.CarType + res.data.CarMumber;
+        const _res = res.data[0]
+        this.CarInfoId= _res.Id;
+        this.cartip = _res.CarBrand + _res.CarType + _res.CarMumber;
       }
+      console.log(this.CarInfoId, "默认车辆id");
     },
       //获取车辆
     getCar() {
@@ -530,8 +538,48 @@ export default {
         }
       }
     },
-    // 支付
+    // 根据临时路径返回base64码
+    upDateImg() {
+      return new Promise ((resolved,rejected)=>{
+         const imgBase=[]
+        for (let i = 0; i < this.PicList.length; i += 1) {
+          wx.getFileSystemManager().readFile({
+            filePath: this.PicList[i], //选择图片返回的相对路径
+            encoding: "base64", //编码格式
+            success: ress => {
+              //成功的回调
+              imgBase.push({
+                PicUrl: "data:image/png;base64," + ress.data.toString()
+              });
+              // console.log("上传后的图片", imgBase);
+              if(i===this.PicList.length-1){
+                  console.log('imgBase',imgBase)
+                  resolved(imgBase)
+              }
+            },
+            fail(err){
+              wx.showToast({
+                title:'图片上传失败！',
+                icon:'none'
+              })
+              rejected()
+            }
+          });
+        }
+      })
+    },
+    // 支付，创建订单
     async payMoney() {
+      // 去获取base64码
+      const picList = await this.upDateImg()
+      console.log('picList',picList.length)
+      if(picList.length!==this.PicList.length){
+        wx.showToast({
+          title:'图片上传中，请稍等！',
+          icon:'none'
+        })
+        return false;
+      }
       const params = {
         UserId: this.userId,
         Token: this.token,
@@ -543,7 +591,7 @@ export default {
         ServiceItem: this.ServiceItem, //服务项目
         ContactName: this.personName, //名字
         Tel: this.personPhone, //手机号
-        pList: JSON.stringify(this.PicList),
+        pList: JSON.stringify(picList),
         AppointmentStartTime: this.AppointmentStartTime, //开始时间
         AppointmentEndTime: this.AppointmentEndTime //结束时间
       };

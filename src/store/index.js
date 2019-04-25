@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     latitude:"",
     longitude:"",
     pList:[],//上门洗车添加图片
+    upImgPathArr:[], //上门洗车添加图片--临时图片路径
     visitconfirmorder:{  //到店确认订单
       ProductId:''
     },

@@ -197,7 +197,7 @@ export default {
     },
     gotoShopcenter(id){
       wx.switchTab({
-        url:"/pages/shopcenter/main?serverCouponId="+id
+        url:"/pages/index/main?serverCouponId="+id
       })
     },
     loadMore(){
