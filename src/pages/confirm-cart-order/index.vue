@@ -52,7 +52,7 @@
           <img src="/static/images/back.png" class="right">
         </div>
       </div>
-      <div class="flex-container infoslide white pad">
+      <!-- <div class="flex-container infoslide white pad">
         <div>邮费</div>
         <div>
           {{freight*1?freight:"免运费"}}
@@ -61,7 +61,7 @@
             class="right"
           >
         </div>
-      </div>
+      </div> -->
       <div class="infoslide inputbor flex-container white pad">
         <div>买家留言</div>
         <input type="text" v-model="message" placeholder="填写内容已和卖家协商确认" class="inputmes">
@@ -92,8 +92,8 @@
       :showPay.sync="showPay"
       :orderNumber="orderNumber"
       :total="total"
-      :successUrl="`/pages/orderdetail/main?orderNo=${orderNumber}`"
-      :closeUrl="`/pages/orderdetail/main?orderNo=${orderNumber}`"
+      :successUrl="`/pages/myorder/main?orderNo=${orderNumber}`"
+      :closeUrl="`/pages/myorder/main?orderNo=${orderNumber}`"
       balanceRequestUrl="Order/OrderSoldePayment"
     ></Pay>
   </div>
@@ -339,7 +339,7 @@ export default {
         phone: _res.tel,
         address: _res.addressinfo
       };
-      this.getFreight();
+      // this.getFreight();
     },
     // 获取运费
     async getFreight() {
@@ -386,21 +386,21 @@ export default {
         this.orderNumber = res.data;
       
       // 查询订单价格
-      order = await post("Order/OrderDetails", {
-        UserId: wx.getStorageSync("userId"),
-        Token: wx.getStorageSync("token"),
-        OrderNo: res.data
-      });
+      // order = await post("Order/OrderDetails", {
+      //   UserId: wx.getStorageSync("userId"),
+      //   Token: wx.getStorageSync("token"),
+      //   OrderNo: res.data
+      // });
       }else{
       const str = JSON.stringify(res.data);
       const _str = _carIds.substring(1, str.length - 1);
         this.orderNumber = _str;
       }
-      console.log("前台计算订单价格", this.total);
-      console.log("后台计算订单价格", order.data.TotalPrice);
       // 1.5秒后弹出支付窗口
       setTimeout(() => {
         this.showPay = true;
+      console.log("前台计算订单价格", this.total);
+      console.log("后台计算订单价格", this.showPay);
       }, 500);
     },
     // 跳转选择收货地址

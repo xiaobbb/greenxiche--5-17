@@ -542,6 +542,9 @@ export default {
     upDateImg() {
       return new Promise ((resolved,rejected)=>{
          const imgBase=[]
+         if(this.PicList<1){
+            resolved(imgBase)
+         }
         for (let i = 0; i < this.PicList.length; i += 1) {
           wx.getFileSystemManager().readFile({
             filePath: this.PicList[i], //选择图片返回的相对路径

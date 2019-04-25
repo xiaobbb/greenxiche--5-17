@@ -52,7 +52,7 @@
             <img src="/static/images/back.png" class="right">
           </div>
         </div>
-        <div class="flex-container infoslide white pad">
+        <!-- <div class="flex-container infoslide white pad">
           <div>邮费</div>
           <div>
             {{product.freight*1?product.freight:"免运费"}}
@@ -61,7 +61,7 @@
               class="right"
             >
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="infoslide inputbor flex-container white pad">
         <div>买家留言</div>
@@ -250,7 +250,7 @@ export default {
         phone: _res.tel,
         address: _res.addressinfo
       };
-      this.getFreight();
+      // this.getFreight();
     },
     // 获取运费
     async getFreight() {

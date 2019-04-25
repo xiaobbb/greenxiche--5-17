@@ -405,7 +405,7 @@ export default {
         const params = {
           UserId: wx.getStorageSync("userId"),
           Token: wx.getStorageSync("token"),
-          // ShopId:shopId,
+          // ShopId:this.shop.shopId,
           page: 1
         };
         const res = await post("Coupon/CouponCenter", params);

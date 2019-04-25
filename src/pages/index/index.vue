@@ -126,6 +126,11 @@ export default {
     this.userId = wx.getStorageSync('userId');
       this.token = wx.getStorageSync('token');
       if(this.userId && this.token){
+        // 初始展示上门还是到店
+        console.log(this.$root.$mp.query,'name')
+      if(this.$root.$mp.query.name){
+        this.change(this.$root.$mp.query.name)
+      }
         console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
           Promise.all([
               this.judgeCityName(),this.getCoupon(),this.isNewVip(),this.getDoorShopinfo()//默认获取上门的门店信息
