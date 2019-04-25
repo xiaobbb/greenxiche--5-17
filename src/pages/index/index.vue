@@ -491,8 +491,12 @@ export default {
             }
           });
         }
-        this.isshow=false
-        this.isnew=false
+        // this.isshow=false
+        // this.isnew=false
+        this.isnew=false,
+        this.isshow=true,
+        this.showmember=true,
+        this.isXiche=false
     },
     async isNewVip(){  //验证是否vip
           console.log(this.$store.state.showMask,"this.$store.state.showMask")

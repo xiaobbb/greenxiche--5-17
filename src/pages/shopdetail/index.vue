@@ -31,13 +31,13 @@
         <div class="serlist">
           <div class="seritem flex-container" v-for="(item,index) in servincelist" :key="index">
             <div class="flex-container" style="width:80%" @click="goServiceProductsDetail(item.Id)">
-              <img src="/static/images/smallcar.png" class="smallcar">
+              <img :src="item.PicNo" class="smallcar">
               <div class="flex-container col">
                 <p class="infotitle">{{item.Name}}</p>
                 <p class="infoitem">{{item.Synopsis}}</p>
                 <p class="serprice">
                   <text>￥{{item.MarketPrice}}</text>
-                  <text>vip价:￥{{item.Price}}</text>
+                  <text>市场价:￥{{item.Price}}</text>
                 </p>
               </div>
             </div>
@@ -67,7 +67,7 @@
       </div>
       <!--评价显示-->
       <div v-if="pointshow" class="dish">
-        <div class="head flex-container" v-if="commonlist.length>0">
+        <div class="head flex-container">
           <div class="titleline">
             <p class="shot"></p>
             <p class="main">商户服务评价</p>
@@ -75,22 +75,24 @@
           </div>
           <div class="flex-container">
             <p>
+              <!-- <pointChildpic :commonlist="detailinfo.ServiceScore" ></pointChildpic> -->
+              <img src="/static/images/xing.png" v-for="item in detailinfo[0].ServiceScore" :key="item"  class="xing-point bigs">
+               <!--<img src="/static/images/xing.png" class="xing-point bigs">
               <img src="/static/images/xing.png" class="xing-point bigs">
               <img src="/static/images/xing.png" class="xing-point bigs">
-              <img src="/static/images/xing.png" class="xing-point bigs">
-              <img src="/static/images/xing.png" class="xing-point bigs">
-              <img src="/static/images/xing.png" class="xing-point bigs">
+              <img src="/static/images/xing.png" class="xing-point bigs"> -->
             </p>
-            <text class="grad">5.0分</text>
+            <text class="grad">{{detailinfo[0].ServiceScore}}.0分</text>
           </div>
         </div>
-        <div class="flex-container pointmenu" v-if="commonlist.length>0">
+        <div class="flex-container pointmenu">
           <p
             v-for="(item,index) in pointlist"
             :key="index"
             :class="{active3:first==index}"
             @click="changeComment(index)"
-          >{{item.name}}({{PageCount}})</p>
+          >{{item.name}}</p>
+          <!-- ({{PageCount}}) 数量-->
         </div>
         <div class="pointsheet">
           <pointChildpic :commonlist="commonlist" v-if="commonlist.length>0"></pointChildpic>
@@ -249,8 +251,16 @@ export default {
         }
       });
     },
-    async showComment() {
+    changeComment(e) {
+      //获取不同类型评价列表
+      this.first = e;
+      this.CommentType = e;
+      this.commonlist = [];
+      this.Page=1;
+      this.showComment();
+    },
       //获取评价列表
+    async showComment() {
       var res = await post("/Server/ServiceCommentList", {
         Page: this.Page,
         PageSize: this.PageSize,
@@ -332,13 +342,6 @@ export default {
       }
     },
 
-    changeComment(e) {
-      //获取不同类型评价列表
-      this.first = e;
-      this.CommentType = e;
-      this.commonlist = [];
-      this.showComment();
-    },
     async goServiceProductsDetail(e) {
       wx.navigateTo({
         url:

@@ -632,7 +632,7 @@ export default {
       }).catch(()=>{
         setTimeout(()=>{
             wx.redirectTo({
-              url: "/pages/myorder/main?orderBigType=2&status=1"
+              url: `/pages/appointorderdet/main?orderNo=${this.orderNo}`
             });
         },1500)
       });
@@ -647,19 +647,19 @@ export default {
           paySign: payData.paySign,
           success(res) {
             wx.redirectTo({
-              url: "/pages/myorder/main?orderBigType=2&status=1"
+              url: `/pages/appointorderdet/main?orderNo=${this.orderNo}`
             });
           },
           fail() {
             wx.redirectTo({
-              url: "/pages/myorder/main?orderBigType=2&status=1"
+              url: `/pages/appointorderdet/main?orderNo=${this.orderNo}`
             });
           }
         });
       }else{
         setTimeout(()=>{
             wx.redirectTo({
-              url: "/pages/myorder/main?orderBigType=2&status=1"
+              url: `/pages/appointorderdet/main?orderNo=${this.orderNo}`
             });
         },1500)
       }
@@ -680,7 +680,7 @@ export default {
       console.log(res, "余额支付");
       if (res.code == 0) {
         //余额支付成功
-        wx.redirectTo({ url: "/pages/myorder/main?orderBigType=2" });
+        wx.redirectTo({ url: `/pages/appointorderdet/main?orderNo=${this.orderNo}` });
       } else if (res.code == "9") {
         this.showPass = false;
       }
@@ -691,7 +691,7 @@ export default {
       this.password = "";
       this.judgePassword();
       
-      wx.redirectTo({ url: "/pages/myorder/main?orderBigType=2" });
+      wx.redirectTo({ url: `/pages/appointorderdet/main?orderNo=${this.orderNo}` });
     },
     findPass() {
       wx.navigateTo({ url: "/pages/setpassword/main?url=orderpay" });
