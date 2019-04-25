@@ -13,7 +13,6 @@
     <div class="flex" style="justify-content:flex-start">
       <div
         class="flexitem"
-        style="margin-right:10rpx;"
         v-for="(img,index) in imgPathArr"
         :key="index"
       >
@@ -44,7 +43,7 @@ export default {
   components: {},
   onLoad() {
     this.setBarTitle();
-     if(this.$store.state.pList.length>0){
+     if(this.$store.state.upImgPathArr.length>0){
     this.imgPathArr = this.$store.state.upImgPathArr;
     // this.upDateImg()
     // this.imgBase = this.$store.state.pList;
@@ -78,6 +77,11 @@ export default {
             console.log("选择的图片", res.tempFilePaths);
             console.log("选择的图片2", that.imgPathArr);
             that.imgPathArr=that.imgPathArr.concat(res.tempFilePaths);
+            if (this.imgPathArr.length == this.imgLenght) {
+              this.isShowBtnUpload = false;
+            } else {
+              this.isShowBtnUpload = true;
+            }
             console.log("选择的图片3", that.imgPathArr);
             // that.upDateImg();
           }
@@ -85,11 +89,6 @@ export default {
       }
     },
     upDateImg() {
-      if (this.imgPathArr.length == this.imgLenght) {
-        this.isShowBtnUpload = false;
-      } else {
-        this.isShowBtnUpload = true;
-      }
       this.imgBase=[]
       for (let i = 0; i < this.imgPathArr.length; i += 1) {
         wx.getFileSystemManager().readFile({

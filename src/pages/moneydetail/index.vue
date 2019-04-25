@@ -32,7 +32,7 @@
       >暂无数据</p>
       <p
         class="ovedMsg"
-        v-if="isOved"
+        v-if="isOved&&page!==1"
         style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
       >我也是有底线的</p>
     </scroll-view>
@@ -45,11 +45,8 @@ import "../../css/common.css";
 import "../../css/global.css";
 export default {
   onShow() {
-    this.list = [];
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
     this.setBarTitle();
-    this.getRechargeList();
+    this.initData();
   },
   data() {
     return {
@@ -79,6 +76,13 @@ export default {
         title: "资金明细"
       });
     },
+    initData(){
+      this.list = [];
+      this.page = 1;
+      this.userId = wx.getStorageSync("userId");
+      this.token = wx.getStorageSync("token");
+      this.getRechargeList();
+    },
     change(e) {
       this.active = e;
       this.page = 1;
@@ -94,6 +98,9 @@ export default {
       wx.navigateTo({ url: "/pages/locationcomplete/main" });
     },
     async getRechargeList() {
+      if(this.isOved){
+        return false;
+      }
       let result = await post("Recharge/GetRechargeList", {
         UserId: this.userId,
         Token: this.token,
@@ -101,14 +108,18 @@ export default {
         pageSize: this.pageSize,
         Type: this.active
       });
-      this.count = result.count;
-      if (parseInt(this.count) % this.pageSize === 0) {
-        this.allPage = this.count / this.pageSize;
-      } else {
-        this.allPage = parseInt(this.count / this.pageSize) + 1;
+      // this.count = result.count;
+      // if (parseInt(this.count) % this.pageSize === 0) {
+      //   this.allPage = this.count / this.pageSize;
+      // } else {
+      //   this.allPage = parseInt(this.count / this.pageSize) + 1;
+      // }
+      if(result.data.length!==this.pageSize){
+        this.isOved = true;
       }
       if (result.data.length === 0 && this.page === 1) {
         this.hasData = true;
+        return false;
       }
       if (result.data.length > 0) {
         for (let i = 0; i < result.data.length; i++) {
@@ -116,26 +127,33 @@ export default {
         }
         this.list = this.list.concat(result.data);
       }
-      if (this.allPage > this.page) {
-        this.isLoad = true;
-      } else {
-        this.isLoad = false;
-      }
+      // if (this.allPage === this.page) {
+      //   this.isLoad = true;
+      // } else {
+      //   this.isLoad = false;
+      // }
     },
     loadMore() {
-      if (this.isLoad) {
+        console.log(this.page,this.isLoad,this.list.length)
+      if (!this.isOved) {
         this.page++;
         this.getRechargeList();
       } else {
-        if (this.page > 1) {
+        // if (this.page > 1) {
           this.isOved = true;
-        } else {
-          this.isOved = false;
-        }
+        // } else {
+        //   this.isOved = false;
+        // }
       }
     }
   },
 
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.initData();
+    // 停止下拉刷新
+    wx.stopPullDownRefresh();
+  },
   created() {
     // let app = getApp()
   },

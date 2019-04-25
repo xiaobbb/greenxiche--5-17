@@ -50,6 +50,7 @@ export default {
     init(){
       this.userId=wx.getStorageSync('userId')
       this.token=wx.getStorageSync('token')
+      this.page=1
       this.scoreList = [];
       this.memberInfo = {};
       this.setBarTitle();
