@@ -29,7 +29,10 @@
                   </p>
               </div>
           </div>
-          <div class="price">￥{{detailinfo.Price || 0}}</div>
+          <div class="price">
+            <div>￥{{detailinfo.Price || 0}}</div>
+            <!-- <div>VIP ￥{{detailinfo.VipPrice}}</div> -->
+            </div>
       </div>
       <div class="hr"></div>
       <!--位置-->
@@ -54,7 +57,7 @@
               <text>评分</text><text>4.0</text>
             </p>
             <p @click="showAllComment">
-              <text>{{ commonlist.length || 0 }}条评论</text>
+              <text>查看全部评论</text>
               <img src="/static/images/back.png" class="arrowback">
             </p>
         </div>
@@ -106,12 +109,12 @@ export default {
     this.shopLng=this.$root.$mp.query.shopLng;
     this.lat=wx.getStorageSync('latitude');
     this.lng=wx.getStorageSync('longitude');
-    this.getSerdetail()
     //console.log(this.shopLng,this.shopLat,"商铺经纬度")
   },
   onShow(){
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
+    this.getSerdetail()
   },
   data () {
     return {

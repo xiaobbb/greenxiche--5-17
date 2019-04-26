@@ -119,7 +119,7 @@
           <p class="maskitem">促销</p>
           <div class="maskdetail">
             <p class="maskcoupon">积分</p>
-            <text>购买可得{{shop.score||0}}积分 拷贝</text>
+            <text>购买可得{{shop.score||0}}积分</text>
           </div>
           <p class="maskitem">领券</p>
           <div class="maskcouponlist" v-for="(coupon,couponIndex) in coupon" :key="couponIndex">
@@ -150,6 +150,7 @@ export default {
   onShow() {
     (this.userId = wx.getStorageSync("userId")),
       (this.token = wx.getStorageSync("token")),
+      (this.showDiscount=false)
       this.setBarTitle();
     this.id = this.$root.$mp.query.id;
     this.getData();

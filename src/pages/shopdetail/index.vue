@@ -36,8 +36,8 @@
                 <p class="infotitle">{{item.Name}}</p>
                 <p class="infoitem">{{item.Synopsis}}</p>
                 <p class="serprice">
-                  <text>￥{{item.MarketPrice}}</text>
-                  <text>市场价:￥{{item.Price}}</text>
+                  <text>￥{{item.Price}}</text>
+                  <text>VIP:￥{{item.VipPrice}}</text>
                 </p>
               </div>
             </div>
@@ -76,11 +76,18 @@
           <div class="flex-container">
             <p>
               <!-- <pointChildpic :commonlist="detailinfo.ServiceScore" ></pointChildpic> -->
-              <img src="/static/images/xing.png" v-for="item in detailinfo[0].ServiceScore" :key="item"  class="xing-point bigs">
-               <!--<img src="/static/images/xing.png" class="xing-point bigs">
+              <img
+                src="/static/images/xing.png"
+                v-for="item in detailinfo[0].ServiceScore"
+                :key="item"
+                class="xing-point bigs"
+              >
+              <img src="/static/images/gray1.png" 
+              v-for="rank in (5-detailinfo[0].ServiceScore)" :key="rank" class="xing-point">
+              <!--<img src="/static/images/xing.png" class="xing-point bigs">
               <img src="/static/images/xing.png" class="xing-point bigs">
               <img src="/static/images/xing.png" class="xing-point bigs">
-              <img src="/static/images/xing.png" class="xing-point bigs"> -->
+              <img src="/static/images/xing.png" class="xing-point bigs">-->
             </p>
             <text class="grad">{{detailinfo[0].ServiceScore}}.0分</text>
           </div>
@@ -95,14 +102,14 @@
           <!-- ({{PageCount}}) 数量-->
         </div>
         <div class="pointsheet">
-          <pointChildpic :commonlist="commonlist" v-if="commonlist.length>0"></pointChildpic>
+          <pointChildpic :commonlist="commonlist" :showPic="true" v-if="commonlist.length>0"></pointChildpic>
         </div>
       </div>
       <p
         class="ovedMsg"
         v-if="isOved"
         style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
-      >我也是有底线的</p>
+      >没有数据了哦！</p>
     </div>
   </div>
 </template>
@@ -132,10 +139,11 @@ export default {
     this.sershow = true;
     this.dishshow = false;
     this.pointshow = false;
+    this.isOved = false;
     this.Page = "1";
     this.typeid = "33";
     this.activecolor = "0";
-      this.active= "服务";
+    this.active = "服务";
     this.getShopDetail();
     this.getBarlist();
     this.showItem();
@@ -158,7 +166,7 @@ export default {
       Token: "",
       UserId: "",
       Page: "1",
-      PageSize: "5",
+      PageSize: 8,
       PageCount: "",
       allPage: "", //页数
       ProductId: "",
@@ -171,10 +179,10 @@ export default {
         { id: 3, name: "评价" }
       ],
       pointlist: [
-        { id: 1, name: "全部" },
-        { id: 2, name: "晒图" },
-        { id: 3, name: "低分" },
-        { id: 4, name: "最新" }
+        { id: 0, name: "全部" },
+        { id: 1, name: "晒图" },
+        { id: 2, name: "低分" },
+        { id: 3, name: "最新" }
       ],
       commonlist: [],
       sershow: true,
@@ -216,51 +224,71 @@ export default {
         console.log(this.barlist, "barlist服务分类");
       }
     },
-    showItem() {
       //服务列表
-      wx.request({
-        url: "https://carapi.wtvxin.com/api/Server/ServiceProducts",
-        method: "POST",
-        data: {
+    async showItem() {
+      // wx.request({
+      //   url: "https://carapi.wtvxin.com/api/Server/ServiceProducts",
+      //   method: "POST",
+      //   data: {
+      //     Page: this.Page,
+      //     PageSize: this.PageSize,
+      //     TypeId: this.typeid,
+      //     //TypeId:33,
+      //     ShopId: this.shopid
+      //   },
+      //   header: {
+      //     "content-type": "application/json" // 默认值
+      //   },
+      //   success: res => {
+        if(this.isOved){
+          return false;
+        }
+        const params={
+          UserId:this.UserId,
+          Token:this.Token,
           Page: this.Page,
           PageSize: this.PageSize,
           TypeId: this.typeid,
           //TypeId:33,
           ShopId: this.shopid
-        },
-        header: {
-          "content-type": "application/json" // 默认值
-        },
-        success: res => {
-          if (res.data.code == 0) {
+        }
+          const res = await post('Server/ServiceProducts',params)
+          if (res.code == 0) {
             //console.log(res,"服务列表")
-            this.PageCount = res.data.count;
-            if (parseInt(this.PageCount) % this.PageSize === 0) {
-              this.allPage = this.PageCount / this.PageSize;
-            } else {
-              this.allPage = parseInt(this.PageCount / this.PageSize) + 1;
+            // this.PageCount = res.data.count;
+            // if (parseInt(this.PageCount) % this.PageSize === 0) {
+            //   this.allPage = this.PageCount / this.PageSize;
+            // } else {
+            //   this.allPage = parseInt(this.PageCount / this.PageSize) + 1;
+            // }
+            if(res.data.length!==this.PageSize){
+              this.isOved = true;
             }
-            this.servincelist = this.servincelist.concat(res.data.data);
-            if (this.allPage > this.Page) {
-              this.isLoad = true;
-            } else {
-              this.isLoad = false;
-            }
+            this.servincelist = this.servincelist.concat(res.data);
+            // if (this.allPage > this.Page) {
+            //   this.isLoad = true;
+            // } else {
+            //   this.isLoad = false;
+            // }
             console.log(this.servincelist, "服务产品列表");
           }
-        }
-      });
+      //   }
+      // });
     },
     changeComment(e) {
       //获取不同类型评价列表
       this.first = e;
       this.CommentType = e;
       this.commonlist = [];
-      this.Page=1;
+      this.Page = 1;
+      this.isOved=false;
       this.showComment();
     },
-      //获取评价列表
+    //获取评价列表
     async showComment() {
+      if(this.isOved){
+        return false;
+      }
       var res = await post("/Server/ServiceCommentList", {
         Page: this.Page,
         PageSize: this.PageSize,
@@ -270,34 +298,49 @@ export default {
       });
       console.log(res, "评价列表");
       if (res.code == 0) {
-        this.PageCount = res.count;
-        if (parseInt(this.PageCount) % this.PageSize === 0) {
-          this.allPage = this.PageCount / this.PageSize;
-        } else {
-          this.allPage = parseInt(this.PageCount / this.PageSize) + 1;
+        // this.PageCount = res.count;
+        // if (parseInt(this.PageCount) % this.PageSize === 0) {
+        //   this.allPage = this.PageCount / this.PageSize;
+        // } else {
+        //   this.allPage = parseInt(this.PageCount / this.PageSize) + 1;
+        // }
+        if(res.data.length!==this.PageSize){
+          this.isOved=true;
+        }
+        if(this.Page==1){
+          this.commonlist = [];
         }
         this.commonlist = this.commonlist.concat(res.data);
         for (let i of this.commonlist) {
           this.$set(i, "AddTime", i.AddTime.split("T").join("  "));
         }
-        console.log(this.commonlist);
-        if (this.allPage > this.Page) {
-          this.isLoadCom = true;
-        } else {
-          this.isLoadCom = false;
-        }
+        // console.log(this.commonlist);
+        // if (this.allPage > this.Page) {
+        //   this.isLoadCom = true;
+        // } else {
+        //   this.isLoadCom = false;
+        // }
       }
     },
-    async getServiceMeal() {
       //获取商户套餐
-      var res = await post("/Server/ServiceMealProducts", {
+    async getServiceMeal() {
+      if(this.isOved){
+        return false;
+      }
+      const res = await post("/Server/ServiceMealProducts", {
         //获取套餐
         Page: this.Page,
         PageSize: this.PageSize,
         ShopId: this.shopid
       });
       if (res.code == 0) {
-        this.meallist = res.data;
+        if(res.data.length!==this.PageSize){
+          this.isOved=true;
+        }
+        if(this.Page==1){
+          this.meallist =[];
+        }
+          this.meallist = this.meallist.concat(res.data);
         console.log(res.data, "套餐列表");
       }
     },
@@ -308,6 +351,7 @@ export default {
       this.activecolor = e;
       this.typeid = this.barlist[e].Id;
       this.Page = "1";
+      this.isOved=false;
       //console.log(this.typeid)
       this.showItem();
     },
@@ -320,6 +364,7 @@ export default {
       console.log(e);
       this.active = e;
       this.Page = "1";
+      this.isOved=false;
       if (e == "服务") {
         this.servincelist = [];
         (this.sershow = true),
@@ -366,14 +411,24 @@ export default {
     // let app = getApp()
   },
   onReachBottom() {
-    if (this.isLoad) {
-      this.Page++;
-      this.showItem();
-    } else if (this.isLoadCom) {
-      this.Page++;
-      this.showComment();
-    } else {
-      this.isOved = true;
+    // if (this.isLoad) {
+    //   this.Page++;
+    //   this.showItem();
+    // } else if (this.isLoadCom) {
+    //   this.Page++;
+    //   this.showComment();
+    // } else {
+    //   this.isOved = true;
+    // }
+    if(!this.isOved){
+      this.Page+=1;
+      if(this.active==='服务'){
+        this.showItem();
+      }else if(this.active==='套餐'){
+        this.getServiceMeal();
+      }else{
+        this.showComment();
+      }
     }
   }
 };

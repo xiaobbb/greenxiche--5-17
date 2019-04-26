@@ -4,25 +4,25 @@
             <div class="flex-container userinfo">
                 <div class="flex-container">
                     <div>
-                        <img src="/static/images/avatar.png" class="avatar">
+                        <img :src="item.Avatar" class="avatar">
                     </div>
                     <div>
                         <p>{{item.MemberName}}</p>
                         <p>
+                            <img src="/static/images/xing.png" v-for="rank in item.Rank" :key="rank" class="xing-point">
+                            <!-- <img src="/static/images/xing.png" class="xing-point">
                             <img src="/static/images/xing.png" class="xing-point">
-                            <img src="/static/images/xing.png" class="xing-point">
-                            <img src="/static/images/xing.png" class="xing-point">
-                            <img src="/static/images/xing.png" class="xing-point">
-                            <img src="/static/images/gray1.png" class="xing-point">
+                            <img src="/static/images/xing.png" class="xing-point"> -->
+                            <img src="/static/images/gray1.png" v-for="rank in (5-item.Rank)" :key="rank" class="xing-point">
                         </p>
                     </div>
                 </div>
-                <div class="carname">{{item.ProductSpecText}}</div>
+                <div class="carname">{{item.ProductName}}</div>
             </div>
             <div>{{item.ContentText}}</div>
             <!--评论图片列表-->
             <div class="flex-container picslist" v-if="showPic">
-                <img src="/static/images/download9.png" class="pointpics" v-for="item in item.PicData" :key="item.id">
+                <img :src="PicData.PicUrl" class="pointpics" v-for="(PicData,PicDataIndex) in item.PicData" :key="PicDataIndex">
             </div>
             <div class="usertime">{{item.AddTime}}</div>
             <div class="callback" v-if="item.Reply">
@@ -87,5 +87,6 @@ box-sizing: border-box;
 .picslist{
     padding:20rpx 0;
     flex-wrap: wrap;
+    justify-content:flex-start;
 }
 </style>
