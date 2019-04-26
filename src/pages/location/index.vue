@@ -147,42 +147,43 @@
         <div class="paybtn" style="margin-top:50rpx;" @click="payMoney">立即支付</div>
       </div>
       <!--密码输入框-->
-      <div class="mypopup" v-if="showPass">
-        <div class="content">
-          <div class="close_btn" @click="closePop">X</div>
-          <div class="main">
-            <div>请输入支付密码验证</div>
-            <div class="pwipt">
+      <cover-view class="mypopup" v-if="showPass">
+        <cover-view class="content">
+          <cover-view class="main">
+           <cover-view class="close_btn" @click="closePop">X</cover-view>
+            <cover-view class="title">请输入支付密码验证</cover-view>
+            <cover-view class="pwipt" @click="inputFocus= !inputFocus">
               <input
                 type="password"
+                :focus="inputFocus"
                 @input="judgePassword"
                 v-model="password"
                 autofocus
                 maxlength="6"
               >
-              <div class="border-right">
-                <span v-if="show1"></span>
-              </div>
-              <div class="border-right">
-                <span v-if="show2"></span>
-              </div>
-              <div class="border-right">
-                <span v-if="show3"></span>
-              </div>
-              <div class="border-right">
-                <span v-if="show4"></span>
-              </div>
-              <div class="border-right">
-                <span v-if="show5"></span>
-              </div>
-              <div>
-                <span v-if="show6"></span>
-              </div>
-            </div>
-            <div class="forgetpw" @click="findPass">忘记密码？</div>
-          </div>
-        </div>
-      </div>
+              <cover-view class="border-right relative">
+                <cover-view class="span" v-if="show1"></cover-view>
+              </cover-view>
+              <cover-view class="border-right relative">
+                <cover-view class="span" v-if="show2"></cover-view>
+              </cover-view>
+              <cover-view class="border-right relative">
+                <cover-view class="span" v-if="show3"></cover-view>
+              </cover-view>
+              <cover-view class="border-right relative">
+                <cover-view class="span" v-if="show4"></cover-view>
+              </cover-view>
+              <cover-view class="border-right relative">
+                <cover-view class="span" v-if="show5"></cover-view>
+              </cover-view>
+              <cover-view class="relative">
+                <cover-view class="span" v-if="show6"></cover-view>
+              </cover-view>
+            </cover-view>
+            <cover-view class="forgetpw" @click="findPass">忘记密码？</cover-view>
+          </cover-view>
+        </cover-view>
+      </cover-view>
     </div>
     <!-- <Pay :showPay.sync="showPay" :orderNumber="orderNumber" 
     :total="total" :successUrl="'/pages/myorder/main'" :closeUrl="'/pages/myorder/main'"
@@ -276,6 +277,7 @@ export default {
       time:[0,0,0,0],//时间
       nowhour:"",//当前的时间
       nowminute:"",
+      inputFocus:false,
     };
   },
   
@@ -308,7 +310,6 @@ export default {
     // 初始化缓存---用于提交订单数据
     this.initSubmitInfo();
     this.orderInfoStatus=0;
-    this.showPass = false;
     this.personName = "";
     this.personPhone = "";
     this.ServiceItem = "";
@@ -326,6 +327,9 @@ export default {
     this.token = wx.getStorageSync("token");
     console.log(this.latitude, this.longitude, "填写订单");
     this.showPay = false;
+    this.inputFocus = false;
+    this.showPass = false;
+    // this.orderInfoStatus=2;
     this.shopId = this.$root.$mp.query.shopId;
     this.latitude = this.$store.state.latitude;
     this.longitude = this.$store.state.longitude;
@@ -616,6 +620,7 @@ export default {
           if (i == 0) {
             this.wxPay();
           } else {
+
             this.showPass = true;
             // this.otherPay()
           }
@@ -690,7 +695,6 @@ export default {
     closePop: function() {
       this.password = "";
       this.judgePassword();
-      
       wx.redirectTo({ url: `/pages/appointorderdet/main?orderNo=${this.orderNo}` });
     },
     findPass() {

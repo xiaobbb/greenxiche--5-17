@@ -54,14 +54,14 @@
         </div>
         <div class="infoslide slideprice white pad">
           合计：
-          <span>￥{{total}}</span>
+          <span>￥{{totalPrice}}</span>
         </div>
       </div>
       <!--底部按钮-->
       <div class="botbtn">
         <div class="price white">
           合计:
-          <span>￥{{total}}</span>
+          <span>￥{{totalPrice}}</span>
         </div>
         <div class="btnconfir" @click="goPay">提交订单</div>
       </div>
@@ -84,7 +84,7 @@
     <Pay
       :showPay.sync="showPay"
       :orderNumber="orderNumber"
-      :total="total"
+      :total="totalPrice"
       :successUrl="`/pages/appointorderdet/main?orderNo=${orderNumber}`"
       :closeUrl="`/pages/appointorderdet/main?orderNo=${orderNumber}`"
     ></Pay>
@@ -204,14 +204,14 @@ export default {
   },
   computed: {
     //计算之后的总价格
-    total() {
-      let totals = 0;
-      totals =
-        this.totalPrice -
-        this.couponPrice -
-        this.totalPrice * this.CardTicketPrice;
-      return totals.toFixed(2);
-    }
+    // total() {
+    //   let totals = 0;
+    //   totals =
+    //     this.totalPrice -
+    //     this.couponPrice -
+    //     this.totalPrice * this.CardTicketPrice;
+    //   return totals.toFixed(2);
+    // }
   },
   components: {
     orderCount,
@@ -299,6 +299,12 @@ export default {
         CouponId: this.CouponId,
         CardTicketId: this.CardTicketId,
         Remarks: this.Remarks
+      }).catch(()=>{
+        setTimeout(()=>{
+        // 请求失败，情况服务卡券
+        this.CardTicketName=''
+        this.CardTicketId=''
+        },1500)
       });
       console.log(result, "获取订单总金额");
       if (result.code == 0) {

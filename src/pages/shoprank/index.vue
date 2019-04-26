@@ -45,14 +45,16 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
+  },
+  onShow(){
     this.getShopBrank()
   },
   data () {
     return {
-      active:"0",
+      active:0,
       datalist:[],
       titlelist:[
-        {id:1,name:"日榜"},{id:2,name:"周榜"},{id:3,name:"月榜"}
+        {id:0,name:"日榜"},{id:1,name:"周榜"},{id:2,name:"月榜"}
       ]
     }
   },
@@ -71,27 +73,33 @@ export default {
       this.getShopBrank()
     },
     getShopBrank(){
-     // console.log(this.datalist)
-      wx.request({
-      url:"http://carapi.wtvxin.com/api/Shop/StoreRanking", //仅为示例，并非真实的接口地址
-      method: "POST",
-      data: {
-        Sort:this.active
-      },
-      header: {
-        'content-type': 'application/json' // 默认值
-      },
-      success: (res) =>{
-        wx.hideLoading();
-        //console.log(res.data)
-        if(res.data.code==0){
-         this.datalist=res.data.data
-         //console.log(this.datalist)
+      this.datalist=[]
+     post('Shop/StoreRanking',{Sort:this.active}).then((res)=>{
+     console.log(res.data,'?')
+        if(res.code==0){
+         this.datalist=res.data
         }
-       },
+     })
+      // wx.request({
+      // url:"http://carapi.wtvxin.com/api/Shop/StoreRanking", //仅为示例，并非真实的接口地址
+      // method: "POST",
+      // data: {
+      //   Sort:this.active
+      // },
+      // header: {
+      //   'content-type': 'application/json' // 默认值
+      // },
+      // success: (res) =>{
+      //   wx.hideLoading();
+      //   //console.log(res.data)
+      //   if(res.data.code==0){
+      //    this.datalist=res.data.data
+      //    //console.log(this.datalist)
+      //   }
+      //  },
       
       
-      })
+      // })
     
     },
     showShopDetail(e){

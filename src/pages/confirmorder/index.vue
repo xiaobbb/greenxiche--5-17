@@ -167,6 +167,13 @@ export default {
   },
   onShow() {
     this.showPay = false;
+    
+      this.couponPrice= 0.0;
+      this.showCoupon= false;
+      // 使用的优惠券id，0--不使用
+      this.couponId= 0;
+      // 订单编号
+      this.orderNumber= "";
     this.setBarTitle();
     this.getData();
     this.isCard = !Boolean(this.$root.$mp.query.isCard);

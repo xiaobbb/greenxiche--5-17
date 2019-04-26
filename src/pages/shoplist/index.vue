@@ -47,11 +47,11 @@
               <div class="shopnamelist">{{item.ShopNick}}</div>
               <div class="shopclass flex-container">
                   <p>
+                    <img src="/static/images/xing.png" v-for="(ServiceScore,ServiceScoreIndex) in item.ServiceScore" :key="ServiceScoreIndex" class="xing-point">
+                    <!-- <img src="/static/images/xing.png" class="xing-point">
                     <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/xing.png" class="xing-point">
-                    <img src="/static/images/gray1.png" class="xing-point">
+                    <img src="/static/images/xing.png" class="xing-point"> -->
+                    <img src="/static/images/gray1.png" v-for="(ServiceScore,ServiceScoreIndex) in 5-item.ServiceScore" :key="ServiceScoreIndex" class="xing-point">
                   </p>
                   <text class="grad">{{item.ServiceScore}}.0分</text>
                   <text class="numb">({{item.TransactionNumber}}条订单)</text>
@@ -136,8 +136,8 @@ export default {
         latitude:"",
         longitude:"",
         cityName:"",
-        Page:"1",
-        PageSize:"5",
+        Page:1,
+        PageSize:12,
         PageCount:"",
         allPage:"", //页数
         isLoad:false,//是否加载更多
@@ -188,31 +188,31 @@ export default {
         if(result.code==0){
           if(result.data.length==0){
               wx.showToast({
-                title: "没有满足条件的商品。。。",
+                title: "没有满足条件的商品...",
                 icon: "none",
                 duration: 2000
               });
             return false
 
-          }else{
-              this.PageCount=result.count
-              if(parseInt(this.PageCount) % this.PageSize === 0){
-                  this.allPage=this.PageCount / this.PageSize
-              }else{
-                this.allPage=parseInt(this.PageCount / this.PageSize) +1
-              }
+          }
+          
+              // this.PageCount=result.count
+              // if(parseInt(this.PageCount) % this.PageSize === 0){
+              //     this.allPage=this.PageCount / this.PageSize
+              // }else{
+              //   this.allPage=parseInt(this.PageCount / this.PageSize) +1
+              // }
             
-              if(this.allPage>this.Page){
-                  this.isLoad=true
-              }else{
-                this.isLoad=false
-              }
+              // if(this.allPage>this.Page){
+              //     this.isLoad=true
+              // }else{
+              //   this.isLoad=false
+              // }
               this.shoplist=this.shoplist.concat(result.data)
               for(let i of result.data){
                 this.$set(i,"Distance",parseFloat(i.Distance).toFixed(2))
               }
               this.closeMask()
-          }
           
         }
     },
@@ -227,7 +227,7 @@ export default {
         this.seractive=e
         this.no1=this.defaultactive
       }else{
-        this.ServiceType=this.serlist[e].Id
+        this.ServiceType=this.serlist[e].TypeName
         this.no1=this.serlist[e].TypeName
       }
       this.shoplist=[]
@@ -255,7 +255,7 @@ export default {
         this.active="全部区域"
         this.no3=this.active
       }else{
-        this.RegionId=this.placelist[e].Id
+        this.RegionId=this.placelist[e].Code
         this.no3=this.placelist[e].Name
       }
       this.shoplist=[]
@@ -327,13 +327,13 @@ export default {
       this.phValue=" "
     },
     closeMask(){ //关闭弹框
-       setTimeout(
-         ()=>{
+      //  setTimeout(
+      //    ()=>{
           this.isServe=false,
           this.showserve=false,
           this.showload=false,
           this.showplace=false
-         },1000)
+        //  },1000)
     },
     showShopDetail(e){ //商户详情
         //console.log(e)
