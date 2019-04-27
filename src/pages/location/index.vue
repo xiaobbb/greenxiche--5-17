@@ -13,9 +13,9 @@
         @markertap="markertap"
         @regionchange="regionchange"
         @controltap="controltap"
-        show-location
         style="width: 100%; height:480rpx;"
       ></map>
+        <!-- show-location -->
     </div>
     <!--填写订单信息列表弹窗-->
     <div class="list" v-show="orderInfoStatus*1===0">
@@ -236,6 +236,8 @@ export default {
           clickable: true
         }
       ],
+      latitude:0,
+      longitude:0,
       markers: [
         {
           iconPath: "/static/images/person.png",
@@ -333,6 +335,8 @@ export default {
     this.shopId = this.$root.$mp.query.shopId;
     this.latitude = this.$store.state.latitude;
     this.longitude = this.$store.state.longitude;
+    // 获取定位坐标位置
+    this.getMapInfo();
     // 图片
         // const state = this.$store.state;
         this.PicList = this.$store.state.upImgPathArr;
@@ -368,6 +372,26 @@ export default {
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "填写订单"
+      });
+    },
+    getMapInfo(){  //首次进入页面获取手机所在地城市经纬度
+    const that = this;
+      wx.getLocation({
+          type: 'wgs84',
+          success:(data)=> {
+          // console.log(data,"微信地图")
+          that.latitude=data.latitude
+          that.longitude=data.longitude
+          that.markers=[
+        {
+          iconPath: "/static/images/person.png",
+          id: 1,
+          latitude: that.latitude,
+          longitude: that.longitude,
+          width: 40,
+          height: 45
+        }]
+        },
       });
     },
     async getDefaultCar() {
@@ -783,7 +807,7 @@ export default {
       }
     },
     gethous(){
-      for (let i =0; i <= 24; i++) {
+      for (let i =0; i < 24; i++) {
           if(i.toString().length<2){
             i="0"+i
           }

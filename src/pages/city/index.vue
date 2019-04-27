@@ -171,6 +171,7 @@ export default {
       this.scrollTopId= 'currentcity'
       this.searchlist=[]
       this.cityList()
+      wx.navigateBack()
     },
     setBarTitle() {
       wx.setNavigationBarTitle({

@@ -426,7 +426,7 @@ export default {
         return false;
       }
       //商城订单
-      let result = await post("Order/OrderList", {
+      let result = await post("Order/CardOrderList", {
         UserId: this.userId,
         Token: this.token,
         Status: this.status,
