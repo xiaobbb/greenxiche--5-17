@@ -6,8 +6,8 @@
     <div class="inforight">
       <div class="infotitle" @click="goDetail">{{data.title}}</div>
       <div class="infospec">{{data.sku}}</div>
-      <div class="infoprice flex-container">
-        <p>￥{{price}}</p>
+      <div class="infoprice flex-container  flex-right">
+        <p class="price">￥{{price}}</p>
         <p v-if="showButton">x{{data.num}}</p>
         <div v-else class="flex-center">
           <img src="/static/images/add5.png" @click="addNum" class="specpic">
@@ -128,11 +128,17 @@ export default {
 .proinfo {
   padding: 20rpx 30rpx;
 }
+.inforight{
+  width:100%;
+}
 .orderimg {
   width: 160rpx;
   height: 160rpx;
   vertical-align: middle;
   margin-right: 30rpx;
+}
+.price{
+  width:100%;
 }
 .infospec {
   color: #999;
@@ -141,6 +147,13 @@ export default {
 .infoprice {
   font-size: 36rpx;
   color: #ff6666;
+  flex-flow:column nowrap;
+
+}
+.flex-right{
+  // flex-flow:row-reverse nowrap;
+  // justify-content:flex-end;
+  align-items:flex-end;
 }
 .infoprice p + p {
   color: #1a1a1a;
@@ -148,6 +161,9 @@ export default {
 }
 .pad {
   padding: 20rpx 30rpx;
+}
+.infotitle,.infospec,.infoprice{
+  width:100%;
 }
 .specpic {
   width: 48rpx;

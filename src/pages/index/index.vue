@@ -111,13 +111,13 @@
             <cover-view class="shopname">{{doorInfo.ShopNick}}</cover-view>
             <cover-view class="addressflex">
               <cover-view class="flex-container">
+                <cover-image v-for="item in doorInfo.ServiceScore" :key="item" src="/static/images/xing.png" class="xing"/>
+                <!-- <cover-image src="/static/images/xing.png" class="xing"/>
                 <cover-image src="/static/images/xing.png" class="xing"/>
                 <cover-image src="/static/images/xing.png" class="xing"/>
-                <cover-image src="/static/images/xing.png" class="xing"/>
-                <cover-image src="/static/images/xing.png" class="xing"/>
-                <cover-image src="/static/images/xing.png" class="xing"/>
+                <cover-image src="/static/images/xing.png" class="xing"/> -->
               </cover-view>
-              <cover-view class="start">5.0分</cover-view>
+              <cover-view class="start">{{doorInfo.ServiceScore}}.0分</cover-view>
               <cover-view class="time">{{doorInfo.BusinessHours}}</cover-view>
             </cover-view>
             <cover-view class="address">{{doorInfo.Address}}</cover-view>
@@ -167,7 +167,7 @@ export default {
           Promise.all([
               // this.judgeCityName(),
               // this.getCoupon(),
-              // this.isNewVip(),
+              this.isNewVip(),
               //this.getCityName(),this.getMapShow(),this.getCoupon(),this.isNewVip()
           ]).then(
             ()=>{

@@ -64,11 +64,11 @@ function request(url, method, data, header = {}) {
                         reject(false)
                         break;
                     default:
-                        reject(false)
                         wx.showToast({
                             title: res.data.msg + '!',
                             icon: 'none'
                         })
+                        reject(false)
                 }
             },
             fail: function(error) {

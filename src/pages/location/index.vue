@@ -19,6 +19,9 @@
     </div>
     <!--填写订单信息列表弹窗-->
     <div class="list" v-show="orderInfoStatus*1===0">
+      <div class="p20">
+        该商家服务时间为：{{shopInfo.BusinessHours}}
+      </div>
       <div class="item" @click="chosePlace">
         <img src="/static/images/yellow.png" class="diandian">
         <span class="location-self">{{nowPlace}}</span>
@@ -33,7 +36,9 @@
       <p class="hr"></p>
       <div class="item" @click="choseTime">
         <img src="/static/images/yellow.png" class="diandian">
-        <span class="location-self">{{timetip}}</span>
+        <!-- <span class="location-self">{{timetip}}</span> -->
+        <span class="location-self" v-if="!startTime">请选择服务时间</span>
+        <span class="location-self" v-else>{{datetip}} {{startTime}}-{{endTime}}</span>
         <img src="/static/images/back.png" class="back">
       </div>
       <p class="hr"></p>
@@ -213,6 +218,9 @@ export default {
       userId: "",
       token: "",
       shopId: "",
+      shopInfo:{},
+      startTime:'',
+      endTime:'',
       orderNo: "", //订单编号
       personName: "", //姓名
       personPhone: "", //手机
@@ -327,10 +335,14 @@ export default {
   onShow() {
     this.userId = wx.getStorageSync("userId");
     this.token = wx.getStorageSync("token");
-    console.log(this.latitude, this.longitude, "填写订单");
+    this.shopInfo = wx.getStorageSync('shopInfo')
+    console.log(this.shopInfo, "商户信息***********");
     this.showPay = false;
     this.inputFocus = false;
     this.showPass = false;
+    
+      this.startTime=''
+      this.endTime=''
     // this.orderInfoStatus=2;
     this.shopId = this.$root.$mp.query.shopId;
     this.latitude = this.$store.state.latitude;
@@ -394,6 +406,7 @@ export default {
         },
       });
     },
+    
     async getDefaultCar() {
       let res = await post("/User/GetCarInfo", {
         UserId: this.userId,
@@ -832,15 +845,51 @@ export default {
           // let minutes = this.minutes[valIndex[1]]
           // 滚动时再动态 通过年和月获取 这个月下对应有多少天
     },
+    // 确认选择时间
     choseTimeSbumit(){
       // console.log(this.shopTime,"日期")
       //console.log(this.time,"时间")
       // 未修复营业时间
-      this.shopTime=wx.getStorageSync("shopInfo").BusinessHours
-      const timeStart=this.shopTime.split("-")[0].split(":")[0]
+      this.shopTime=this.shopInfo.WorkTime
+      const timeStart=this.shopTime.split(" - ")[0].split(":")[0]
       const timeEnd=this.shopTime.split("-")[1].split(":")[0]
-      console.log(this.time,"营业时间")
-      let test=(this.time[2]*60 + this.time[3]) - (this.time[0]*60 + this.time[1])
+      console.log(timeStart,timeEnd,this.time,"营业时间")
+      console.log(this.datelist,this.datetip.replace(/月/g,'-'),'日期')
+      let datetip = this.datetip
+      datetip = datetip.replace(/月/g,'-')
+      datetip=datetip.replace(/日/g,' ')
+      console.log(this.time,'月份')
+      const year = new Date().getFullYear()
+      let time = [];
+      this.time.map(t=>{
+        let ts=''
+        if(String(t).length===1){
+          ts='0'+t
+        }else{
+          ts=t
+        }
+        time.push(ts)
+      })
+      const timeItem = year+'-'+datetip+time[0]+':'+time[1]+':00'
+      const timeItem2 = year+'-'+datetip+time[2]+':'+time[3]+':00'
+      console.log('time',timeItem,timeItem2)
+      post('Order/CheckMakeTime',{
+        WorkWeek:this.shopInfo.WorkWeek,
+        WorkTime:this.shopInfo.WorkTime,
+        AppointmentStartTime:timeItem,
+        AppointmentEndTime:timeItem2
+      }).then(res=>{
+        console.log(res,'校验时间')
+        this.startTime = time[0]+':'+time[1]
+        this.endTime = time[2]+':'+time[3]
+        this.orderInfoStatus=0;
+            // wx.setStorageSync("timearr",timeItem)
+            // wx.setStorageSync("datearr",'')
+            // this.changeTime();
+            // wx.navigateBack({ url: "/pages/location/main" });
+      })
+      return false;
+      // let test=(this.time[2]*60 + this.time[3]) - (this.time[0]*60 + this.time[1])
         //  if(this.time[2] >timeEnd || this.time[0] < timeStart ){
         //  wx.showToast({
         //     title: '您选择的时间不在营业范围内',
@@ -853,58 +902,58 @@ export default {
         // return false
         // }else 
 
-        if(test >120){
-         wx.showToast({
-            title: '服务时间不超过两个小时哦。。。',
-            icon: 'none',
-            duration: 2000,
-            complete: function (){
+        // if(test >120){
+        //  wx.showToast({
+        //     title: '服务时间不超过两个小时哦。。。',
+        //     icon: 'none',
+        //     duration: 2000,
+        //     complete: function (){
               
-            }
-        });
-        return false
-       }else if(this.active==0 && this.time[0]<=this.nowhour && this.time[1] <this.nowminute){
-          wx.showToast({
-            title: '您选择的时间已过...',
-            icon: 'none',
-            duration: 2000,
-            complete: function (){
+        //     }
+        // });
+        // return false
+      //  }else if(this.active==0 && this.time[0]<=this.nowhour && this.time[1] <this.nowminute){
+      //     wx.showToast({
+      //       title: '您选择的时间已过...',
+      //       icon: 'none',
+      //       duration: 2000,
+      //       complete: function (){
               
-            }
-        });
-        return false
-       }else if(this.time[0]>this.time[2]){
-         wx.showToast({
-            title: '开始时间不能大于结束时间',
-            icon: 'none',
-            duration: 2000,
-            complete: function (){
+      //       }
+      //   });
+        // return false
+      //  }else if(this.time[0]>this.time[2]){
+      //    wx.showToast({
+      //       title: '开始时间不能大于结束时间',
+      //       icon: 'none',
+      //       duration: 2000,
+      //       complete: function (){
               
-            }
-        });
-        return false
-      }else{
-          if(this.datetip && this.time.length>0){
-          console.log(this.datetip,this.time,'选择后的时间')
-            wx.setStorageSync("timearr",this.time)
-            wx.setStorageSync("datearr",this.datetip)
-            this.changeTime();
-            // wx.navigateBack({ url: "/pages/location/main" });
-            // 显示下单信息弹窗
-            this.orderInfoStatus=0;
-          }else{
-                wx.showToast({
-                  title: '请选择时间',
-                  icon: 'none',
-                  duration: 2000,
-                  complete: function (){
+      //       }
+        // });
+        // return false
+      // }else{
+      //     if(this.datetip && this.time.length>0){
+      //     console.log(this.datetip,this.time,'选择后的时间')
+      //       wx.setStorageSync("timearr",this.time)
+      //       wx.setStorageSync("datearr",this.datetip)
+      //       this.changeTime();
+      //       // wx.navigateBack({ url: "/pages/location/main" });
+      //       // 显示下单信息弹窗
+      //       this.orderInfoStatus=0;
+      //     }else{
+      //           wx.showToast({
+      //             title: '请选择时间',
+      //             icon: 'none',
+      //             duration: 2000,
+      //             complete: function (){
                     
-                  }
-              });
-              return false
-            }
+      //             }
+      //         });
+      //         return false
+      //       }
             
-          }
+      //     }
     }
   },
 
@@ -917,4 +966,7 @@ export default {
 <style lang="scss" scoped>
 @import "./style";
 @import "../../css/common.css";
+.p20{
+  padding:20rpx;
+}
 </style>

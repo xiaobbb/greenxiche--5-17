@@ -26,8 +26,10 @@
             @click="oneClick(pindex)"
           >
         </div>
-        <orderChild class="shopItem" :showButton="!isShow" :data="item" @editCar="editCar" :gotoDetail="true"></orderChild>
-      </div>
+        <div class="shopItem">
+          <orderChild :showButton="!isShow" :data="item" @editCar="editCar" :gotoDetail="true"></orderChild>
+        </div>
+        </div>
     </div>
     <!--底部按钮-->
     <div>
