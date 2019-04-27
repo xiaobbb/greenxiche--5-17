@@ -422,6 +422,9 @@ export default {
       this.getOrderList();
     },
     async getOrderList() {
+      if(this.isOved||this.hasData){
+        return false;
+      }
       //商城订单
       let result = await post("Order/OrderList", {
         UserId: this.userId,
@@ -430,16 +433,26 @@ export default {
         Page: this.page,
         pageSize: this.pageSize
       });
-      if (result.data == "" && this.page === 1) {
+      // 第一页没有数据
+      if (result.data.length ===0&& this.page===1) {
+        this.isOved= false;
         this.hasData = true;
+        return false;
+      }
+      // 没有数据了
+      if(result.data.length !==this.pageSize){
+        this.isOved= true;
+      }
+      if(this.page===1){
+        this.orderList=[]
       }
       if (result.data.length > 0) {
-        this.count = result.count;
-        if (parseInt(this.count) % this.pageSize === 0) {
-          this.allPage = this.count / this.pageSize;
-        } else {
-          this.allPage = parseInt(this.count / this.pageSize) + 1;
-        }
+        // this.count = result.count;
+        // if (parseInt(this.count) % this.pageSize === 0) {
+        //   this.allPage = this.count / this.pageSize;
+        // } else {
+        //   this.allPage = parseInt(this.count / this.pageSize) + 1;
+        // }
         for (let i = 0; i < result.data.length; i++) {
           if (parseFloat(result.data[i].ExpressPrice).toFixed(2) > 0) {
             this.$set(result.data[i], "isExpress", true);
@@ -454,15 +467,18 @@ export default {
         }
         // Express
         this.orderList = this.orderList.concat(result.data);
-        if (this.allPage > this.page) {
-          this.isLoad = true;
-        } else {
-          this.isLoad = false;
-        }
+        // if (this.allPage > this.page) {
+        //   this.isLoad = true;
+        // } else {
+        //   this.isLoad = false;
+        // }
         console.log(this.orderList, "订单列表");
       }
     },
     async getReserveOrderList() {
+      if(this.isOved||this.hasData){
+        return false;
+      }
       let result = await post("Order/MakeOrderList", {
         UserId: this.userId,
         Token: this.token,
@@ -470,8 +486,19 @@ export default {
         pageSize: this.pageSize,
         ServiceMode: this.serviceMode
       });
-      if (result.data == "" && this.page === 1) {
+      
+      // 第一页没有数据
+      if (result.data.length ===0&& this.page===1) {
+        this.isOved= false;
         this.hasData = true;
+        return false;
+      }
+      // 没有数据了
+      if(result.data.length !==this.pageSize){
+        this.isOved= true;
+      }
+      if(this.page===1){
+        this.bookList=[]
       }
       if (result.data.length > 0) {
         this.bookList = this.bookList.concat(result.data);
@@ -674,7 +701,9 @@ export default {
     },
     loadMoreOrder(e) {
       console.log("ffffffffff");
-      if (this.isLoad) {
+      if (this.isOved||this.hasData) {
+        return false;
+      }
         this.page++;
         if (this.orderBigType === 1) {
           //商城订单
@@ -684,13 +713,6 @@ export default {
           //预约订单
           this.getReserveOrderList();
         }
-      } else {
-        if (this.page > 1) {
-          this.isOved = true;
-        } else {
-          this.isOved = false;
-        }
-      }
     }
   },
 

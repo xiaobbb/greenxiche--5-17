@@ -14,7 +14,30 @@
             </div>
         </div>
         <div class="location glo-relative">
-            <map id="map" :longitude="longitude" :latitude="latitude"  scale="10" :controls="controls" :markers="markers" @markertap="markertap"   @regionchange="regionchange"   @controltap="controltap" show-location style="width: 750rpx; height: 1000rpx;"></map>
+          <!-- <map id="map" 
+              :longitude="longitude"  地图中心经度
+              :latitude="latitude"  地图中心纬度
+              scale="10"  地图放大倍数
+              :controls="controls"  地图控件，--我的位置
+              @controltap="controltap" 地图控件点击事件
+              :markers="markers"  地图标记
+              @markertap="markertap"    地图标记点击事件--点击之后
+              @regionchange="regionchange"  视野发生变化时 
+              show-location 
+              style="width: 750rpx; height: 1000rpx;">
+            </map> -->
+            <map id="map" 
+              :longitude="longitude"  
+              :latitude="latitude"  
+              scale="13"  
+              :controls="controls" 
+              :markers="markers" 
+              @markertap="markertap"   
+              @regionchange="regionchange"   
+              @controltap="controltap" 
+              show-location 
+              style="width: 750rpx; height: 100vh;">
+            </map>
         </div>
         <!--弹框遮罩-->
         <cover-view class="mask-modal" v-if="isshow"></cover-view>
@@ -133,7 +156,10 @@ export default {
       }
         console.log("userId:"+this.userId+"token:"+this.token,"首页获取token");
           Promise.all([
-              this.judgeCityName(),this.getCoupon(),this.isNewVip(),this.getDoorShopinfo()//默认获取上门的门店信息
+              this.judgeCityName(),
+              // this.getCoupon(),
+              // this.isNewVip(),
+              this.getDoorShopinfo()//默认获取上门的门店信息
               //this.getCityName(),this.getMapShow(),this.getCoupon(),this.isNewVip()
           ]).then(
             ()=>{
@@ -247,7 +273,7 @@ export default {
           this.$store.commit('update',{ latitude:data.latitude,
                         longitude:data.longitude
                         });
-         console.log(data.latitude,data.longitude);
+         console.log('重新定位',data.latitude,data.longitude);
           this.getCityinfo()
         },
         fail:(info)=>{
@@ -297,7 +323,9 @@ export default {
                     //console.log(this.markers,this.markers.length,"markers数组")
                   }
                 })
-               // console.log(this.markers,"markers数组")
+               this.markers.map(arr=>{
+               console.log(arr.latitude,arr.longitude,"markers数组")
+               })
                 this.getCityinfo()
               }
           }

@@ -108,6 +108,9 @@ export default {
     this.shoplist=[]
     this.Page=1
     this.ServiceType=''
+        this.no1="全部服务";
+        this.no2="距离排序";
+        this.no3="全部区域";
     this.Sort='0'
     this.RegionId=''
     this.latitude=wx.getStorageSync('latitude');
@@ -174,7 +177,10 @@ export default {
   },
   methods: {
     async getShopList(){  //获取商户列表
-        var result=await post("/Shop/SearchShopList",{
+        if(this.isOved){
+          return false;
+        }
+        const result=await post("/Shop/SearchShopList",{
           Page:this.Page,
           Lat:this.latitude,
           Lng:this.longitude,
@@ -184,7 +190,14 @@ export default {
           SearchKey:this.SearchKey,//关键词
           Sort:this.Sort,//距离查询
         })
+        this.closeMask()
         console.log(result,"商户列表数据")
+          if(result.data.length!==this.PageSize){
+            this.isOved= true;
+          }
+          if(this.Page===1){
+            this.shoplist=[]
+          }
         if(result.code==0){
           if(result.data.length==0){
               wx.showToast({
@@ -195,7 +208,6 @@ export default {
             return false
 
           }
-          
               // this.PageCount=result.count
               // if(parseInt(this.PageCount) % this.PageSize === 0){
               //     this.allPage=this.PageCount / this.PageSize
@@ -212,12 +224,12 @@ export default {
               for(let i of result.data){
                 this.$set(i,"Distance",parseFloat(i.Distance).toFixed(2))
               }
-              this.closeMask()
           
         }
     },
     choseServe(e){   //选择服务列表
-     this.Page='1'
+     this.Page=1
+      this.isOved=false
       //console.log(e)
       this.seractive=e
       this.defaultactive=""
@@ -235,7 +247,8 @@ export default {
      // this.closeMask()
     },
     choseDistance(e){  //选择距离列表
-      this.Page='1'
+      this.Page=1
+      this.isOved=false
       console.log(e)
       this.disactive=e
       this.Sort=e
@@ -246,7 +259,8 @@ export default {
      
     },
     chosePlace(e){   //选择区域列表
-      this.Page='1'
+      this.Page=1
+      this.isOved=false
       console.log(e)
       this.placeactive=e
       this.active=""
@@ -343,13 +357,19 @@ export default {
     showBrand(){  //展示排行榜
       wx.navigateTo({ url: "/pages/shoprank/main" });
     },
+    // 触底事件
     scrolltolower(){
-      if(this.isLoad){
+      if(!this.isOved){
+        
         this.Page++;
         this.getShopList();
-      }else{
-        this.isOved=true
       }
+      // if(this.isLoad){
+      //   this.Page++;
+      //   this.getShopList();
+      // }else{
+      //   this.isOved=true
+      // }
     },
     searchShop(){
       this.shoplist=[]

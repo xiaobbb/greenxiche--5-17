@@ -206,7 +206,7 @@ export default {
         shopId:shop.ShopId,
         name:shop.ShopNick,
         img:shop.Logo,
-        score:shop.ServiceScore
+        score:res.data[0].Score
       }
       // 获取优惠券信息
       this.getCoupon();
