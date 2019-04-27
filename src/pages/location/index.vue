@@ -20,7 +20,8 @@
     <!--填写订单信息列表弹窗-->
     <div class="list" v-show="orderInfoStatus*1===0">
       <div class="p20">
-        该商家服务时间为：{{shopInfo.BusinessHours}}
+        该商家服务时间为：
+        <div>{{shopInfo.WorkWeekSTR}} / {{shopInfo.WorkTime}}</div>
       </div>
       <div class="item" @click="chosePlace">
         <img src="/static/images/yellow.png" class="diandian">
