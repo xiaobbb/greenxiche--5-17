@@ -11,7 +11,18 @@
 .ser-menu{
     background:#f4f7fc;
     font-size: 28rpx;
-    width:20%;
+    width:180rpx;
+    height:100vh;
+    // height:100rpx;
+    position:fixed;
+    left:0;
+    top:0;
+    &
+    ::-webkit-scrollbar{
+        width: 0;
+        height: 0;
+        color: transparent;
+        }
 }
 .nemeitem{
     padding:30rpx 0;
@@ -33,8 +44,8 @@
     display:inline-block
 }
 .list{
-    width:78%;
-    padding:0 30rpx;
+    width:100%;
+    padding:0 20rpx 90rpx 200rpx;
 }
 .itemtitle,.price{
     font-weight:bold;

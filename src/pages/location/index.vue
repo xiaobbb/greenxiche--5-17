@@ -332,6 +332,10 @@ export default {
     this.timetip = "请选择服务时间";
     this.serTip = "请选择服务项目";
     this.total = "0.00";
+    this.datetip='';
+    this.startTime='';
+    this.endTime=''
+    console.log('initdate')
   },
   onShow() {
     this.userId = wx.getStorageSync("userId");
@@ -341,9 +345,6 @@ export default {
     this.showPay = false;
     this.inputFocus = false;
     this.showPass = false;
-    
-      this.startTime=''
-      this.endTime=''
     // this.orderInfoStatus=2;
     this.shopId = this.$root.$mp.query.shopId;
     this.latitude = this.$store.state.latitude;
@@ -364,7 +365,7 @@ export default {
       this.getDefaultCar();
     }
     //转换时间
-    this.changeTime();
+    // this.changeTime();
     //服务项目
     this.getSerItem();
     //备注
@@ -561,7 +562,7 @@ export default {
     },
     // 初始化下单缓存和vuex---用于提交订单数据
     initSubmitInfo() {
-      wx.setStorageSync("serItem", "");
+      wx.setStorageSync("serItem", []);
       wx.setStorageSync("CarInfo", "");
       wx.setStorageSync("timearr", "");
       wx.setStorageSync("datearr", "");
@@ -881,6 +882,8 @@ export default {
         AppointmentEndTime:timeItem2
       }).then(res=>{
         console.log(res,'校验时间')
+        this.AppointmentStartTime = timeItem
+        this.AppointmentEndTime = timeItem2
         this.startTime = time[0]+':'+time[1]
         this.endTime = time[2]+':'+time[3]
         this.orderInfoStatus=0;

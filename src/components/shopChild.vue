@@ -7,11 +7,11 @@
                 <p class="sertitle">{{name}}</p>
                 <div class="shopclass flex-container">
                     <p>
+                      <img src="/static/images/xing.png" v-for="score in detailinfo[0].ServiceScore" :key="score" class="xing-point">
+                      <!-- <img src="/static/images/xing.png" class="xing-point">
                       <img src="/static/images/xing.png" class="xing-point">
-                      <img src="/static/images/xing.png" class="xing-point">
-                      <img src="/static/images/xing.png" class="xing-point">
-                      <img src="/static/images/xing.png" class="xing-point">
-                      <img src="/static/images/gray1.png" class="xing-point">
+                      <img src="/static/images/xing.png" class="xing-point"> -->
+                      <img src="/static/images/gray1.png" v-for="score in (5-detailinfo[0].ServiceScore)" :key="score" class="xing-point">
                     </p>
                     <text class="grad">{{detailinfo[0].ServiceScore}}.0分</text>
                 <text class="numb">({{detailinfo[0].TransactionNumber}}条订单)</text>

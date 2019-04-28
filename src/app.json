@@ -10,13 +10,13 @@
         "van-switch": "/static/vant/switch/index"
     },
     "window": {
-        "navigationBarBackgroundColor": "#fff",
+        "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTitleText": "绿妞洗车",
         "navigationBarTextStyle": "black",
         "enablePullDownRefresh": true
     },
     "tabBar": {
-        "backgroundColor": "#fffff",
+        "backgroundColor": "#ffffff",
         "borderStyle": "white",
         "selectedColor": "#ff6325",
         "color": "#333",

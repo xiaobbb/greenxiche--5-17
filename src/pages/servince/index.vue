@@ -48,12 +48,16 @@ export default {
     this.latitude=this.$store.state.latitude
     this.longitude=this.$store.state.longitude
     this.shopId=this.$root.$mp.query.shopId
+    this.selectArr=[] //要提交的数组
     this.setBarTitle();
     console.log(this.shopId)
   },
   onShow(){
-      this.Page="1"
+      this.Page=1
       this.servicelist=[]
+      if(wx.getStorageSync("serItem").length>0){
+          this.selectArr=wx.getStorageSync("serItem")
+      }
       this.getMenulist();
   },
   data () {
@@ -69,6 +73,7 @@ export default {
       menulist:[],
       TypeId:"", //获取列表种类
       servicelist:[],
+      selectArr:[], //要提交的数组
       active:"0",
       isSelectAll:false
     }
@@ -119,6 +124,7 @@ export default {
             this.allPage = parseInt(this.pageCount / this.PageSize) + 1;
           }
           this.servicelist = this.servicelist.concat(res.data)
+          this.checkedSelectArr()
          // console.log("当前的页数",this.Page)
           //console.log("总页数："+this.allPage);
           if(this.allPage>=this.Page){
@@ -127,6 +133,16 @@ export default {
             this.isLoad=false
           }
       }
+    },
+    // 查找是否满足已选择条件
+    checkedSelectArr(){
+        this.servicelist.map(list=>{
+          this.selectArr.map(arr=>{
+            if(list.Id===arr.Id){
+              list.isSelect = true
+            }
+          })
+        })
     },
     change(e){  //点击菜单获取产品列表
       this.active=e
@@ -145,26 +161,37 @@ export default {
         }
     },
     oneClick(i){
+      if(!this.servicelist[i].isSelect){
+        this.selectArr.push(this.servicelist[i])
+      }else{
+        this.selectArr.map((arr,index)=>{
+          if(arr.Id===this.servicelist[i].Id){
+            this.selectArr.splice(index,1)
+          }
+        })
+      }
       this.servicelist[i].isSelect=!this.servicelist[i].isSelect
+      let isSelectAll= true; //判断是否全选
       for(var i=0;i<this.servicelist.length;i++){
             if(!this.servicelist[i].isSelect){
+                isSelectAll= false
                 this.isSelectAll=false
-                return
+                console.log('3')
+                return false;
             }
         }
-        this.isSelectAll=true
+          this.isSelectAll=isSelectAll
     },
     submit(){
       //console.log(this.servicelist)
-      const serItem=[]
-      for(var i=0;i<this.servicelist.length;i++){
-          if(this.servicelist[i].isSelect){
-            serItem.push(this.servicelist[i])
-          }
-      }
-      console.log(serItem)
-      wx.setStorageSync("serItem",serItem)
-      if(serItem.length>0){
+      // const serItem=[]
+      // for(var i=0;i<this.servicelist.length;i++){
+      //     if(this.servicelist[i].isSelect){
+      //       serItem.push(this.servicelist[i])
+      //     }
+      // }
+      wx.setStorageSync("serItem",this.selectArr)
+      if(this.selectArr.length>0){
         wx.navigateBack({ url: "/pages/location/main" })
       }else{
         wx.showToast({
@@ -187,6 +214,7 @@ export default {
       // }
          
     }
+
     
   },
 

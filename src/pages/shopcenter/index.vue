@@ -1,16 +1,18 @@
 <template>
   <div class="flex-container bigcontainer">
     <!--左菜单-->
-    <div class="ser-menu">
-      <div
-        v-for="(item,index) in menulist"
-        :key="index"
-        :class="{'active':activeId==item.id}"
-        @click="getClassifyLisit(item.id)"
-        class="nemeitem"
-      >
-        <text class="title">{{item.name}}</text>
-      </div>
+    <div >
+      <scroll-view scroll-y class="ser-menu">
+        <div
+          v-for="(item,index) in menulist"
+          :key="index"
+          :class="{'active':activeId==item.id}"
+          @click="getClassifyLisit(item.id)"
+          class="nemeitem"
+        >
+          <text class="title">{{item.name}}</text>
+        </div>
+      </scroll-view>
     </div>
     <!--右列表-->
     <div class="list">
@@ -44,6 +46,12 @@
           </div>
         </div>
       </div>
+
+      <p
+        class="ovedMsg"
+        v-if="isOved"
+        style="text-align:center;padding:20rpx;font-size:26rpx;color:#666;"
+      >没有数据了哦！</p>
     </div>
     <!--底部按钮-->
     <div class="btn">
@@ -85,7 +93,11 @@ export default {
       carNum: 0,
       carPrice: 0,
       userId: "",
-      token: ""
+      token: "",
+      page:1,
+      pageSize:12,
+      isOved:false,
+      notData:false
     };
   },
   watch: {
@@ -104,21 +116,29 @@ export default {
     //     deep: true
     // }
   },
-  onShow() {
-    this.cardlist = [];
-    this.combolist = [];
-    this.carData = [];
-    (this.userId = wx.getStorageSync("userId")),
-      (this.token = wx.getStorageSync("token")),
+  onLoad(){
       this.setBarTitle();
-    // 分类列表
-    this.getClassify();
+  },
+  onShow() {
+    this.initData()
   },
   methods: {
     setBarTitle() {
       wx.setNavigationBarTitle({
         title: "商城"
       });
+    },
+    initData(){
+      this.page=1;
+      this.cardlist = [];
+      this.combolist = [];
+      this.carData = [];
+      this.isOved=false;
+      this.notData=false;
+      (this.userId = wx.getStorageSync("userId")),
+        (this.token = wx.getStorageSync("token")),
+      // 分类列表
+      this.getClassify();
     },
     // 获取分类列表
     getClassify() {
@@ -139,16 +159,27 @@ export default {
     // 分类产品列表
     getClassifyLisit(id) {
       const that = this;
-      that.activeId = id;
-      that.productlist = [];
+      if(id){
+        that.activeId = id;
+        this.page=1;
+      }
       const params = {
-        page: 1,
-        pageSize: 30,
-        TypeId: id,
+        page: this.page,
+        pageSize:this.pageSize,
+        TypeId: id||that.activeId,
         Lat: 0,
         Lng: 0
       };
       post("/Goods/GoodsList", params).then(res => {
+        if(this.page===1){
+          that.productlist = [];
+        }
+        if(res.data.length!==this.pageSize&&this.page===1){
+          this.notData=true;
+        }
+        if(res.data.length!==this.pageSize&&this.page>1){
+          this.isOved=true;
+        }
         for (let i = 0; i < res.data.length; i += 1) {
           const datas = res.data[i];
           that.productlist.push({
@@ -179,16 +210,16 @@ export default {
       let status = true;
       for (let i = 0; i < this.carData.length; i += 1) {
         if (this.carData[i].ProductId == product.id) {
-            carId = this.carData[i].Id;
-            num = this.carData[i].Number - 1;
-            status = true;
-            break;
-        }else{
-            status = false;
-          }
+          carId = this.carData[i].Id;
+          num = this.carData[i].Number - 1;
+          status = true;
+          break;
+        } else {
+          status = false;
+        }
       }
       // 如果数量等于0，跳出
-      if(!status){
+      if (!status) {
         return false;
       }
       const data = [
@@ -241,24 +272,24 @@ export default {
           title: "大于库存了哦！",
           icon: "none"
         });
-        setTimeout(()=>{
-        post("Cart/EditCart", {
-          UserId: this.userId,
-          Token: this.token,
-          data: [
-            {
-              CartId: carId,
-              Total: product.stock,
-              SpecText: ""
-            }
-          ]
-        }).then(()=>{
-      this.getCarData();
-        });
-        },1000)
+        setTimeout(() => {
+          post("Cart/EditCart", {
+            UserId: this.userId,
+            Token: this.token,
+            data: [
+              {
+                CartId: carId,
+                Total: product.stock,
+                SpecText: ""
+              }
+            ]
+          }).then(() => {
+            this.getCarData();
+          });
+        }, 1000);
       } else {
         await post("Cart/AddCart", params);
-      this.getCarData();
+        this.getCarData();
       }
     },
     // 获取购物车信息
@@ -268,7 +299,7 @@ export default {
         Token: this.token
       };
       const res = await post("Cart/CartList", params);
-      this.carData=[]
+      this.carData = [];
       this.carNum = res.data.length;
       let carPrice = 0;
       for (let i = 0; i < res.data.length; i += 1) {
@@ -322,6 +353,19 @@ export default {
     goUrl(url) {
       wx.navigateTo({ url });
     }
+  },
+  // 下拉刷新
+  onPullDownRefresh(){
+    this.initData()
+    wx.stopPullDownRefresh()
+  },
+  // 上拉加载
+  onReachBottom(){
+      
+      if(!this.isOved&&!this.notData){
+        this.page+=1;
+        this.getClassifyLisit()
+      }
   }
 };
 </script>
