@@ -28,6 +28,7 @@
               :markers="markers"  地图标记
               @markertap="markertap"    地图标记点击事件--点击之后
               @regionchange="regionchange"  视野发生变化时 
+              @end="getCenterMap"  视野发生变化时 
               show-location 
               style="width: 750rpx; height: 1000rpx;">
         </map>-->
@@ -36,15 +37,19 @@
           :longitude="longitude"
           :latitude="latitude"
           scale="13"
-          :controls="controls"
-          @controltap="controltap"
           :markers="markers"
           @markertap="markertap"
-          @regionchange="regionchange"
+          @regionchange="getCenterMap1"
+          @end="getCenterMap"
           show-location
-          style="width: 750rpx; height: 94vh;"
+          style="width:750rpx; height:99vh;"
         ></map>
+        <!-- 中心点 -->
+        <!-- v-show="active==='上门'" -->
+        <cover-image class="centerImg" src="/static/images/person.png"></cover-image>
+        <cover-image @click="getMyPosition" class="backMyPosition" src="/static/images/location.png"></cover-image>
       </div>
+
       <!--弹框遮罩-->
       <cover-view class="mask-modal" v-if="isshow"></cover-view>
       <!--领取会员弹框-->
@@ -74,7 +79,7 @@
       <cover-view v-if="showShop" class="maskshop">
         <cover-view class="title">
           您的当前位置不在服务范围内，无法提供上门服务，是否到店服务？
-          <cover-view style="margin-top:20rpx;">提供上门服务，是否到店服务？</cover-view>
+          <!-- <cover-view style="margin-top:20rpx;">提供上门服务，是否到店服务？</cover-view> -->
         </cover-view>
         <cover-view class="flex-container bottombtn">
           <cover-view
@@ -96,29 +101,31 @@
         <cover-view class="tuanpick cover-text" @click="getNewConpon">立即领取</cover-view>
       </cover-view>
       <!--我要洗车-->
-      <cover-view class="modal-xiche" v-if="isXiche && shopArr.length>0">
-        <cover-view class="line flex-container" @click="choseLocation">
+      <cover-view class="modal-xiche" v-if="isXiche">
+        <!-- <cover-view class="line flex-container" @click="choseLocation"> -->
+        <cover-view class="line flex-container">
           <cover-view class="flex-container">
             <cover-image src="/static/images/yellow.png" class="diandian"/>
             <cover-view class="location-self">{{nowPlace}}</cover-view>
           </cover-view>
-          <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;"/>
+          <!-- 更改地图位置，搜索位置 -->
+          <!-- <cover-image src="/static/images/back.png" style="width:12rpx;height:22rpx;padding-left:10rpx;"/> -->
         </cover-view>
         <cover-view class="line flex-container">
           <cover-view class="flex-container">
             <cover-image src="/static/images/yellow.png" class="diandian"/>
-            <cover-view class="location-self">{{name}}</cover-view>
+            <cover-view class="location-self">{{shopInfo.name||'周边无可服务商户!'}}</cover-view>
           </cover-view>
         </cover-view>
         <cover-view class="wash" @click="washCar">我要洗车</cover-view>
       </cover-view>
       <!--到店-->
-      <cover-view class="modal-goshop" v-if="isGoshop && shopArr.length>0">
+      <cover-view class="modal-goshop" v-if="isGoshop">
         <cover-view @click="toShopdet(doorInfo.ShopId)">
           <cover-image :src="doorInfo.Logo" class="showimg"/>
         </cover-view>
-        <cover-view class="shopinfoflex" @click="toShopdet(doorInfo.ShopId)">
-          <cover-view class="shopname">{{doorInfo.ShopNick}}</cover-view>
+        <cover-view class="shopinfoflex" @click="toShopdet(doorInfo.id)">
+          <cover-view class="shopname">{{doorInfo.name}}</cover-view>
           <cover-view class="addressflex">
             <cover-view class="flex-container">
               <cover-image
@@ -140,7 +147,9 @@
         <cover-view class="rights" style="z-index:999" @click="getMap">
           <cover-image src="/static/images/rembg.png" class="big"/>
           <cover-image src="/static/images/wei.png" class="small"/>
-          <cover-view class="span-info">{{doorInfo.Distance>1000?'1000+':doorInfo.Distance}}km</cover-view>
+          <cover-view
+            class="span-info"
+          >{{doorInfo.tofixedDistance>100?'100+':doorInfo.tofixedDistance}}km</cover-view>
         </cover-view>
       </cover-view>
     </div>
@@ -152,63 +161,18 @@
 import { get, myget, mypost, post, toLogin } from "../../utils";
 import amapFile from "../../utils/amap-wx"; //高德地图API调用JS SDK
 import { mapState, mapMutations } from "vuex"; //vuex辅助函数
+import { transformFromGCJToWGS } from "@/utils/WSCoordinate"; //将gcj02坐标转wgs84
+import QQMapWX from "@/utils/qqmap-wx-jssdk"; //腾讯地图，reverseGeocoder逆地址转码
 import "../../css/common.css";
 import "../../css/global.css";
 export default {
-  onLoad() {
-    // this.getCityName() //获取定位位置和城市
-    // this.getDoorShopinfo()//默认获取上门的门店信息
-  },
-  onShow() {
-    wx.stopPullDownRefresh();
-    this.initData();
-    this.userId = wx.getStorageSync("userId");
-    this.token = wx.getStorageSync("token");
-    if (this.userId && this.token) {
-      // 初始展示上门还是到店
-
-      if (this.$root.$mp.query.name) {
-        this.change(this.$root.$mp.query.name);
-      }
-      //获取定位位置和城市
-      this.getCityName().then(res => {
-        if (this.active == "上门") {
-          this.getDoorShopinfo(); //要显示的店铺信息*******到店跟上门分开
-        } else {
-          this.getShopShopinfo();
-        }
-      });
-      this.isNewVip();
-    } else {
-      wx.navigateTo({ url: "/pages/login/main" });
-    }
-  },
-  watch: {
-    "$store.state": {
-      handler: function() {
-        const state = this.$store.state;
-        this.longitude = state.longitude;
-        this.latitude = state.latitude;
-        // if(this.longitude||this.latitude){
-        //   this.getCityinfo();
-        // }
-      },
-      deep: true
-    }
-
-    // shopArr:function(){
-    //     if(this.shopArr == ""){
-    //       this.isshow=true
-    //       this.showShop=true
-    //   }
-    // },
-    // 更改城市名称
-    // cityName:function(){
-    // this.getMapShow()
-    // }
+  watch: {},
+  computed: {
+    ...mapState(["cityName", "nowPlace", "longitude", "latitude", "showMask"])
   },
   data() {
     return {
+      qqmapsdk: null, //实例化地图sdk
       latitude: 0,
       longitude: 0,
       shopId: "", //展示的商户id
@@ -228,10 +192,10 @@ export default {
       controls: [
         {
           //控件不随着地图移动
-          id: 1,
-          iconPath: "/static/images/location.png",
+          id: 0,
+          iconPath: "/static/images/person.png",
           position: {
-            left: 0,
+            left: "375rpx",
             top: 300,
             width: 30,
             height: 30
@@ -244,46 +208,70 @@ export default {
       isshow: false,
       showShop: false, //提示不在服务范围
       showmember: false, //是否是vip
-      isXiche: false, //我要洗车
+      isXiche: true, //我要洗车
       isGoshop: false, //到店洗车最近的一家商铺
       isnew: false, //是否是新人
       dddd: false,
       cityName: "定位中.."
     };
   },
-  computed: {
-    ...mapState(["cityName", "nowPlace", "longitude", "latitude", "showMask"])
-  },
 
+  onLoad() {
+    this.getMyPosition(); //获取当前位置
+    // 实例化API核心类
+    this.qqmapsdk = new QQMapWX({
+      key: "3P2BZ-6G4WD-CEX43-PIV5G-3VDYH-N5BGH" // 必填
+    });
+  },
+  onShow() {
+    wx.stopPullDownRefresh(); //关闭下拉刷新
+    this.initData();
+    if (this.userId && this.token) {
+      // 初始展示上门还是到店
+      // 判断城市名称是否被更改，获取城市中心位置
+      if (this.cityName !== this.$store.state.cityName) {
+        console.log("更改了城市名称", this.$store.state.cityName);
+        // this.isXiche = false;
+        this.cityName = this.$store.state.cityName;
+        this.cityNameGetPosition();
+      }
+
+      // if (this.$root.$mp.query.name) {
+      //   this.change(this.$root.$mp.query.name);
+      // }
+      //获取定位位置和城市
+      // this.getMyPosition().then(res => {
+      // });
+      this.getCoupon()
+      this.isNewVip(); //检查是否vip---应开启，还有新人
+    } 
+    // else {
+    //   wx.navigateTo({ url: "/pages/login/main" });
+    // }
+  },
   methods: {
     ...mapMutations(["update"]),
     initData() {
       this.isshow = false;
       this.showmember = false;
       this.isnew = false;
-      this.isGoshop = false;
+      // this.isXiche = false;
+      // this.isGoshop = false;
       this.showShop = false;
+      this.userId = wx.getStorageSync("userId");
+      this.token = wx.getStorageSync("token");
+      // 获取定位,中文定位发生改变时
+      // this.latitude = this.$store.state.latitude;
+      // this.longitude = this.$store.state.longitude;
+
       // this.active='上门'
-      this.$store.commit("update", {
-        latitude: 0,
-        longitude: 0
-      });
+      // this.$store.commit("update", {
+      //   latitude: 0,
+      //   longitude: 0
+      // });
     },
-    controltap() {
-      //点击地图上control 回到当前定位点
-      this.getCityName();
-    },
-    //判断是否有城市名 没有的话就定位获取城市名 有就执行getMap
-    judgeCityName() {
-      // if(this.cityName=="定位中.."){
-      this.getCityName();
-      // }
-      // else{
-      //   this.getMapShow()
-      // }
-    },
-    getCityName() {
-      //首次进入页面获取手机所在地城市经纬度
+    // 获取定位
+    getMyPosition() {
       return new Promise((resolved, rejected) => {
         wx.getLocation({
           type: "wgs84",
@@ -295,287 +283,227 @@ export default {
               latitude: data.latitude,
               longitude: data.longitude
             });
-            console.log("重新定位", this.cityName);
+            // 根据坐标获取城市信息
             this.getCityinfo().then(() => {
-              console.log("获取到的name", this.$store.state.cityName);
-              // 选择城市
-              if (
-                this.cityName !== this.$store.state.cityName &&
-                this.$store.state.cityName !== "定位中.."
-              ) {
-                console.log("执行的name", this.$store.state.cityName);
-                this.cityName = this.$store.state.cityName;
-                this.isXiche = false; //我要洗车
-                this.isGoshop = false;
-                // this.update({ cityName: "定位中.." });
-                this.getMapShow(true).then(() => {
-                  if (this.active == "上门") {
-                    this.isshow = true;
-                    this.showShop = true;
-                    this.getShopShopinfo();
-                  }
-                });
-              }
-              
-                  resolved();
+              resolved();
             });
           },
-          fail: info => {
+          fail() {
             //失败回调
-            console.log(info);
-            //如果用户拒绝授权
-            // 默认为北京
+            //如果用户拒绝授权,默认为北京
             this.cityName = "北京市";
             this.update({ cityName: "北京市" });
           }
         });
       });
     },
-    getMapShow(status) {
-      //根据城市名称获取地图
-      return new Promise((resolved, rejected) => {
-        wx.request({
-          url:
-            "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address=" +
-            this.cityName +
-            "&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
-          header: {
-            "content-type": "application/x-www-form-urlencoded"
-          },
-          success: res => {
-            //console.log(res,"根据市获取地图")
-            if (res.data.result) {
-              const _res = res.data.result.location;
-              this.update({
-                latitude: res.data.result.location.lat,
-                longitude: res.data.result.location.lng
-              });
-              //   //console.log(this,"选择位置页面")
-              const MapContext = wx.createMapContext("map");
-              MapContext.getCenterLocation({
-                success: res => {
-                  console.log(this.latitude, this.longitude, "经纬度中心");
-                  //console.log(res,"获取地图中心位置经纬度")//还是原始位置的中心
-                  let centerMarker = [];
-                  centerMarker = [
-                    {
-                      iconPath: "/static/images/person.png",
-                      id: 0,
-                      latitude: this.latitude,
-                      longitude: this.longitude,
-                      width: 40,
-                      height: 45
-                    }
-                  ];
-                  // console.log(centerMarker,"中心标记")
-                  // this.markers=this.markers.concat(centerMarker)
-                  function sortId(a, b) {
-                    return a.id - b.id;
-                  }
-                  // this.markers.sort(sortId)
-                  //console.log(this.markers,this.markers.length,"markers数组")
-                }
-              });
-              if (!status) {
-                this.getCityinfo();
-              }
-              resolved();
-            }
-          }
-        });
-      });
-    },
-    getCityinfo() {
-      //根据经纬度获取城市名称nowPlace 反地理转码
+    //根据城市名称获取地图坐标
+    cityNameGetPosition() {
       return new Promise((resolved, rejected) => {
         const that = this;
-        //console.log(this.latitude,this.longitude,"首页")
-        // KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG
-        wx.setStorageSync("latitude", this.latitude);
-        wx.setStorageSync("longitude", this.longitude);
-        //console.log(this.latitude,this.longitude,"首页获取商户")
-        wx.request({
-          url:
-            "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&location=" +
-            this.latitude +
-            "," +
-            this.longitude +
-            "&output=json&src=webapp.baidu.openAPIdemo",
-          header: {
-            "content-type": "application/x-www-form-urlencoded"
+        this.qqmapsdk.geocoder({
+          address: this.cityName,
+          success(res) {
+            console.log("根据地址转换坐标", res);
+            const _res = res.result.location;
+            that.latitude = _res.lat;
+            that.longitude = _res.lng;
+            that.update({
+              latitude: _res.lat,
+              longitude: _res.lng
+            });
+            that.getCityinfo();
           },
-          success: res => {
-            console.log(res, "地理转码");
-            if (res.data.result) {
-              that.cityName = res.data.result.addressComponent.city;
-              that.update({
-                // cityName:res.data.result.addressComponent.city,
-                nowPlace: res.data.result.formatted_address
-              });
-              wx.setStorageSync("cityName", that.cityName);
-            }
-            console.log(that.cityName, that.nowPlace, "获取城市以及中心点位置");
-            resolved();
+          fail(err) {
+            console.log("根据地址转换坐标err", err);
           }
         });
+        // 百度地图
+        // wx.request({
+        //   url:
+        //     "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address=" +
+        //     this.cityName +
+        //     "&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
+        //   header: {
+        //     "content-type": "application/x-www-form-urlencoded"
+        //   },
+        //   success: res => {
+        //     //console.log(res,"根据市获取地图")
+        //     if (res.data.result) {
+        //       const _res = res.data.result.location;
+        //       that.latitude = _res.lat;
+        //       that.longitude = _res.lng;
+        //       that.update({
+        //         latitude: _res.lat,
+        //         longitude: _res.lng
+        //       });
+        //       that.getShopData();
+        //       resolved();
+        //     }
+        //   }
+        // });
       });
     },
-    //根据手机所在地经纬度获取上门周围商铺信息
-    async getDoorShopinfo() {
-      var res = await post("/Shop/NearbyShop", {
-        Lat: this.latitude,
-        Lng: this.longitude
+    //根据经纬度获取城市名称nowPlace 反地理转码
+    getCityinfo() {
+      return new Promise((resolved, rejected) => {
+        const that = this;
+        this.qqmapsdk.reverseGeocoder({
+          location: {
+            latitude: this.latitude,
+            longitude: this.longitude
+          },
+          success(res) {
+            console.log("地址转码成功", res);
+            const _res = res.result;
+            that.cityName = _res.address_component.city;
+            that.update({
+              cityName: _res.address_component.city,
+              nowPlace:
+                _res.formatted_addresses.recommend + " - " + _res.address
+            });
+            that.getShopData();
+          },
+          fail: function(res) {
+            console.log(res);
+          }
+        });
+        // 百度地图
+        // wx.request({
+        //   url:
+        //     "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&location=" +
+        //     that.latitude +
+        //     "," +
+        //     that.longitude +
+        //     "&output=json&src=webapp.baidu.openAPIdemo",
+        //   header: {
+        //     "content-type": "application/x-www-form-urlencoded"
+        //   },
+        //   success: res => {
+        //     console.log(res, "地理转码");
+        //     if (res.data.result) {
+        //       that.cityName = res.data.result.addressComponent.city;
+        //       that.update({
+        //         cityName: res.data.result.addressComponent.city,
+        //         nowPlace: res.data.result.formatted_address
+        //       });
+        //       this.getShopData();
+        //       // wx.setStorageSync("cityName", that.cityName);
+        //     }
+        //     console.log(that.cityName, that.nowPlace, "获取城市以及中心点位置");
+        //     resolved();
+        //   }
+        // });
       });
-      //console.log(res,"上门所有的商铺信息")
-      this.getShopArr(res);
     },
-    //获取到店商铺信息
-    async getShopShopinfo() {
-      let res = await post("/Shop/SearchShopList", {
+    //获取店铺信息,店铺集合
+    async getShopData() {
+      // 获取完城市中文名后获取数据
+      let url = "";
+      // 初始化到店和上门选中的商户信息
+      this.shopInfo = {};
+      this.doorInfo = {};
+      if (this.active === "上门") {
+        url = "Shop/NearbyShop";
+          this.isXiche = true;
+      } else {
+        url = "Shop/SearchShopList";
+        this.isGoshop = true;
+      }
+      const res = await post(url, {
         Lat: this.latitude,
         Lng: this.longitude,
-        Page: "1"
+        Page: 1
       });
-      //console.log(res,"到店所有的商铺信息")
-      this.getShopArr(res);
-    },
-    //店铺集合
-    getShopArr(res) {
       if (res.code == 0) {
-        this.shopArr = res.data; //所有店铺信息的集合
-        console.log(this.shopArr, "shoparr");
+        this.shopArr = JSON.parse(JSON.stringify(res.data)); //所有店铺信息的集合
         //根据上门的数组长度判断是否在服务范围之内
-        if (this.shopArr.length <= 0 && this.active == "上门") {
-          this.isshow = true;
-          this.showShop = true;
-          return false;
-        }
-        this.markers = [];
-        //console.log(this.shopArr,'66666666666666666666666')
         let arr = []; //保存markers数组
         for (let i = 0; i < res.data.length; i++) {
           //console.log(res.data[i])
-          let latitude = res.data[i].Lat;
-          let longitude = res.data[i].Lng;
+          const _res = res.data[i];
           let marker = {
             iconPath: "/static/images/cart.png",
-            id: i + 1,
-            name: res.data[i].ShopNick || "",
-            latitude: latitude,
-            longitude: longitude,
+            id: _res.ShopId,
+            Distance: _res.Distance,
+            name: _res.ShopNick || "",
+            Logo: _res.Logo,
+            ServiceScore: _res.ServiceScore,
+            BusinessHours: _res.BusinessHours,
+            Address: _res.Address,
+            WorkWeekSTR: _res.WorkWeekSTR,
+            WorkTime: _res.WorkTime,
+            WorkWeek:_res.WorkWeek,
+            latitude: _res.Lat,
+            longitude: _res.Lng,
             width: 24,
             height: 27.5
           };
           arr.push(marker);
         }
-        //this.markers=arr
-        //console.log(arr,"商铺标记集合")
-
-        this.markers = this.markers.slice(0, 1).concat(arr);
-        //console.log(this.markers,this.markers.length,"markers数组")
+        this.markers = arr;
         function sortId(a, b) {
-          return a.id - b.id;
+          return a.Distance - b.Distance;
         }
+        console.log("距离排序", this.markers[0].Distance);
         this.markers.sort(sortId);
-        if (this.active == "上门") {
-          this.getNearShop(); //要显示的店铺信息*******到店跟上门分开
+        console.log("距离排序2", this.markers[0].Distance);
+        if (this.active === "上门") {
+          this.shopInfo = this.markers[0];
         } else {
-          this.getDoorShop();
+          // 到店
+          console.log("距离排序2", this.markers[0].Distance);
+          // 判断如果大于100公里就不显示最近商家
+          if (this.markers[0].Distance * 1 < 100) {
+            this.doorInfo = this.markers[0];
+            this.doorInfo.tofixedDistance = this.doorInfo.Distance.toFixed(2);
+            
+          } else {
+            this.isGoshop = false;
+            return false;
+          }
         }
+        // 最近的商户放大
+          this.markers[0].iconPath = "/static/images/bigcar.png";
+          this.markers[0].width = 48;
+          this.markers[0].height = 55;
       }
     },
-    getNearShop() {
-      //上门获取markers标记时的商户信息
-      console.log(this.markerId, this.shopArr, "上门店铺标记id");
-      this.shopInfo = this.shopArr[this.markerId - 1];
-      console.log(this.shopInfo, "要显示上门的商铺的信息111111111111111");
-      this.name = this.shopInfo.ShopNick;
-      this.shopId = this.shopInfo.ShopId;
-    },
-    getDoorShop() {
-      //到店获取markers标记时的商户信息
-      console.log(this.markerId, this.shopArr, "到店店铺标记id");
-      this.doorInfo = this.shopArr[this.markerId - 1];
-      console.log(this.doorInfo, "要显示到店的商铺的信息2222222222222");
-      this.shopLat = this.doorInfo.Lat * 1;
-      this.shopLng = this.doorInfo.Lng * 1;
-      this.address = this.doorInfo.Address;
-      this.shopNick = this.doorInfo.ShopNick;
-      // this.name=this.doorInfo.ShopNick
-      // this.shopId=this.doorInfo.ShopId
-      this.$set(
-        this.doorInfo,
-        "Distance",
-        (this.doorInfo.Distance * 1).toFixed(2)
-      );
-
-      if (this.doorInfo.BusinessHours.length > 10) {
-        this.$set(
-          this.doorInfo,
-          "BusinessHours",
-          this.doorInfo.BusinessHours.split(" ")[1]
-        );
-        //this.doorInfo.BusinessHours=this.doorInfo.BusinessHours.split(" ")[1]
-      }
-      //console.log(this.doorInfo,"店铺详情")
-    },
+    //点击标记点
     markertap(e) {
-      //点击标记点
-      console.log(this.markers, "点击标记时");
-      console.log(e, "正在点击标记");
-      console.log(this.shopInfo, "点击的商户信息");
-      if (e.mp.markerId == 0) {
+      if (!e.mp.markerId) {
         return false;
       } else {
-        this.markerId = e.mp.markerId;
-        this.changeMarkerColor(); //更改样式
-        if (this.active == "上门") {
-          this.getNearShop();
-          this.isXiche = true;
-        } else {
-          this.isGoshop = true;
-          this.getDoorShop();
-        }
+        const markerId = e.mp.markerId;
+        //更改用户选中的标记样式
+        this.markers.map((item, index) => {
+          if (item.id === markerId) {
+            item.iconPath = "/static/images/bigcar.png";
+            item.width = 48;
+            item.height = 55;
+            console.log(item, "点击的商户信息");
+            if (this.active === "上门") {
+              this.shopInfo = item;
+              this.isXiche = true;
+            } else {
+              // 到店
+              this.doorInfo = item;
+              this.doorInfo.Distance = (item.Distance * 1).toFixed(2);
+              this.isGoshop = true;
+              this.latitude = item.latitude * 1;
+              this.longitude = item.longitude * 1;
+            }
+          } else {
+            // 把不选中的图标变回原形
+            item.iconPath = "/static/images/cart.png";
+            item.width = 24;
+            item.height = 27.5;
+          }
+        });
       }
     },
-    changeMarkerColor() {
-      //更改用户选中的标记样式
-      this.markers.forEach((item, index) => {
-        console.log(item, "遍历的商户item");
-        console.log(this.latitude, this.longitude, "原来的坐标");
-        if (item.id == this.markerId && this.markerId != 0) {
-          item.iconPath = "/static/images/bigcar.png";
-          item.width = 48;
-          item.height = 55;
-          this.latitude = item.latitude * 1;
-          this.longitude = item.longitude * 1;
-          this.$store.commit("update", {
-            latitude: item.latitude * 1,
-            longitude: item.longitude * 1
-          });
-          console.log(this.latitude, item.latitude, "现在的坐标");
-          // }else if(item.id != this.markerId&&index!==0){
-        } else if (item.id != this.markerId) {
-          item.iconPath = "/static/images/cart.png";
-          item.width = 24;
-          item.height = 27.5;
-        }
-      });
-      // this.markers.map((item) => {
-      //   //console.log(item.id)
-      //   if (item.id == this.markerId){
-      //     item.iconPath = "/static/images/bigcar.png";
-      //     item.width=48;
-      //     item.height=55
-      //   }else if(item.id != 0){
-      //     item.iconPath = "/static/images/cart.png";
-      //     item.width=24;
-      //     item.height=27.5
-      //   }
-      // })
-    },
+    //判断是否是新人  三天内
     async getCoupon() {
-      //判断是否是新人  三天内
       console.log(this.$store.state.showMask, "this.$store.state.showMask");
       if (!this.$store.state.showMask) {
         const res = await post("/Coupon/IsNewUser", {
@@ -591,8 +519,8 @@ export default {
         }
       }
     },
+    //领取新人礼券
     async getNewConpon() {
-      //领取新人礼券
       let res = await post("/Coupon/GetNewCoupon", {
         UserId: this.userId,
         Token: this.token
@@ -613,8 +541,8 @@ export default {
       this.showmember = true;
       // this.isXiche=false
     },
+    //验证是否vip
     async isNewVip() {
-      //验证是否vip
       console.log(this.$store.state.showMask, "this.$store.state.showMask");
       if (!this.$store.state.showMask) {
         let res = await post("/User/VerifyVIP", {
@@ -640,54 +568,50 @@ export default {
         }, 3000);
       }
     },
+    //关闭新人框
     closeNewModal() {
-      //关闭新人框
       (this.isnew = false), (this.isshow = true), (this.showmember = true);
       // this.isXiche=false
     },
+    //关闭vip框
     closeModal() {
-      //关闭vip框
       (this.isnew = false), (this.isshow = false), (this.showmember = false);
       // this.isXiche=true
     },
+    // 关闭上门周边无服务商家弹窗
     close() {
       this.isshow = false;
       this.showShop = false;
     },
+    // 确认上门周边无服务商家弹窗，跳转到店
     confirm() {
       this.isshow = false;
       this.showShop = false;
       this.active = "到店";
       this.isGoshop = false;
       this.isXiche = false; //我要洗车
-      //this.getShopinfo()
+      this.getShopData();
     },
+    // 改变上门还是到店状态
     change: function(name) {
       //console.log(name)
       this.active = name;
-      if (name == "到店") {
-        //console.log(666)
-        this.isXiche = false;
-        this.isGoshop = false;
-        this.markerId = "1";
-        this.shopArr = [];
-        //获取最近的商家显示
-        this.getCityName();
-        this.getShopShopinfo(); //获取到店商铺标记信息
-      } else if (name == "上门") {
-        this.isXiche = false;
-        this.isGoshop = false;
-        this.markerId = "1";
-        this.shopArr = [];
-        this.getCityName();
-        this.getDoorShopinfo(); //上门
-      }
+      this.isXiche = false;
+      this.isGoshop = false;
+      this.shopArr = [];
+      this.getShopData();
     },
+    // 跳转更改地图位置，搜索地图位置
     choseLocation() {
       wx.navigateTo({ url: "/pages/locationorder/main" });
     },
     washCar() {
-      //console.log(this.shopId)
+      console.log(this.shopInfo);
+      if (!this.shopInfo.id) {
+        this.isshow = true;
+        this.showShop = true;
+        return false;
+      }
       wx.setStorageSync("shopInfo", this.shopInfo);
       console.log(this.shopInfo, this.shopId, "跳转我要洗车");
       wx.navigateTo({ url: "/pages/location/main?shopId=" + this.shopId });
@@ -703,8 +627,8 @@ export default {
     toShopdet(e) {
       wx.navigateTo({ url: "/pages/shopdetail/main?shopid=" + e });
     },
+    //打开导航app功能
     getMap() {
-      //导航功能
       wx.openLocation({
         latitude: this.shopLat * 1,
         longitude: this.shopLng * 1,
@@ -712,6 +636,38 @@ export default {
         name: this.shopNick,
         scale: 18
       });
+    },
+    // 地图视野是触发
+    getCenterMap1() {},
+    // 地图视野结束是触发
+    getCenterMap() {
+      // if (this.active === "上门") {
+      const that = this;
+      console.log("自身位置坐标", this.longitude, this.latitude);
+      const map = wx.createMapContext("map");
+      map.getCenterLocation({
+        success(res) {
+          // 判断坐标一致，不用重复请求数据
+          if (
+            that.longitude === res.longitude &&
+            that.latitude === res.latitude
+          ) {
+            return false;
+          }
+          //  const ress =  transformFromGCJToWGS(res.latitude,res.longitude)
+          that.latitude = res.latitude;
+          that.longitude = res.longitude;
+          
+            that.$store.commit("update", {
+              latitude: res.latitude,
+              longitude: res.longitude
+            });
+          console.log("中心位置坐标", that.longitude, that.latitude);
+          // console.log('转换后的中心位置坐标',ress)
+          that.getCityinfo();
+        }
+      });
+      // }
     }
   },
 

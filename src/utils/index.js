@@ -64,11 +64,15 @@ function request(url, method, data, header = {}) {
                         reject(false)
                         break;
                     default:
+                    // 发生错误提示信息过短问题，
+                    if(url!=='Order/CheckMakeTime'){
                         wx.showToast({
                             title: res.data.msg + '!',
-                            icon: 'none'
+                            icon: 'none',
+                            duration:2000
                         })
-                        reject(false)
+                    }
+                        reject(res)
                 }
             },
             fail: function(error) {
