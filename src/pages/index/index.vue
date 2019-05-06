@@ -140,7 +140,7 @@
               <cover-image src="/static/images/xing.png" class="xing"/>-->
             </cover-view>
             <cover-view class="start">{{doorInfo.ServiceScore}}.0分</cover-view>
-            <cover-view class="time">{{doorInfo.BusinessHours}}</cover-view>
+            <cover-view class="time">{{doorInfo.WorkTime}}</cover-view>
           </cover-view>
           <cover-view class="address">{{doorInfo.Address}}</cover-view>
         </cover-view>

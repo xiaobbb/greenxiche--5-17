@@ -270,6 +270,9 @@
 .address{
     font-size: 26rpx;
     color:#999;
+    width:100%;
+    // overflow:hidden;
+    text-overflow: ellipsis;
 }
 .maskshop{
     position: fixed;

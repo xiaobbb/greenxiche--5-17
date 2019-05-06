@@ -4,7 +4,8 @@
       <div class="regLoginBox">
         <div class="logo">
           <div class="img">
-            <img src="/static/images/logo.png">
+            <!-- <img src="/static/images/logo0.png"> -->
+            <img src="/static/images/logo.jpg">
           </div>
         </div>
         <div class="from pd10">
@@ -16,7 +17,7 @@
             <span class="icon icon_code"></span>
             <input type="text" class="ipt" placeholder="请输入验证码" v-model="verifyCode">
             <!-- <div class="getcode" @click="getCode(this)">{{btnText}}</div> -->
-            <button
+            <button 
               class="getcode"
               style="background:#ff5c29;font-size:28rpx;"
               @click="getVerifyCode(this)"
@@ -33,7 +34,7 @@
           <label class="from-line from-txt inlineflex" @click="onCheckedStatus">
             <!-- <div class="IconsCK IconsCK-radio checked" style="margin-right:12rpx;vertical-align:top;"></div> -->
             <input type="checkbox" class="checkbox-cart" :checked="checkedStatus" v-model="checkedStatus" >
-            <text style="font-size:28rpx">我已阅读并同意{{checkedStatus}}</text>
+            <text style="font-size:28rpx">我已阅读并同意</text>
             <text style="color:#ff5c29;font-size:28rpx">《用户协议》</text>
           </label>
         </div>
@@ -218,4 +219,9 @@ export default {
 </script>
 <style lang='scss' scoped>
 @import "./style";
+.img{
+  img{
+    border-radius:50%;
+  }
+}
 </style>
