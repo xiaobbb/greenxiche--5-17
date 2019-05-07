@@ -159,4 +159,7 @@ export default {
 <style lang="scss" scoped>
 @import "./style";
 @import "../../css/common.css";
+.minicoupon{
+  padding:0 20rpx;
+}
 </style>

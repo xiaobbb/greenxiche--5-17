@@ -145,8 +145,6 @@ export default {
     this.activecolor = "0";
     this.active = "服务";
     this.getShopDetail();
-    this.getBarlist();
-    this.showItem();
     console.log(this.typeid, "page服务类型id");
   },
   data() {
@@ -204,6 +202,7 @@ export default {
         Lat: this.lat,
         Lng: this.lng
       });
+      this.getBarlist();
       if (res.code == 0) {
         this.$set(
           res.data[0],
@@ -223,6 +222,7 @@ export default {
         this.barlist = res.data;
         console.log(this.barlist, "barlist服务分类");
       }
+      this.showItem();
     },
       //服务列表
     async showItem() {

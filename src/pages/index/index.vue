@@ -46,7 +46,7 @@
         ></map>
         <!-- 中心点 -->
         <!-- v-show="active==='上门'" -->
-        <cover-image class="centerImg" src="/static/images/person.png"></cover-image>
+        <cover-image v-show="active==='上门'"  class="centerImg" src="/static/images/person.png"></cover-image>
         <cover-image @click="getMyPosition" class="backMyPosition" src="/static/images/location.png"></cover-image>
       </div>
 
@@ -597,7 +597,7 @@ export default {
     getCenterMap1() {},
     // 地图视野结束是触发
     getCenterMap() {
-      // if (this.active === "上门") {
+      if (this.active === "上门") {
       const that = this;
       console.log("自身位置坐标", this.longitude, this.latitude);
       const map = wx.createMapContext("map");
@@ -623,7 +623,7 @@ export default {
           that.getCityinfo();
         }
       });
-      // }
+      }
     }
   },
 

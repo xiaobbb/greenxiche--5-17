@@ -62,7 +62,7 @@ export default {
       this.password= "";
       this.password2= "";
       this.disabled=false;
-      this.checkedStatus = false;
+      this.checkedStatus = true;
     this.setBarTitle();
   },
   data() {
@@ -73,7 +73,7 @@ export default {
       password: "",
       password2: "",
       disabled:false,
-      checkedStatus:false
+      checkedStatus:true
     };
   },
   components: {},
