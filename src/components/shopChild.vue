@@ -38,7 +38,7 @@
                   <img src="/static/images/bg9.png" class="big">
                   <img src="/static/images/to.png" class="small">
               </p>
-              <p>{{detailinfo[0].Distance}}km</p>
+              <p class="km">{{detailinfo[0].Distance>100?'100+':detailinfo[0].Distance}}km</p>
             </div>
         </div>
         <div class="halfhr"></div>
@@ -144,7 +144,7 @@ export default {
 .range{
     flex-direction: column;
     color:#999;
-    padding:0 30rpx;
+    padding:0 20rpx;
 }
 .lineleft{
   border-left:1rpx solid #eee;

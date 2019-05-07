@@ -338,6 +338,8 @@ export default {
       this.orderList = [];
       this.bookList = [];
       this.reasonList = [];
+        this.isOved= false;
+        this.hasData = false;
 
       if (this.$root.$mp.query.orderBigType) {
         //是商城订单还是预约订单;1:商城订单；2：预约订单
@@ -346,7 +348,8 @@ export default {
       // else {
       //   this.orderBigType = 1;
       // }
-      if (this.orderBigType === 1) {
+      console.log(this.orderBigType,'类型')
+      if (this.orderBigType*1 === 1) {
         if (this.$root.$mp.query.status || this.$root.$mp.query.status == 0) {
           this.status = this.$root.$mp.query.status * 1;
         } else {
@@ -355,7 +358,7 @@ export default {
         this.serviceMode = 1;
         this.getOrderList();
       }
-      if (this.orderBigType === 2) {
+      if (this.orderBigType*1 === 2) {
         if (this.$root.$mp.query.status) {
           this.serviceMode = this.$root.$mp.query.status * 1;
         }

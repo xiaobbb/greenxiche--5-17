@@ -258,6 +258,7 @@ export default {
         this.orderinfo.ShopData = result.data[0].ShopData[0];
         this.CouponData = result.data[0].CouponData;
         this.CardTicketData = result.data[0].CardTicketData;
+        this.totalPrice = result.data[0].Price
         console.log(this.orderinfo.ShopData, "确认页面详情");
       }
     },

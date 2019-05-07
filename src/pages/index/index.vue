@@ -134,6 +134,13 @@
                 src="/static/images/xing.png"
                 class="xing"
               />
+              <cover-image
+                v-show="doorInfo.ServiceScore==0"
+                v-for="item1 in 5"
+                :key="item1"
+                src="/static/images/gray1.png"
+                class="xing"
+              />
               <!-- <cover-image src="/static/images/xing.png" class="xing"/>
                 <cover-image src="/static/images/xing.png" class="xing"/>
                 <cover-image src="/static/images/xing.png" class="xing"/>
@@ -318,30 +325,6 @@ export default {
             console.log("根据地址转换坐标err", err);
           }
         });
-        // 百度地图
-        // wx.request({
-        //   url:
-        //     "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&address=" +
-        //     this.cityName +
-        //     "&output=json&src=webapp.baidu.openAPIdemo&coord_type= bd09ll",
-        //   header: {
-        //     "content-type": "application/x-www-form-urlencoded"
-        //   },
-        //   success: res => {
-        //     //console.log(res,"根据市获取地图")
-        //     if (res.data.result) {
-        //       const _res = res.data.result.location;
-        //       that.latitude = _res.lat;
-        //       that.longitude = _res.lng;
-        //       that.update({
-        //         latitude: _res.lat,
-        //         longitude: _res.lng
-        //       });
-        //       that.getShopData();
-        //       resolved();
-        //     }
-        //   }
-        // });
       });
     },
     //根据经纬度获取城市名称nowPlace 反地理转码
@@ -368,32 +351,6 @@ export default {
             console.log(res);
           }
         });
-        // 百度地图
-        // wx.request({
-        //   url:
-        //     "https://api.map.baidu.com/geocoder/v2/?ak=KpdqD9A6OzIRDWUV1Au2jcPgy9BZxDGG&location=" +
-        //     that.latitude +
-        //     "," +
-        //     that.longitude +
-        //     "&output=json&src=webapp.baidu.openAPIdemo",
-        //   header: {
-        //     "content-type": "application/x-www-form-urlencoded"
-        //   },
-        //   success: res => {
-        //     console.log(res, "地理转码");
-        //     if (res.data.result) {
-        //       that.cityName = res.data.result.addressComponent.city;
-        //       that.update({
-        //         cityName: res.data.result.addressComponent.city,
-        //         nowPlace: res.data.result.formatted_address
-        //       });
-        //       this.getShopData();
-        //       // wx.setStorageSync("cityName", that.cityName);
-        //     }
-        //     console.log(that.cityName, that.nowPlace, "获取城市以及中心点位置");
-        //     resolved();
-        //   }
-        // });
       });
     },
     //获取店铺信息,店铺集合
@@ -452,7 +409,6 @@ export default {
           this.shopInfo = this.markers[0];
         } else {
           // 到店
-          console.log("距离排序2", this.markers[0].Distance);
           // 判断如果大于100公里就不显示最近商家
           if (this.markers[0].Distance * 1 < 100) {
             this.doorInfo = this.markers[0];
