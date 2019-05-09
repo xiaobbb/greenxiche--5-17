@@ -2,10 +2,10 @@
   <div class="login">
     <open-data class="icon icon_circular_bead" type="userAvatarUrl"></open-data>
     <div class="auth-text">
-      <text class="main">该小程序由网坛科技开发，请提供以下授权，即可继续操作</text>
-      <text class="sub">· 获得你的公开信息（昵称、头像等）</text>
+      <text class="main">{{title}}</text>
+      <text class="sub">{{content}}</text>
     </div>
-    <button class="login-btn" open-type="getUserInfo" lang="zh_CN" @getuserinfo="doBind">授权登录</button>
+    <button class="login-btn" open-type="getUserInfo" lang="zh_CN" @getuserinfo="doBind">{{buttonText}}</button>
   </div>
 </template>
 
@@ -21,6 +21,22 @@ export default {
   },
   onShow() {
     
+        console.log('res1')
+        const that = this;
+    wx.getSetting({
+      success(res){
+        // 已授权
+        if(res.authSetting['scope.userInfo']){
+        console.log('res',res.authSetting['scope.userInfo'])
+          that.title = '登录信息已过期或者已经失效，需重新进行登录'
+          that.buttonText = '登录'
+        }
+        // 未授权
+        else{
+
+        }
+      }
+    })
   },
   created() {},
   data() {
@@ -36,7 +52,11 @@ export default {
       telNumber: "",
       code: "",
       accessToken: "",
-      askUrl: ""
+      askUrl: "",
+      // 是否授权的提示信息
+      title:'该小程序由网坛科技开发，请提供以下授权，即可继续操作',
+      content:'· 获得你的公开信息（昵称、头像等）',
+      buttonText:'授权登录'
     };
   },
   components: {},

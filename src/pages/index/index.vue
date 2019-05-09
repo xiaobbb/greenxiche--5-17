@@ -121,7 +121,7 @@
       </cover-view>
       <!--到店-->
       <cover-view class="modal-goshop" v-if="isGoshop">
-        <cover-view @click="toShopdet(doorInfo.ShopId)">
+        <cover-view @click="toShopdet(doorInfo.id)">
           <cover-image :src="doorInfo.Logo" class="showimg"/>
         </cover-view>
         <cover-view class="shopinfoflex" @click="toShopdet(doorInfo.id)">
