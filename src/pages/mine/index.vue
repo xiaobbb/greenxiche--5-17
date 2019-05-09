@@ -4,7 +4,13 @@
           <div class="flex-container clomn avahead">
               <img v-if="memberInfo.Avatar" :src="memberInfo.Avatar" class="avatar">
               <img v-else src="/static/images/default.png" class="avatar">
-              <p class="person">{{memberInfo.NickName}}</p>
+              <div class="flexs name" @click="gotoVipGrade">
+                <p class="person">{{memberInfo.NickName}}</p>
+                <img src="/static/images/vip_v.png" alt="">
+                <p class="level">LV0</p>
+              </div>
+              
+              <div class="person_id">ID:{{memberInfo.MemberID}}</div>
           </div>
           <div class="flex-container avaitem">
               <div class="flex-container clomn" @click="gotoWallet">
@@ -53,6 +59,10 @@
           <div class="mineitem" @click="goItem(1)">
               <img src="/static/images/purple.png" class="mine1">
               <p>我的钱包</p>
+          </div>
+          <div class="mineitem" @click="goItem(4)">
+              <img src="/static/images/friends.png" class="mine1">
+              <p>邀请好友</p>
           </div>
           <div class="mineitem" @click="goItem(2)">
               <img src="/static/images/msg.png" class="mine2">
@@ -112,6 +122,10 @@ export default {
       this.memberInfo = {};
       this.isHasInfo = false;
     },
+    // 跳转到vip等级
+    gotoVipGrade(){
+          wx.navigateTo({ url: "/pages/vipGrade/main" });
+    },
     goItem(e){
       var a=e
       if(a==1){
@@ -122,6 +136,10 @@ export default {
       }
       if(a==3){
           wx.navigateTo({ url: "/pages/installinfo/main" });
+      }
+      // 跳转会员等级
+      if(a==4){
+          wx.navigateTo({ url: "/pages/inviteFriends/main"});
       }
       
     },
@@ -158,6 +176,7 @@ export default {
           console.log("dddddd");
         this.isHasInfo = true;
         this.memberInfo = result.data;
+        wx.setStorageSync('userInfo',result.data)
         console.log(this.memberInfo);
       }
     //   console.log(result);

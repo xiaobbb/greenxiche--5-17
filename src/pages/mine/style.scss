@@ -27,13 +27,29 @@
 .avahead {
     height: 200rpx;
     justify-content: flex-end;
+    .name{
+        margin-top: 10rpx;
+        display:flex;
+        align-items:center;
+        .person {
+            font-size: 30rpx;
+            // margin-left:70rpx;
+        }
+        img{
+            width:26rpx;
+            height:26rpx;
+            margin:0 5rpx 0 20rpx;
+        }
+        .level{
+            font-size:26rpx;
+            color:#ff6325;
+        }
+    }
 }
-
-.person {
-    margin-top: 10rpx;
-    font-size: 30rpx;
+.person_id{
+    font-size: 26rpx;
+    color:#999;
 }
-
 .logo4 {
     width: 39rpx;
     height: 38rpx;
