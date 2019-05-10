@@ -1,0 +1,88 @@
+
+
+.userInfo{
+    padding:30rpx 0 30rpx 60rpx;
+    background:#fff9f7;
+    .avatar{
+        border-radius:50%;
+        width:121rpx;
+        height:121rpx;
+    }
+    .name{
+        img{
+            width:28rpx;
+            height:28rpx;
+            margin:0 5rpx 0 15rpx;
+        }
+        .person{
+            font-size:30rpx;
+        }
+        .level{ 
+            font-size:20rpx;
+            color:#ff6325;
+        }
+    }
+    .person_id{
+        color:#999;
+        font-size:24rpx;
+    }
+}
+h3{
+    font-size:28rpx;
+    margin-top:20rpx;
+    line-height:78rpx;
+    display:flex;
+    align-items:center;
+    &::before{
+        content:'';
+        display:inline-block;
+        width:4rpx;
+        height:30rpx;
+        background:#ff6325;
+        margin-right:15rpx;
+    }
+}
+p{
+    font-size:28rpx;
+    line-height:45rpx;
+    color:#999;
+}
+// 等级对照表
+.grade-tabel{
+    .tabel{
+        text-align:center;
+        margin:30rpx 0;
+        .left{
+            width:210rpx;
+            height:82rpx;
+            line-height:82rpx;
+        }
+        .right{
+            width:480rpx;
+            height:82rpx;
+            line-height:82rpx;
+        }
+        .head{
+            background:#628eda;
+            color:#fff;
+        }
+        .bodys{
+            background: #ecf1fc;
+            .left{
+                color:#628eda;
+                border-right:#c7d3df;
+            }
+            .right{
+                color:#8698b6;
+                justify-content:center;
+            }
+            .item{
+                border-bottom:#c7d3df;
+            }
+        }
+    }
+}
+// 权益介绍
+.introduction{
+
+}
