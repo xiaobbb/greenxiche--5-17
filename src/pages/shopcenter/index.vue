@@ -1,7 +1,7 @@
 <template>
   <div class="flex-container bigcontainer">
     <!--左菜单-->
-    <div >
+    <div>
       <scroll-view scroll-y class="ser-menu">
         <div
           v-for="(item,index) in menulist"
@@ -30,18 +30,24 @@
           </div>
           <div class="flex-container citeminfo">
             <p class="itemtitle" @click="goDetail(item.brandId,item.id)">{{item.title}}</p>
-            <p class="progress" @click="goDetail(item.brandId,item.id)">
+            <p class="progress" @click="goDetail(item.brandId,item.id)" 
+            v-if="item.brandId!=21">
               <text v-for="(tab,tabIndex) in item.tab" :key="tabIndex">{{tab}}</text>
             </p>
-            <p class="sales">销量{{item.sale}}</p>
+            <p class="sales" v-if="item.brandId!=21" @click="goDetail(item.brandId,item.id)">销量{{item.sale}}</p>
+              <!-- 店铺名称 -->
+            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.ShopName}}</p>
+              <!-- 距离 -->
+            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.Distance}}</p>
             <div class="flex-container around">
               <p class="price">￥{{item.price}}</p>
               <!-- <div v-show="item.isAttr"> -->
-              <div v-show="item.isAttr">
+              <div v-show="item.isAttr&&item.brandId!=24">
                 <img src="/static/images/s1.png" @click="lessNumber(index)" class="tippic">
                 <text class="nums">{{item.num}}</text>
                 <img src="/static/images/addcart.png" @click="addNumber(index)" class="tippic">
               </div>
+              <div class="pay" v-show="item.brandId==24">立即购买</div>
             </div>
           </div>
         </div>
@@ -70,6 +76,7 @@
 </template>
 
 <script>
+// BrandId 21:服务项目 22:服务套餐23:服务卡券 24:镀晶版本
 import { post } from "@/utils/index";
 import "../../css/common.css";
 import "../../css/global.css";
@@ -94,10 +101,12 @@ export default {
       carPrice: 0,
       userId: "",
       token: "",
-      page:1,
-      pageSize:12,
-      isOved:false,
-      notData:false
+      page: 1,
+      pageSize: 12,
+      isOved: false,
+      notData: false,
+      latitude:0,
+      longitude:0,
     };
   },
   watch: {
@@ -116,11 +125,11 @@ export default {
     //     deep: true
     // }
   },
-  onLoad(){
-      this.setBarTitle();
+  onLoad() {
+    this.setBarTitle();
+    this.initData();
   },
   onShow() {
-    this.initData()
   },
   methods: {
     setBarTitle() {
@@ -128,17 +137,25 @@ export default {
         title: "商城"
       });
     },
-    initData(){
-      this.page=1;
+    initData() {
+      this.page = 1;
       this.cardlist = [];
       this.combolist = [];
       this.carData = [];
-      this.isOved=false;
-      this.notData=false;
+      this.isOved = false;
+      this.notData = false;
       (this.userId = wx.getStorageSync("userId")),
         (this.token = wx.getStorageSync("token")),
-      // 分类列表
-      this.getClassify();
+        // 分类列表
+      // 获取定位
+      wx.getLocation({
+        type: "wgs84",
+        success: res => {
+          this.latitude = res.latitude;
+          this.longitude = res.longitude;
+          this.getClassify();
+        }
+          });
     },
     // 获取分类列表
     getClassify() {
@@ -159,44 +176,45 @@ export default {
     // 分类产品列表
     getClassifyLisit(id) {
       const that = this;
-      if(id){
+      if (id) {
         that.activeId = id;
-        this.page=1;
+        this.page = 1;
       }
-      const params = {
-        page: this.page,
-        pageSize:this.pageSize,
-        TypeId: id||that.activeId,
-        Lat: 0,
-        Lng: 0
-      };
-      post("/Goods/GoodsList", params).then(res => {
-        if(this.page===1){
-          that.productlist = [];
-        }
-        if(res.data.length!==this.pageSize&&this.page===1){
-          this.notData=true;
-        }
-        if(res.data.length!==this.pageSize&&this.page>1){
-          this.isOved=true;
-        }
-        for (let i = 0; i < res.data.length; i += 1) {
-          const datas = res.data[i];
-          that.productlist.push({
-            brandId: datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
-            id: datas.Id,
-            title: datas.Name,
-            price: datas.Price,
-            img: datas.ProductImg,
-            sale: datas.SalesVolume,
-            num: 0,
-            stock: datas.Stock,
-            tab: datas.KeywordName ? JSON.parse(datas.KeywordName) : [],
-            // isAttr:datas.SpecificationValue&&datas.BrandId===21
-            isAttr: datas.SpecificationValue
-          });
-        }
-        that.getCarData();
+
+          const params = {
+            page: this.page,
+            pageSize: this.pageSize,
+            TypeId: id || that.activeId,
+            Lat: this.latitude,
+            Lng: this.longitude
+          };
+          post("Goods/GoodsList", params).then(res => {
+            if (this.page === 1) {
+              that.productlist = [];
+            }
+            if (res.data.length !== this.pageSize && this.page === 1) {
+              this.notData = true;
+            }
+            if (res.data.length !== this.pageSize && this.page > 1) {
+              this.isOved = true;
+            }
+            for (let i = 0; i < res.data.length; i += 1) {
+              const datas = res.data[i];
+              that.productlist.push({
+                brandId: datas.BrandId, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
+                id: datas.Id,
+                title: datas.Name,
+                price: datas.Price,
+                img: datas.ProductImg,
+                sale: datas.SalesVolume,
+                num: 0,
+                stock: datas.Stock,
+                tab: datas.KeywordName ? JSON.parse(datas.KeywordName) : [],
+                // isAttr:datas.SpecificationValue&&datas.BrandId===21
+                isAttr: datas.SpecificationValue
+              });
+            }
+            that.getCarData();
       });
     },
     // 删除购物车
@@ -296,7 +314,9 @@ export default {
     async getCarData() {
       const params = {
         UserId: this.userId,
-        Token: this.token
+        Token: this.token,
+            Lat: this.latitude,
+            Lng: this.longitude
       };
       const res = await post("Cart/CartList", params);
       this.carData = [];
@@ -335,13 +355,13 @@ export default {
     },
     // 跳转
     goDetail(type, id) {
-      //type商品分类0--全部分类，21--商品，22--套餐，23--卡券
+      //type商品分类0--全部分类，21--服务卡券商品，22--套餐，23--卡券
       console.log(type, "type-id", id);
       // wx.navigateTo({ url: "/pages/detail/main?id=" + id });
       // return false;
       var a = type * 1;
       if (a === 21) {
-        wx.navigateTo({ url: "/pages/detail/main?id=" + id });
+        wx.navigateTo({ url: "/pages/serdetail/main?proid=" + id });
       }
       if (a === 22 || a === 23) {
         wx.navigateTo({ url: "/pages/coupondetail/main?id=" + id });
@@ -355,17 +375,16 @@ export default {
     }
   },
   // 下拉刷新
-  onPullDownRefresh(){
-    this.initData()
-    wx.stopPullDownRefresh()
+  onPullDownRefresh() {
+    this.initData();
+    wx.stopPullDownRefresh();
   },
   // 上拉加载
-  onReachBottom(){
-      
-      if(!this.isOved&&!this.notData){
-        this.page+=1;
-        this.getClassifyLisit()
-      }
+  onReachBottom() {
+    if (!this.isOved && !this.notData) {
+      this.page += 1;
+      this.getClassifyLisit();
+    }
   }
 };
 </script>

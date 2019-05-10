@@ -273,6 +273,18 @@ export default {
           this.isDefault = false;
         }
     },
+    btnSave() {
+      if (this.valOther()) {
+        console.log("传进来的车牌号：");
+        console.log(this.Id);
+        if (this.Id!=0) {
+          //编辑地址
+          this.editCarInfo();
+        } else {
+          this.saveCar();
+        }
+      }
+    },
     async editCarInfo() {
       let type = 0;
       //this.isshow=true
@@ -297,27 +309,15 @@ export default {
       if (res.code === 0) {
         wx.showToast({
           title: "修改成功！",
-          icon: "none",
           duration: 1500,
           success: function() {
             setTimeout(function(){
-              wx.navigateTo({ url: "/pages/mycar/main"});
+              // wx.navigateTo({ url: "/pages/mycar/main"});
+              wx.navigateBack()
             },1500)
             
           }
         });
-      }
-    },
-    btnSave() {
-      if (this.valOther()) {
-        console.log("传进来的车牌号：");
-        console.log(this.Id);
-        if (this.Id!=0) {
-          //编辑地址
-          this.editCarInfo();
-        } else {
-          this.saveCar();
-        }
       }
     },
     async saveCar() {
@@ -344,11 +344,10 @@ export default {
       if (res.code === 0) {
         wx.showToast({
           title: "新增成功！",
-          icon: "none",
-          duration: 1500,
           success: function() {
             setTimeout(function(){
-              wx.navigateTo({ url: "/pages/mycar/main"});
+              // wx.navigateTo({ url: "/pages/mycar/main"});
+              wx.navigateBack()
             },1500)
           }
         });

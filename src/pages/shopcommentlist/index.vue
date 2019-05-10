@@ -1,6 +1,7 @@
 <template>
   <div class="comment">
     <pointChildpic :commonlist="commonlist" :showPic="true"></pointChildpic>
+    <div style="color:#999;text-align:center;line-height:60rpx;" v-if="commonlist.length<1">暂无数据！</div>
   </div>
 </template>
 

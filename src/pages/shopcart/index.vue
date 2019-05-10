@@ -114,7 +114,9 @@ export default {
         }
       ],
       active: "洗车",
-      isSelectAll: false
+      isSelectAll: false,
+      latitude:0,
+      longitude:0,
     };
   },
 
@@ -140,7 +142,16 @@ export default {
     this.token = wx.getStorageSync("token");
     this.isSelectAll = false;
     this.setBarTitle();
-    this.getCarData();
+    
+      // 获取定位
+      wx.getLocation({
+        type: "wgs84",
+        success: res => {
+          this.latitude = res.latitude;
+          this.longitude = res.longitude;
+          this.getCarData();
+        }
+          });
   },
   methods: {
     setBarTitle() {
@@ -153,7 +164,9 @@ export default {
     async getCarData() {
       const params = {
         UserId: this.userId,
-        Token: this.token
+        Token: this.token,
+            Lat: this.latitude,
+            Lng: this.longitude
       };
       const res = await post("Cart/CartList", params);
       this.carData = [];
@@ -348,4 +361,7 @@ export default {
 <style lang="scss" scoped>
 @import "./style";
 @import "../../css/common.css";
+.list{
+  padding-bottom:90rpx;
+}
 </style>

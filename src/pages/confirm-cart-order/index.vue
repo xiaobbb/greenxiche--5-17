@@ -15,11 +15,11 @@
     </div>
     <div class="slide"></div>
     <!--订单详情-->
-    <div class="gray proorder" v-for="(item,index) in productList" :key="index">
-      <div class="protitle white pad">{{item.ShopName}}</div>
-      <div class="proinfo flex-container pad" v-for="(product,listIndex) in item.list" :key="listIndex">
+    <div class="gray proorder">
+      <div class="protitle white pad">{{ShopData.ShopName}}</div>
+      <div class="proinfo flex-container pad" v-for="(ServiceCard,ServiceCardIndex) in ServiceCard.dt" :key="ServiceCardIndex">
         <div>
-          <img :src="product.ProductImg" class="orderimg">
+          <img :src="ServiceCard.ProductImg" class="orderimg">
         </div>
         <div class="inforight">
           <div class="infotitle">{{product.ProductName}}</div>
@@ -30,19 +30,6 @@
           </div>
         </div>
       </div>
-      <!-- <div class="flex-container infoslide white pad">
-              <div>购买数量</div>
-              <div class="flex-container">
-                  <img src="/static/images/add5.png" @click="addNum" class="specpic"> 
-                  <input class="num" v-model="buyNum" type="number" />
-                  <img src="/static/images/shot5.png" @click="lessNum" class="specpic">
-              </div>
-      </div>-->
-      <!-- <div class="flex-container infoslide white pad">
-              <div>支付方式</div>
-              <div class="infoway">在线支付</div>
-      </div>-->
-      
     </div>
     <div class="gray proorder">
       <div class="flex-container infoslide white pad" @click="onShowCoupon">
@@ -52,16 +39,6 @@
           <img src="/static/images/back.png" class="right">
         </div>
       </div>
-      <!-- <div class="flex-container infoslide white pad">
-        <div>邮费</div>
-        <div>
-          {{freight*1?freight:"免运费"}}
-          <img
-            src="/static/images/back.png"
-            class="right"
-          >
-        </div>
-      </div> -->
       <div class="infoslide inputbor flex-container white pad">
         <div>买家留言</div>
         <input type="text" v-model="message" placeholder="填写内容已和卖家协商确认" class="inputmes">
@@ -130,7 +107,18 @@ export default {
       couponId: 0,
       // 订单编号
       orderNumber: "",
-      cartIds:[]
+      cartIds:[],
+      latitude:0,
+      longitude:0,
+      // 服务项目
+      ServiceItem:{
+      },
+      // 卡券
+      ServiceCard:{
+      },
+      ShopData:{},
+      AllNumber:0,
+      AllPrice:0
     };
   },
 
@@ -173,7 +161,15 @@ export default {
   onShow() {
     this.showPay = false;
     this.setBarTitle();
+      // 获取定位
+      wx.getLocation({
+        type: "wgs84",
+        success: res => {
+          this.latitude = res.latitude;
+          this.longitude = res.longitude;
     this.getData();
+        }
+          });
     // Promise.all(
     // [this.getData(),this.getAddress()]).then((res)=> {
     //   console.log('getFreight')
@@ -194,62 +190,24 @@ export default {
     },
 
     async getData() {
-      // 获取页面传参,在store里获取
-      // const store = this.$store.state
-      // console.log('store',store)
-      // const id = store.confirmOrder.productId;
-      // this.productId = store.confirmOrder.productId;
-      // const sku = store.confirmOrder.sku;
-
-      // this.sku = sku.replace(/_/g, " ");
-      // this.sbumitValue = sku
-      // this.buyNum = store.confirmOrder.buyNum||1;
-      // this.couponPrice = this.$store.state.couponPrice.toFixed(2)
       this.cartIds = this.$store.state.cartIds;
-      // this.cartIds = [443, 444];
       const _carIds = JSON.stringify(this.cartIds);
       const __carIds = _carIds.substring(1, _carIds.length - 1);
-      console.log("_carIds", __carIds);
-      const res = await post("Cart/GetConfirmOrderGoods", {
+      // 购物车列表请求
+      // const res = await post("Cart/GetConfirmOrderGoods", {
+      const res = await post("Cart/GetConfirmOrderXQ", {
         UserId: wx.getStorageSync("userId"),
         Token: wx.getStorageSync("token"),
-        CartIdList: __carIds
+        CartIdList: __carIds,
+            Lat: this.latitude,
+            Lng: this.longitude
       });
-      this.productList = [];
-      res.data.map(datas => {
-        this.productList.map((product, index) => {
-          // 判断相同店铺的产品，放到list下
-          if (datas.ShopId === product.ShopId) {
-            const _datas = datas
-            _datas.sku = datas.SpecText.replace(/_/g, " ")
-            this.productList[index].list.push(_datas);
-          } else {
-          // 不存在店铺该店铺，创建一个店铺
-          const _datas = datas
-          _datas.sku = datas.SpecText.replace(/_/g, " ")
-          this.productList.push({
-              ShopId: datas.ShopId,
-              ShopName: datas.ShopName,
-              freight:0,
-              message:'',
-              list:[_datas]
-            });
-          }
-        });
-        // 第一次遍历productList没有值，增加一个
-        if (this.productList.length < 1) {
-          const _datas = datas
-          _datas.sku = datas.SpecText.replace(/_/g, " ")
-          this.productList.push({
-              ShopId: datas.ShopId,
-              ShopName: datas.ShopName,
-              freight:0,
-              message:'',
-              list:[_datas]
-            });
-        }
-      });
-      
+      const data = res.data;
+      this.ServiceItem = data.ServiceItem
+      this.ServiceCard = data.ServiceCard
+      this.ShopData = ShopData
+      this.AllNumber = data.AllNumber
+      this.AllPrice =data.AllPrice
       // for (let i = 0; i < res.data.length; i += 1) {
       //   const datas = res.data[i];
       //   // 遍历产品列表，如果相同店铺添加到数组，不同店铺增加一个店铺

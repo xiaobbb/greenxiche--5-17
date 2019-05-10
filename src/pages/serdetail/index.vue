@@ -2,7 +2,7 @@
   <div>
       <!--顶部图片-->
       <div>
-        <img :src="detailinfo.PicData[0].PicUrl" class="bg">
+        <img v-show="PicData" :src="PicData.PicUrl" class="bg">
       </div>
       <div class="item">
           <div class="title">{{detailinfo.Name}}</div>
@@ -18,7 +18,7 @@
           <div>
               <div class="sertitle">服务项目</div>
               <div class="sercomplain">{{detailinfo.Name}}</div>
-              <div class="flex-container iteminfo">
+              <!-- <div class="flex-container iteminfo">
                   <p>
                     <img src="/static/images/gou.png" class="pics">
                     <text>未消费，随时退</text>
@@ -27,7 +27,7 @@
                     <img src="/static/images/gou.png" class="pics">
                     <text>过期退</text>
                   </p>
-              </div>
+              </div> -->
           </div>
           <div class="price">
             <div>￥{{detailinfo.Price || 0}}</div>
@@ -38,15 +38,15 @@
       <!--位置-->
       <div class="flex-container item">
           <div>
-              <p class="sertitle">{{detailinfo.ShopData[0].ShopNick}}</p>
-              <p class="sercomplain">{{detailinfo.ShopData[0].Address}}</p>
+              <p class="sertitle">{{ShopData.ShopNick}}</p>
+              <p class="sercomplain">{{ShopData.Address}}</p>
           </div>
           <div class="flex-container range">
             <p class="location" @click="getMap">
                 <img src="/static/images/bg9.png" class="big">
                 <img src="/static/images/to.png" class="small">
             </p>
-            <p>{{detailinfo.ShopData[0].Distance}}km</p>
+            <p>{{(ShopData.Distance<100)?ShopData.Distance:'100+'}}km</p>
           </div>
       </div>
       <div class="slide"></div>
@@ -54,7 +54,7 @@
       <div class="point" v-if="commonlist.length>0">
         <div class="flex-container">
             <p class="left">
-              <text>评分</text><text>4.0</text>
+              <text>评分</text><text>{{detailinfo.Score}}.0</text>
             </p>
             <p @click="showAllComment">
               <text>查看全部评论</text>
@@ -112,6 +112,11 @@ export default {
     //console.log(this.shopLng,this.shopLat,"商铺经纬度")
   },
   onShow(){
+       this.detailinfo={
+       };
+       this.PicData={}
+       this.commonlist={};
+      this.ShopData={};
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
     this.getSerdetail()
@@ -127,9 +132,11 @@ export default {
        lng:"",
        Token:"",
        UserId:"",
-       detailinfo:[],
-       commonlist:[]
-      
+       detailinfo:{
+         },
+       commonlist:{},
+      ShopData:{},
+      PicData:[]
     }
   },
  
@@ -147,8 +154,10 @@ export default {
             UserId:this.UserId,
             Token:this.Token,
             ProductId:this.proid,
-            Lat:this.lat,
-            Lng:this.lng
+            // Lat:this.lat,
+            // Lng:this.lng
+            Lat:0,
+            Lng:0
             // UserId:"91DC2AD9ED2B2C1C",
             // Token:"6CB02D88A51F637467FC0CAD02681D71",
             // ProductId:"341",
@@ -158,6 +167,8 @@ export default {
         if(result.code==0){
             this.detailinfo=result.data[0];
             this.address=result.data[0].ShopData[0].ShopNick
+            this.ShopData = result.data[0].ShopData[0]
+            this.PicData = result.data[0].PicData[0]
             this.name=result.data[0].ShopData[0].Address
             this.commonlist=result.data[0].CommentData;
             this.$set(result.data[0].ShopData[0],"Distance",parseFloat(result.data[0].ShopData[0].Distance).toFixed(2))
