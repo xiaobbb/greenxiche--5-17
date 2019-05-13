@@ -32,9 +32,9 @@
           </div>
         </div>
         <div class="flex-container infoslide white pad" @click="choseItem(3)">
-          <div>优惠券</div>
+          <div>优惠券{{CouponType}}</div>
           <div>
-            <span v-if="couponPrice*1">-{{couponPrice}}</span>
+            <span v-if="couponPrice">{{couponPrice}}</span>
             <img src="/static/images/back.png" class="right" v-else>
           </div>
           <!-- <div>
@@ -70,6 +70,7 @@
       <orderCount
         :showCoupon.sync="showCoupon"
         :couponId.sync="CouponId"
+        :couponType.sync="CouponType"
         :couponList="couponList"
         :couponPrice.sync="couponPrice"
       ></orderCount>
@@ -162,9 +163,15 @@ export default {
       // }
     },
     CouponId(){
-      // if(this.CouponId!=='0'){
+      let price = this.couponPrice;
+        if (this.CouponType == 1) {
+          price = "-" + price;
+        } else if (this.CouponType == 2) {
+          price = price + "折";
+        }
+        console.log(this.CouponType,'this.CouponType')
+      this.couponPrice = price
        this.getTotal(); //获取订单总金额
-      // }
     }
   },
   data() {
@@ -178,6 +185,7 @@ export default {
       CarInfoId: "", //车辆id
       CarInfo: "",
       CouponId: "0", //优惠券id
+      CouponType: "", //优惠券id
       CardTicketId: "0", //服务卡券id
       couponPrice: "0.00",
       CardTicketPrice: "0.00",

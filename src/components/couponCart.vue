@@ -1,20 +1,21 @@
 <template>
-  <div v-show="showCoupon" >
+  <div v-show="showCoupon" @touchmove.stop="dialog">
       <!--遮罩层-->
     <div class="mask-modal" @click="closeMask"></div>
     <div class="paymask white" >
       <div class="paytile">
-        <text>请选择服务卡券</text>
+        <text>选择优惠券</text>
       </div>
       <div>
         <radio-group class="radio-group" @change="selectCoupon">
           <label class="flex-container couponItem" v-for="(item,index) in couponList" :key="index">
-            {{item.Title}}
-            <input type="radio" name="coupon" :value="item.CardTicketId" :checked="CardTicketId==item.CardTicketId" >
+            {{item.name}}
+            <input type="radio" name="coupon" :value="item.id" :checked="couponId==item.id">
           </label>
+
           <label class="flex-container couponItem">
-            不使用服务卡券
-             <input type="radio" name="coupon"  :checked="CardTicketId==0" value="0">
+            不使用优惠券
+            <input type="radio" name="coupon" :checked="couponId==0" value="0">
           </label>
         </radio-group>
       </div>
@@ -23,6 +24,11 @@
   </div>
 </template>
 <script>
+        // couponList:[{
+        //   name:'',
+        //   id:'',
+        //   price:''
+        // }]
 import {post} from '@/utils/index'
 export default {
     props:{
@@ -30,47 +36,63 @@ export default {
           type:Boolean,
           default:false
         },
-        couponList: [],
-        // couponId:0,
-        CardTicketId:{
+        // 优惠券列表
+        couponList:{
+          type:Array,
+          default(){
+            return []
+          }
+        },
+        couponId:{
           type:Number,
           default:0
         },
-        CardTicketName:{
-          type:String,
-          default:''
+        couponPrice:{
+          type:Number,
+          default:0
+        },
+        couponType:{
+          type:Number,
+          default:0
         }
     },
     watch:{
-     
+      showCoupon(){
+        if(this.showCoupon){
+          // this.getCouponList()
+        }
+      }
     },
   data() {
     return {
+      couponList: [
+      ]
     };
   },
   methods: {
+    dialog(){
+      return
+    },
     selectCoupon(e){
-      const id = e.mp.detail.value*1
-      // this.CardTicketId = id;
-      // console.log(e.mp.detail,this.CardTicketId,this.CardTicketId)
-      let cardName = ''
+      console.log(e.mp.detail.value)
+      const id = e.mp.detail.value
+      let price = 0
+      let type = 0
       for(let i=0;i<this.couponList.length;i++){
           const _res = this.couponList[i]
-          if(_res.CardTicketId == id){
-            // cardName = _res.Denomination*1
-            cardName = _res.Title
+          if(_res.id == id){
+            price = _res.price
+            type = _res.type
           }
-      }
-        this.$emit('update:CardTicketId',id)
-    // console.log(this.CardTicketId,'listid')
-        this.$emit('update:CardTicketName',cardName)
-        this.closeMask();
-      
+        }
+      this.$emit('update:couponId',id)
+      this.$emit('update:couponPrice',price)
+      this.$emit('update:couponType',type)
+      this.closeMask()
   },
   closeMask(){ 
-    // console.log(this.CardTicketId,'list')
-    // return false;
       this.$emit('update:showCoupon', false); //触发 input 事件，并传入新值
+      this.$emit('success');
     //   this.showCoupon = !this.showCoupon
   }
   }

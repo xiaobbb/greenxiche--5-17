@@ -32,7 +32,11 @@ export default {
         },
         couponList: [ ],
         couponId:"",
-        CardTicketId:""
+        CardTicketId:"",
+        couponPrice:{
+          typee:String,
+          default:''
+        }
     },
     watch:{
      
@@ -50,14 +54,17 @@ export default {
       console.log(e.mp.detail.value)
       const id = e.mp.detail.value
       let cardprice = 0
+      let type =''
       for(let i=0;i<this.couponList.length;i++){
           const _res = this.couponList[i]
           if(_res.CouponId == id){
             cardprice = _res.Denomination
+            type = _res.DiscountType
           }
       }
         this.$emit('update:couponId',id)
         this.$emit('update:couponPrice',cardprice)
+        this.$emit('update:couponType',type)
       
   },
   closeMask(){ 

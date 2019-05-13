@@ -94,12 +94,12 @@ export default {
       if(this.gotoDetail){
         
       //type商品分类0--全部分类，21--商品，22--套餐，23--卡券
-        let type = this.data.type;
+        let type = this.data.type||this.data.BrandId||this.data.BrandId;
         let id = this.data.productId
-        console.log(type,'type-id',id)
+        console.log(this.data,'type-id',id)
       var a = type*1;
       if (a === 21) {
-        wx.navigateTo({ url: "/pages/detail/main?id=" + id });
+        wx.navigateTo({ url: "/pages/serdetail/main?proid=" + id });
       }
       if (a === 22||a===23) {
         wx.navigateTo({ url: "/pages/coupondetail/main?id="+id });

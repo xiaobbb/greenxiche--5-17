@@ -64,6 +64,7 @@ export default {
       this.disabled=false;
       this.checkedStatus = true;
     this.setBarTitle();
+      this.shareId = this.$store.state.shareId;
   },
   data() {
     return {
@@ -73,7 +74,8 @@ export default {
       password: "",
       password2: "",
       disabled:false,
-      checkedStatus:true
+      checkedStatus:true,
+      shareId:''
     };
   },
   components: {},
@@ -125,7 +127,8 @@ export default {
             unionid: unionid, //微信统一unionid号
             userInfo: userinfo,
             password: this.password,
-            openId: openid
+            openId: openid,
+            InviteCode:this.shareId
           },
           header: {
             "content-type": "application/json" // 默认值

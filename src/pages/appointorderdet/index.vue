@@ -78,7 +78,7 @@
             </div>
             <div class="flex-container">
                 <p>优惠</p>
-                <p>-¥0.00</p>
+                <p>¥{{offerPrice}}</p>
             </div>
         </div>
         <div class="flex-container padtop">
@@ -237,6 +237,7 @@ export default {
       
       balanceRequestUrl: "Order/PaymentOrder", //余额支付接口
       showPay: false, //支付弹窗
+      offerPrice:0 //优惠的价格
     }
   },
  
@@ -261,6 +262,11 @@ export default {
         this.info = result.data;
         // this.info.AppointmentEndTime = this.info.AppointmentEndTime
         this.orderItemNum=result.data.OrderNumber
+        let totalPrice = result.data.TotalPrice
+        result.data.orderDetails.map(item => {
+              totalPrice-=item.UnitPrice*item.ProductCount
+        }) 
+        this.offerPrice=totalPrice.toFixed(2)  //优惠价格
         this.phoneNumber=result.data.ShopMobile
         //console.log(this.orderItemNum,"子单号")
         this.hasData = true;

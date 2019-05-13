@@ -37,7 +37,7 @@
               <p class="small" :style="status!==1?'color:#fff':''">凭此券免费兑换{{item.ScopeOfUse}}一次</p>
               <p class="inite">{{item.EndTime}} 前有效</p>
             </div>
-            <div @click="gotoShopcenter(item.Id)" v-if="status===2">立即使用</div>
+            <div @click="gotoShopcenter(item)" v-if="status===2">立即使用</div>
               <img src="/static/images/used.png" class="frazz" v-if="status===3">
               <img src="/static/images/pass.png" class="frazz" v-if="status===1">
           </div>
@@ -195,10 +195,16 @@ export default {
           return false;
       }
     },
-    gotoShopcenter(id){
-      wx.switchTab({
-        url:"/pages/index/main?name=123"
-      })
+    gotoShopcenter(item){
+      if(item.ProductId==0){
+        wx.navigateTo({
+          url:"/pages/shopdetail/main?shopid="+item.ShopId
+        })
+      }else{
+        wx.navigateTo({
+          url:"/pages/serdetail/main?proid="+item.ProductId
+        })
+      }
     },
     loadMore(){
       this.page+=1;

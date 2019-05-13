@@ -42,6 +42,7 @@ const store = new Vuex.Store({
     couponPrice:0.00,
     // 购物车
     carIds:[],
+    shareId:'',//分享id
   },
   mutations: {
     /**

@@ -64,7 +64,6 @@ export default {
   onShow(){
     this.userId =wx.getStorageSync('userId') ;
     this.token = wx.getStorageSync("token");
-    console.log(wx.getStorageSync('userId'))
     this.carinfolist = [];
     this.getAllcar(); 
   },

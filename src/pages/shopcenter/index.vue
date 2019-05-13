@@ -7,7 +7,7 @@
           v-for="(item,index) in menulist"
           :key="index"
           :class="{'active':activeId==item.id}"
-          @click="getClassifyLisit(item.id)"
+          @click="getClassifyLisit(item.id,item.BrandList)"
           class="nemeitem"
         >
           <text class="title">{{item.name}}</text>
@@ -34,11 +34,11 @@
             v-if="item.brandId!=21">
               <text v-for="(tab,tabIndex) in item.tab" :key="tabIndex">{{tab}}</text>
             </p>
-            <p class="sales" v-if="item.brandId!=21" @click="goDetail(item.brandId,item.id)">销量{{item.sale}}</p>
+            <p class="sales" v-if="item.brandId!=21&&item.brandId!=24" @click="goDetail(item.brandId,item.id)">销量{{item.sale}}</p>
               <!-- 店铺名称 -->
-            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.ShopName}}</p>
+            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.shopName}}</p>
               <!-- 距离 -->
-            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.Distance}}</p>
+            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">距离：{{item.Distance}}km</p>
             <div class="flex-container around">
               <p class="price">￥{{item.price}}</p>
               <!-- <div v-show="item.isAttr"> -->
@@ -47,7 +47,7 @@
                 <text class="nums">{{item.num}}</text>
                 <img src="/static/images/addcart.png" @click="addNumber(index)" class="tippic">
               </div>
-              <div class="pay" v-show="item.brandId==24">立即购买</div>
+              <div class="pay" v-show="item.brandId==24" @click="goDetail(24,0)">立即购买</div>
             </div>
           </div>
         </div>
@@ -166,21 +166,39 @@ export default {
           const datas = res.data[i];
           that.menulist.push({
             id: datas.Id,
-            name: datas.TypeName
+            name: datas.TypeName,
+            BrandList:datas.BrandList
           });
         }
         // 获取第一个分类产品
-        that.getClassifyLisit(that.menulist[0].id);
+        that.getClassifyLisit(that.menulist[0].id,that.menulist[0].BrandList);
       });
     },
-    // 分类产品列表
-    getClassifyLisit(id) {
+    // 分类产品列表 type分类类型 // 镀晶产品--24
+    async getClassifyLisit(id,type) {
       const that = this;
       if (id) {
         that.activeId = id;
         this.page = 1;
       }
-
+      let res = null;
+        if(type==24){
+         res = await post("Server/VipProductList")
+              that.productlist = [];
+         for (let i = 0; i < res.data.length; i += 1) {
+              const datas = res.data[i];
+              that.productlist.push({
+                brandId: datas.BrandId||24, //商品分类0--全部分类，21--商品，22--套餐，23--卡券
+                id: datas.Id,
+                title: datas.Name,
+                price: datas.Price,
+                img: datas.PicNo,
+                tab: datas.KeywordName ? JSON.parse(datas.KeywordName) : [],
+                // isAttr:datas.SpecificationValue&&datas.BrandId===21
+              });
+         }
+      console.log('res',this.productlist)
+        }else{
           const params = {
             page: this.page,
             pageSize: this.pageSize,
@@ -188,7 +206,7 @@ export default {
             Lat: this.latitude,
             Lng: this.longitude
           };
-          post("Goods/GoodsList", params).then(res => {
+          res = await post("Goods/GoodsList", params)
             if (this.page === 1) {
               that.productlist = [];
             }
@@ -207,6 +225,8 @@ export default {
                 price: datas.Price,
                 img: datas.ProductImg,
                 sale: datas.SalesVolume,
+                shopName:datas.Name,
+                Distance:datas.Distance.toFixed(2),
                 num: 0,
                 stock: datas.Stock,
                 tab: datas.KeywordName ? JSON.parse(datas.KeywordName) : [],
@@ -215,7 +235,7 @@ export default {
               });
             }
             that.getCarData();
-      });
+        }
     },
     // 删除购物车
     async lessNumber(index) {
@@ -366,6 +386,9 @@ export default {
       if (a === 22 || a === 23) {
         wx.navigateTo({ url: "/pages/coupondetail/main?id=" + id });
       }
+      if (a === 24) {
+        wx.navigateTo({ url: "/pages/coupondetail/main?id=" + id });
+      }
     },
     toPAy() {
       wx.navigateTo({ url: "/pages/confirmorder/main" });
@@ -392,4 +415,13 @@ export default {
 <style lang="scss" scoped>
 @import "./style";
 @import "../../css/common.css";
+.pay{
+  width:140rpx;
+  line-height:50rpx;
+  background:#ff6325;
+  border-radius:30rpx;
+  color:#fff;
+  padding:0 10rpx;
+  text-align:center;
+}
 </style>

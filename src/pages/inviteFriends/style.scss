@@ -2,7 +2,7 @@
     min-height:100vh;
     width:100%;
     position:relative;
-    z-index:-2;
+    // z-index:-2;
     // background-color:#e85184;
         background:linear-gradient(130deg,#eb3d62,#ad41d0);
     .bgimg{
@@ -10,7 +10,7 @@
         position:absolute;
         top:0;
         left:0;
-        z-index:-1;
+        z-index:1;
         img{
             width:100%;
             height:100vh; 
@@ -18,6 +18,8 @@
     }
     .content{
         padding:350rpx 50rpx 0;
+        position:relative;
+        z-index:2;
     }
     .obtain{
         background:#fff;
@@ -62,6 +64,8 @@
         text-align:center;
         margin:20rpx 0 10rpx;
         padding:30rpx 0 10rpx;
+        display:flex;
+        flex-flow:column nowrap;
         img{
             width:80rpx;
             height:80rpx;
@@ -84,4 +88,7 @@
             padding-bottom:20rpx;
         }
     }
+    button::after {
+        border: none;
+      }
 }

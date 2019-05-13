@@ -219,12 +219,20 @@ export default {
       isGoshop: false, //到店洗车最近的一家商铺
       isnew: false, //是否是新人
       dddd: false,
-      cityName: "定位中.."
+      cityName: "定位中..",
+
     };
   },
 
   onLoad() {
     this.getMyPosition(); //获取当前位置
+    // 判断是否朋友分享
+    if(this.$root.$mp.query.shareId){
+      console.log('root',this.$root.$mp.query.shareId)
+      this.$store.commit('update',{shareId:this.$root.$mp.query.shareId})
+      
+      console.log('root222',this.$store.state.shareId)
+    }
     // 实例化API核心类
     this.qqmapsdk = new QQMapWX({
       key: "3P2BZ-6G4WD-CEX43-PIV5G-3VDYH-N5BGH" // 必填
