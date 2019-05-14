@@ -45,10 +45,12 @@
                   <p class="couptime coupuse">{{item.AddTime}}-{{item.EndTime}}</p>
                   <p class="couptime">{{item.ScopeOfUse}}</p>
                 </div>
+                
+                  <!-- v-if="item.Enables*1===1&&item.isUse" -->
                 <div
                   class="btn"
-                  v-if="item.Enables===1&&item.isUse"
-                  @click="gotoShopcenter(item.Id,item.Denomination)"
+                  v-if="item.Enables*1===1"
+                  @click="gotoShopcenter(item)"
                 >立即使用</div>
               </div>
             </div>
@@ -176,7 +178,7 @@ export default {
       this.couptlist = [];
       this.getCouponList();
     },
-    gotoShopcenter(id, price) {
+    gotoShopcenter(item) {
       const coupon = this.$store.state.selectCoupon;
       const confirmOrder = this.$store.state.confirmOrder;
       // 选择优惠券
@@ -187,10 +189,10 @@ export default {
           productId: confirmOrder.productId,
           skuId: confirmOrder.skuId,
           buyNum: confirmOrder.buyNum,
-          couponId: id
+          couponId: item.Id,
         });
         // 设置优惠券价格
-        this.$store.commit("update", { couponPrice: price });
+        this.$store.commit("update", { couponPrice: item.Denomination });
 
         wx.redirectTo({ url: coupon.url });
         this.$store.commit("setSelectCoupon", {
@@ -202,9 +204,16 @@ export default {
         });
       } else {
         // 没有选择优惠券
-        wx.switchTab({
-          url: "/pages/shopcenter/main?couponId=" + id
-        });
+        // productId=0时跳转店铺页面
+        if(item.ProductId){
+          wx.navigateTo({
+            url: "/pages/serdetail/main?proid=" + item.ProductId
+          });
+        }else{
+          wx.navigateTo({
+            url: "/pages/shopdetail/main?shopid=" + item.ShopId
+          });
+        }
       }
     },
     loadMore() {

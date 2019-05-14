@@ -35,21 +35,6 @@
             </div>
       </div>
       <div class="hr"></div>
-      <!--位置-->
-      <div class="flex-container item">
-          <div>
-              <p class="sertitle">{{ShopData.ShopNick}}</p>
-              <p class="sercomplain">{{ShopData.Address}}</p>
-          </div>
-          <div class="flex-container range">
-            <p class="location" @click="getMap">
-                <img src="/static/images/bg9.png" class="big">
-                <img src="/static/images/to.png" class="small">
-            </p>
-            <p>{{(ShopData.Distance<100)?ShopData.Distance:'100+'}}km</p>
-          </div>
-      </div>
-      <div class="slide"></div>
       <!--评分-->
       <div class="point" v-if="commonlist.length>0">
         <div class="flex-container">
@@ -72,20 +57,6 @@
           <div v-html="detailinfo.ContentDetail">
 
           </div>
-          <!-- <div class="pmenu">
-              <img src="/static/images/time.png" class="tippic">
-              <div>
-                <p class="fsize">适用车型</p>
-                <p class="carcor">五座轿车</p>
-              </div>
-          </div>
-          <div class="pmenu">
-              <img src="/static/images/time.png" class="tippic">
-              <div>
-                <p  class="fsize">有效期</p>
-                <p class="carcor">付款成功后7天</p>
-              </div>
-          </div> -->
       </div>
       <!--支付-->
       <div class="btn"> 
@@ -104,7 +75,6 @@ import "../../css/global.css";
 export default {
   onLoad(){
     this.setBarTitle();
-    this.proid=this.$root.$mp.query.proid;
     this.shopLat=this.$root.$mp.query.shopLat;
     this.shopLng=this.$root.$mp.query.shopLng;
     this.lat=wx.getStorageSync('latitude');
@@ -117,9 +87,9 @@ export default {
        this.PicData={}
        this.commonlist={};
       this.ShopData={};
+      this.proid = this.$root.$mp.query.id
     this.Token=wx.getStorageSync('token');
     this.UserId=wx.getStorageSync('userId');
-    
     this.getSerdetail()
   },
   data () {
@@ -128,7 +98,7 @@ export default {
       shopLng:"",
        name:"",
        address:"",
-       proid:"",
+       proid:0,
        lat:"",
        lng:"",
        Token:"",
@@ -151,19 +121,8 @@ export default {
       });
     },
     async getSerdetail(){
-        var result=await post("/Server/ServiceProductsDetails",{
-            UserId:this.UserId,
-            Token:this.Token,
-            ProductId:this.proid,
-            // Lat:this.lat,
-            // Lng:this.lng
-            Lat:0,
-            Lng:0
-            // UserId:"91DC2AD9ED2B2C1C",
-            // Token:"6CB02D88A51F637467FC0CAD02681D71",
-            // ProductId:"341",
-            // Lat:22.548456637984177,
-            // Lng:114.06455183658751
+        var result=await post("Server/VipProductXQ",{
+            ProductId:this.proid
         })
         if(result.code==0){
             this.detailinfo=result.data[0];
@@ -197,7 +156,7 @@ export default {
       this.$store.commit("setVisitConfirmOrder",{
           ProductId:e
       })
-      wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
+      wx.navigateTo({ url: "/pages/djConfirmOrder/main" });
     }
   },
 

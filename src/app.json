@@ -26,6 +26,8 @@
     "pages/mycar/main",
     "pages/shoplist/main",
     "pages/serdetail/main",
+    "pages/djdetail/main",
+    "pages/djConfirmOrder/main",
     "pages/choosenum/main",
     "pages/mycenter/main",
     "pages/servince/main",

@@ -47,7 +47,7 @@
                 <text class="nums">{{item.num}}</text>
                 <img src="/static/images/addcart.png" @click="addNumber(index)" class="tippic">
               </div>
-              <div class="pay" v-show="item.brandId==24" @click="goDetail(24,0)">立即购买</div>
+              <div class="pay" v-show="item.brandId==24" @click="goDetail(24,item.id)">立即购买</div>
             </div>
           </div>
         </div>
@@ -375,7 +375,7 @@ export default {
     },
     // 跳转
     goDetail(type, id) {
-      //type商品分类0--全部分类，21--服务卡券商品，22--套餐，23--卡券
+      //type商品分类0--全部分类，21--服务卡券商品，22--套餐，23--卡券,24镀晶产品
       console.log(type, "type-id", id);
       // wx.navigateTo({ url: "/pages/detail/main?id=" + id });
       // return false;
@@ -387,7 +387,7 @@ export default {
         wx.navigateTo({ url: "/pages/coupondetail/main?id=" + id });
       }
       if (a === 24) {
-        wx.navigateTo({ url: "/pages/coupondetail/main?id=" + id });
+        wx.navigateTo({ url: "/pages/djdetail/main?id=" + id });
       }
     },
     toPAy() {
