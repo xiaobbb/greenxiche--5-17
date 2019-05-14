@@ -15,7 +15,7 @@
     </div>
     <div class="slide"></div>
     <!--订单详情--卡券-->
-    <div v-if="ServiceCard.dt.length>0">
+    <div v-if="ServiceCard.dt&&ServiceCard.dt.length>0">
       <div class="gray proorder">
         <!-- <div class="protitle white pad">{{ShopData.ShopName}}</div> -->
         <div class="protitle white pad">服务卡券</div>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <!--服务项目-->
-    <div v-if="ServiceItem.dt.length>0">
+    <div v-if="ServiceItem.dt&&ServiceItem.dt.length>0">
       <div class="gray proorder">
         <!-- <div class="protitle white pad">{{ShopData.ShopName}}</div> -->
         <div class="protitle white pad">服务项目</div>

@@ -32,9 +32,10 @@
           </div>
           <div class="itemain flex-container">
             <div>
-              <p class="certitle">{{item.TypeName}}</p>
+              <p class="certitle">{{item.ShopName}}</p>
               <p class="small" :style="status!==1?'color:#fff':''">{{item.Title}}</p>
               <p class="small" :style="status!==1?'color:#fff':''">凭此券免费兑换{{item.ScopeOfUse}}一次</p>
+              <!-- <p class="small" :style="status!==1?'color:#fff':''">{{item.ScopeOfUse}}一次</p> -->
               <p class="inite">{{item.EndTime}} 前有效</p>
             </div>
             <div @click="gotoShopcenter(item)" v-if="status===2">立即使用</div>
