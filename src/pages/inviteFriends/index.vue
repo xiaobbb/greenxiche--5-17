@@ -4,16 +4,16 @@
       <div class="obtain p40">
         <div class="flexs-align top">
           <div class="item">
-            <div class="number">10</div>
+            <div class="number">{{scoreNum}}</div>
             <p>积分</p>
           </div>
           <div class="b2-eae2df"></div>
           <div class="item">
-            <div class="number">20</div>
+            <div class="number">{{cardNum}}</div>
             <p>服务卡券</p>
           </div>
         </div>
-        <div class="checked">查看</div>
+        <div class="checked" @click="goCardList">查看</div>
       </div>
       <button open-type="share" class="wx">
         <img src="/static/images/friend.png" alt>
@@ -47,10 +47,12 @@ export default {
     return {
       userId: "",
       token: "",
+      cardNum:0,
+      scoreNum:0,
       shareId: null,
       rule: [
-        "每成功推荐1位好友注册，好友和推荐人同时获得积分 或服务卡券。",
-        "推荐的好友需通过推荐人的邀请码、二维码、发送的链 接，才可建立推荐关系。",
+        "每成功推荐1位好友注册并下单成功，好友和推荐人同时获得积分或服务卡券。",
+        "推荐的好友需通过推荐人的邀请码、二维码、发送的链接，才可建立推荐关系。",
         "若发现恶意注册推荐好友获得奖励，平台有权取消该奖励。"
       ]
     };
@@ -67,7 +69,14 @@ export default {
         UserId: this.userId,
         Token: this.token
       });
-      this.shareId = res.data;
+      this.shareId = res.data.ReferralCode;
+      this.cardNum = res.data.ShareCard;
+      this.scoreNum = res.data.ShareScore;
+    },
+    goCardList(){
+      wx.redirectTo({
+        url:'/pages/certical/main'
+      })
     }
   },
   // 分享

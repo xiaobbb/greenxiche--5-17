@@ -35,6 +35,62 @@
             </div>
       </div>
       <div class="hr"></div>
+       <!--优惠-->
+      <div class="flex-container coupon">
+        <div class="flex-container">
+          <div>优惠</div>
+          <div>
+            <div class="couponmenu">
+              <div class="flex-container" v-if="coupon[0]">
+                <text class="itemname">优惠券</text>
+                <!-- <p class="couponmenuinfo"> -->
+                  <!-- <img src="/static/images/deatailbg.png" class="couponbg" style="width:100%;"> -->
+                  <!-- <text>满{{coupon[0].meetConditions}}减{{coupon[0].price}}</text> -->
+                  <text>{{coupon[0].Name}}</text>
+                <!-- </p> -->
+              </div>
+              <div class="flex-container couptsild">
+                <text class="itemname">积分</text>
+                <p>购买可得{{detailinfo.Score||0}}积分</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flec-container" @click="getCoupons">
+          <text class="getcon">领券</text>
+          <img src="/static/images/back.png" class="right">
+        </div>
+      </div>
+      <!--遮罩层-->
+      <div class="mask-modal" v-if="showDiscount" @click="showDiscount= false"></div>
+      <!--优惠券弹窗-->
+      <div class="mask" v-if="showDiscount">
+        <div class="masktitle">优惠</div>
+        <div class="maskinfo">
+          <p class="maskitem">促销</p>
+          <div class="maskdetail">
+            <p class="maskcoupon">积分</p>
+            <text>购买可得{{detailinfo.Score||0}}积分</text>
+          </div>
+          <p class="maskitem">领券</p>
+          <div class="maskcouponlist" v-for="(coupon,couponIndex) in coupon" :key="couponIndex">
+            <img src="/static/images/pinkbg.png" class="pink">
+            <div class="maskser flex-container">
+              <div>
+                <p class="maskprice">
+                  {{coupon.DiscountType==1?'¥':''}}
+                  <span>{{coupon.price}}</span>
+                  {{coupon.DiscountType==2?'折':''}}
+                </p>
+                <p class="maskask">满{{coupon.meetConditions}}使用</p>
+                <p class="maskask">有效期{{coupon.time}}</p>
+              </div>
+              <div class="maskget" @click="nowGetCoupon(coupon.id)">立即领取</div>
+            </div>
+          </div>
+        </div>
+        <div class="btnget" @click="cancleMask">完成</div>
+      </div>
       <!--位置-->
       <div class="flex-container item">
           <div>
@@ -137,7 +193,12 @@ export default {
          },
        commonlist:{},
       ShopData:{},
-      PicData:[]
+      PicData:[],
+      // 领取优惠券
+      coupon:[],
+      isshow:false,
+      showDiscount:false,
+
     }
   },
  
@@ -180,6 +241,8 @@ export default {
             console.log(tt.indexOf("</p>"))
             //console.log("数据长度："+this.commentlist.length);
         }
+        // 获取优惠券信息
+        this.getCoupon()
     },
     showAllComment(){
         wx.navigateTo({ url: "/pages/shopcommentlist/main?proid="+this.proid });
@@ -198,7 +261,59 @@ export default {
           ProductId:e
       })
       wx.navigateTo({ url: "/pages/visitconfirmorder/main" });
-    }
+    },
+    // 获取优惠券列表
+    async getCoupon() {
+      if (wx.getStorageSync("token") && wx.getStorageSync("userId")) {
+        const params = {
+          UserId: wx.getStorageSync("userId"),
+          Token: wx.getStorageSync("token"),
+          ShopId:this.ShopData.shopId,
+          page: 1
+        };
+        const res = await post("Coupon/CouponCenter", params);
+        this.coupon = [];
+        for (let i = 0; i < res.data.length; i += 1) {
+          const _res = res.data[i];
+          this.coupon.push({
+            price: _res.Denomination,
+            time: _res.StartEndTimeStr,
+            Name:_res.Name,
+            meetConditions: _res.MeetConditions,
+            DiscountType:_res.DiscountType,
+            id: _res.Id
+          });
+        }
+        console.log(this.coupon, "coupon");
+      }
+    },
+    // 展示优惠券
+    getCoupons() {
+      this.isshow = true;
+      this.showDiscount = true;
+    },
+    // 领取优惠券
+    async nowGetCoupon(id) {
+      const params = {
+        UserId: wx.getStorageSync("userId"),
+        Token: wx.getStorageSync("token"),
+        UseType: 0,
+        CouponId: id
+      };
+      const res = await post("Coupon/ReceiveCoupon", params);
+      wx.showToast({
+        title: "领取成功!"
+      });
+      // setTimeout(() => {
+      //   this.isshow = false;
+      //   this.showDiscount = false;
+      // }, 1500);
+    },
+    // 关闭优惠券弹窗
+    cancleMask() {
+      this.isshow = false;
+      this.showDiscount = false;
+    },
   },
 
   created () {

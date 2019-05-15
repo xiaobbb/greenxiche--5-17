@@ -17,8 +17,8 @@
         >{{item.name}}</p>
       </div>
       <!--服务显示-->
-      <div class="sershow" v-if="sershow">
-        <div class="caritem">
+      <div class="" v-if="sershow">
+        <div class="caritem sershow">
           <!--洗车分类-->
           <text
             v-for="(item,mindex) in barlist"
@@ -27,9 +27,9 @@
             @click="showItemServe(mindex)"
           >{{item.TypeName}}</text>
         </div>
-        <div class="ships">以下为门店服务内容</div>
-        <div class="serlist">
-          <div class="seritem flex-container" v-for="(item,index) in servincelist" :key="index">
+        <div class="ships sershow">以下为门店服务内容</div>
+        <div class="serlist ">
+          <div class="seritem sershow flex-container" v-for="(item,index) in servincelist" :key="index">
             <div class="flex-container" style="width:80%" @click="goServiceProductsDetail(item.Id)">
               <img :src="item.PicNo" class="smallcar">
               <div class="flex-container col">
@@ -141,7 +141,7 @@ export default {
     this.pointshow = false;
     this.isOved = false;
     this.Page = "1";
-    this.typeid = "33";
+    this.typeid = 0;
     this.activecolor = "0";
     this.active = "服务";
     this.getShopDetail();
@@ -155,7 +155,7 @@ export default {
       lat: "",
       lng: "",
       detailinfo: [],
-      typeid: "33",
+      typeid: 0,
       active: "服务",
       activecolor: "0",
       servincelist: [],
@@ -220,6 +220,7 @@ export default {
       var res = await post("Server/GetServerType", {});
       if (res.code == 0) {
         this.barlist = res.data;
+        this.typeid = res.data[0].Id
         console.log(this.barlist, "barlist服务分类");
       }
       this.showItem();

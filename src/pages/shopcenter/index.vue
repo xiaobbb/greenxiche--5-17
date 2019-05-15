@@ -30,15 +30,18 @@
           </div>
           <div class="flex-container citeminfo">
             <p class="itemtitle" @click="goDetail(item.brandId,item.id)">{{item.title}}</p>
-            <p class="progress" @click="goDetail(item.brandId,item.id)" 
+            <!-- <p class="progress" @click="goDetail(item.brandId,item.id)" 
             v-if="item.brandId!=21">
               <text v-for="(tab,tabIndex) in item.tab" :key="tabIndex">{{tab}}</text>
-            </p>
-            <p class="sales" v-if="item.brandId!=21&&item.brandId!=24" @click="goDetail(item.brandId,item.id)">销量{{item.sale}}</p>
+            </p> -->
+            <!-- <p class="sales" v-if="item.brandId!=21&&item.brandId!=24" @click="goDetail(item.brandId,item.id)">销量{{item.sale}}</p> -->
+            <!-- <p class="sales" v-if="item.brandId==24" @click="goDetail(item.brandId,item.id)">销量{{item.sale}}</p> -->
               <!-- 店铺名称 -->
-            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.shopName}}</p>
+            <!-- <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">{{item.shopName}}</p> -->
+            <p class="sales" @click="goDetail(item.brandId,item.id)">{{item.shopName}}</p>
               <!-- 距离 -->
-            <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">距离：{{item.Distance}}km</p>
+            <!-- <p class="sales" v-if="item.brandId==21" @click="goDetail(item.brandId,item.id)">距离：{{item.Distance}}km</p> -->
+            <p class="sales" v-if="item.brandId!=24" @click="goDetail(item.brandId,item.id)">距离：{{item.Distance}}km</p>
             <div class="flex-container around">
               <p class="price">￥{{item.price}}</p>
               <!-- <div v-show="item.isAttr"> -->
@@ -130,6 +133,8 @@ export default {
     this.initData();
   },
   onShow() {
+      this.userId = wx.getStorageSync("userId")
+        this.token = wx.getStorageSync("token")
   },
   methods: {
     setBarTitle() {
@@ -144,8 +149,6 @@ export default {
       this.carData = [];
       this.isOved = false;
       this.notData = false;
-      (this.userId = wx.getStorageSync("userId")),
-        (this.token = wx.getStorageSync("token")),
         // 分类列表
       // 获取定位
       wx.getLocation({
@@ -225,7 +228,7 @@ export default {
                 price: datas.Price,
                 img: datas.ProductImg,
                 sale: datas.SalesVolume,
-                shopName:datas.Name,
+                shopName:datas.ShopName,
                 Distance:datas.Distance.toFixed(2),
                 num: 0,
                 stock: datas.Stock,

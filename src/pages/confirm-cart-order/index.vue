@@ -88,7 +88,7 @@
         <div class="flex-container infoslide white pad" @click="onGetCarInfo">
           <div>选择车辆</div>
           <div>
-            <span>{{carInfo.CarMumber}}</span>
+            <span v-if="carInfo&&carInfo.CarMumber">{{carInfo.CarMumber}}</span>
             <img src="/static/images/back.png" class="right">
           </div>
         </div>
@@ -96,8 +96,8 @@
           <div>优惠券</div>
           <div>
             <span
-              v-show="ServiceItemCoupon.offerPrice&&ServiceItemCoupon.id"
-            >- ￥{{ServiceItemCoupon.offerPrice}}</span>
+              v-show="ServiceItem.offerPrice&&ServiceItemCoupon.id"
+            >- ￥{{ServiceItem.offerPrice}}</span>
             <img src="/static/images/back.png" class="right">
           </div>
         </div>
@@ -220,7 +220,9 @@ export default {
       },
       ServiceCardContent: "",
       // 选择车辆信息
-      carInfo: {},
+      carInfo: {
+        CarMumber:''
+      },
 
       ShopData: {},
       AllNumber: 0,
@@ -392,10 +394,12 @@ export default {
       // 优惠券
       if (type === "ServiceCard") {
         list = this.ServiceCard.CouponData;
+        this.couponId = this.ServiceCardCoupon.id
       }
       // 服务卡券
       else if (type === "ServiceItem") {
         list = this.ServiceItem.CouponData;
+        this.couponId = this.ServiceItemCoupon.id
       }
       this.couponList = [];
       list.map(item => {

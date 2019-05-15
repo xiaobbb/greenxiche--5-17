@@ -8,7 +8,7 @@
                  <div class="flexs-align name">
                 <p class="person">{{memberInfo.NickName}}</p>
                 <img src="/static/images/vip_v.png" alt="">
-                <p class="level">LV0</p>
+                <p class="level">LV{{memberInfo.Level||0}}</p>
               </div>
               
               <div class="person_id">ID:{{memberInfo.MemberID}}</div>
@@ -30,7 +30,9 @@
           <div class="bodys">
             <div class="item flexs-align" v-for="(item,index) in gradeTabel" :key="index">
               <div class="left">{{item.level}}</div>
-              <div class="right flexs-align" @click="gotoProduct">{{item.content}} <van-icon name="arrow" class="mt8"></van-icon>  </div>
+              <div class="right flexs-align" @click="gotoProduct">{{item.content}} 
+                <!-- <van-icon name="arrow" class="mt8"></van-icon>  -->
+                 </div>
               </div>
           </div>
         </div>
@@ -56,19 +58,19 @@ export default {
       memberInfo:{},
       gradeTabel:[
         {
-          level:'LV0',
+          level:'LV1',
           content:'购买绿妞长效镀晶普通版'
         },
         {
-          level:'LV1',
+          level:'LV2',
           content:'购买绿妞长效镀晶经典版'
         },
         {
-          level:'LV2',
+          level:'LV3',
           content:'购买绿妞长效镀晶旗舰版'
         },
         {
-          level:'LV3',
+          level:'LV4',
           content:'购买绿妞长效镀晶至尊版'
         },
       ]

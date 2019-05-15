@@ -54,7 +54,8 @@
                 <text class="itemname">优惠券</text>
                 <p class="couponmenuinfo">
                   <img src="/static/images/deatailbg.png" class="couponbg">
-                  <text>满{{coupon[0].meetConditions}}减{{coupon[0].price}}</text>
+                  <!-- <text>满{{coupon[0].meetConditions}}减{{coupon[0].price}}</text> -->
+                  <text>{{coupon[0].Name}}</text>
                 </p>
               </div>
               <div class="flex-container couptsild">
@@ -127,8 +128,9 @@
             <div class="maskser flex-container">
               <div>
                 <p class="maskprice">
-                  ¥
+                  {{coupon.DiscountType==1?'¥':''}}
                   <span>{{coupon.price}}</span>
+                  {{coupon.DiscountType==2?'折':''}}
                 </p>
                 <p class="maskask">满{{coupon.meetConditions}}使用</p>
                 <p class="maskask">有效期{{coupon.time}}</p>
@@ -227,8 +229,10 @@ export default {
           const _res = res.data[i];
           this.coupon.push({
             price: _res.Denomination,
+            Name:_res.Name,
             time: _res.StartEndTimeStr,
             meetConditions: _res.MeetConditions,
+            DiscountType:_res.DiscountType,
             id: _res.Id
           });
         }

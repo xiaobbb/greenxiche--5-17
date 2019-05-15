@@ -162,11 +162,11 @@ export default {
     box-sizing: border-box;
 }
 .sercomplain{
-    margin:25rpx 0;
+    margin:20rpx 0;
     color:#999;
     font-weight:500;
     font-size:24rpx;
-    height:24rpx;
+    /* height:24rpx; */
     box-sizing: border-box;
 }
 .shopclass{

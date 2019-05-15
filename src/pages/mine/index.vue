@@ -7,7 +7,7 @@
               <div class="flexs name" @click="gotoVipGrade">
                 <p class="person">{{memberInfo.NickName}}</p>
                 <img src="/static/images/vip_v.png" alt="">
-                <p class="level">LV0</p>
+                <p class="level">LV{{memberInfo.Level||0}}</p>
               </div>
               
               <div class="person_id">ID:{{memberInfo.MemberID}}</div>
@@ -124,7 +124,7 @@ export default {
     },
     // 跳转到vip等级
     gotoVipGrade(){
-          wx.navigateTo({ url: "/pages/vipGrade/main" });
+          wx.navigateTo({ url: "/pages/vipGrade/main"});
     },
     goItem(e){
       var a=e

@@ -163,3 +163,112 @@
     width:30%;
     text-align:center;
 }
+
+// 优惠券
+.couponbg,.couponmenuinfo,.couponmenuinfo text{
+    width:144rpx;
+    height:40rpx;
+}
+.coupon{
+    color:#999;
+    padding:20rpx;
+}
+.couponmenu{
+    font-size: 22rpx;
+    margin-left:60rpx;
+}
+.getcon{
+    margin-right:10rpx;
+}
+.couptsild{
+    margin-top:10rpx;
+}
+.itemname{
+    color:#ff6325;
+    padding:3rpx 20rpx;
+    border-radius:25rpx;
+    margin-right:20rpx;
+    background:#fef0f0
+}
+.couponmenuinfo{
+    position: relative;
+}
+.couponmenuinfo text{
+    position: absolute;
+    top:0;
+    left:0;
+    text-align: center;
+    line-height: 40rpx;
+    display: block
+}
+
+// 弹出框
+.mask{
+    width:750rpx;
+    // height:800rpx;
+    position:fixed;
+    left:0;
+    bottom:0;
+    z-index:40;
+    background:#fff;
+    border-top-left-radius: 15rpx;
+    border-top-right-radius: 15rpx;
+}
+.pink,.maskcouponlist,.couponinfo{
+    width:690rpx;
+    height:161rpx;
+}
+.masktitle{
+    font-weight: bold;
+    font-size:32rpx;
+    text-align: center;
+    padding:45rpx 0;
+}
+.maskitem{
+    color:#999;
+    padding:10rpx 0;
+}
+.maskinfo{
+    padding:0 20rpx;
+}
+.maskcoupon{
+    display: inline-block;
+    color:#ff6325;
+    padding:5rpx 20rpx;
+    border-radius: 25rpx;
+    background: #fed4d4;
+    margin-right:15rpx;
+    font-size:22rpx;
+}
+.maskdetail{
+    padding-bottom:30rpx;
+}
+.maskcouponlist{
+    position: relative;
+    margin:0 auto 15rpx;
+}
+.maskser{
+    position: absolute;
+    top:0;
+    left:0;
+    padding:32rpx 30rpx 25rpx 30rpx;
+    color:#f75364;
+    width:100%;
+}
+.maskprice span,.maskget{
+    font-size:32rpx;
+}
+.maskask{
+    font-size:22rpx;
+}
+.btnget{
+    width:690rpx;
+    height:72rpx;
+    color:#fff;
+    background: #ff6325;
+    text-align: center;
+    line-height: 72rpx;
+    margin:0 auto;
+    margin-top:220rpx;
+    border-radius:50rpx;
+}

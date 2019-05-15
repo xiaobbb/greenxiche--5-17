@@ -92,7 +92,7 @@
         <p class="pitem">订单编号：{{info.OrderNumber}}<span class="copy" @click="copy(info.OrderNumber)">复制</span></p>
         <p class="pitem">创建时间：{{info.AddTime}}</p>
         <div>
-           <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' ">支付时间：{{info.PayTime}}</p>
+           <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' || info.StatusId=='1'">支付时间：{{info.PayTime}}</p>
             <p class="pitem" v-if="info.StatusId=='13'">上门时间：{{info.FaHuoTime}}</p>
             <p class="pitem" v-if="info.StatusId=='13'">到店时间：{{info.FaHuoTime}}</p>
             <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' ">成交时间：{{info.CompleteTime}}</p>
