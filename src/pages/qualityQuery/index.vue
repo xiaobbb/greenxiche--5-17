@@ -26,7 +26,7 @@
             
         </div>
         <div class="result">验证结果：</div>
-        <div class="resultinfo white" v-show="checkInput">恭喜你！{{checkInput}}是正品</div>  
+        <div class="resultinfo white" v-show="checkInput">{{checkInput}}</div>  
       </div>
       <!--遮罩层-->
       <!-- <div class="mask-modal" v-if="isshow"></div>
@@ -62,7 +62,7 @@ import "../../css/global.css";
 export default {
    onShow(){
     this.setBarTitle();
-    this.checkInput=''
+      this.checkInput=''
   },
   data () {
     return {
@@ -88,7 +88,9 @@ export default {
           let result = await post("Server/SecurityCheckWarranty",{
             WarrantyNumber:this.inputTxt
           }).then(res=>{
-            this.checkInput =this.inputTxt;
+            this.checkInput =`恭喜你！${this.inputTxt}是正品！`
+          }).catch(err=>{
+            this.checkInput =`很遗憾！没有查询到${this.inputTxt}！`
           })
         }else{
             wx.showToast({

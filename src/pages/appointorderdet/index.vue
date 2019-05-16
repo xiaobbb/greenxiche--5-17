@@ -90,6 +90,7 @@
     <div class="orderinfo">
         <p class="infotitle">订单信息</p>
         <p class="pitem">订单编号：{{info.OrderNumber}}<span class="copy" @click="copy(info.OrderNumber)">复制</span></p>
+        <p class="pitem" v-if="info.WarrantyNumber">质保号：{{info.WarrantyNumber}}<span class="copy" @click="copy(info.WarrantyNumber)">复制</span></p>
         <p class="pitem">创建时间：{{info.AddTime}}</p>
         <div>
            <p class="pitem" v-if="info.StatusId=='13' || info.StatusId=='3' || info.StatusId=='1'">支付时间：{{info.PayTime}}</p>
